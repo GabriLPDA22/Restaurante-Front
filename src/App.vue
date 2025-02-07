@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
 import HeaderComponent from './components/HeaderComponent.vue';
 import FooterComponent from './components/FooterComponent.vue';
-import ContactPage from './views/ContactPage.vue';
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <HeaderComponent/>
-  <div>
-    <!-- <ContactPage/> -->
-  </div>
-  <FooterComponent/>
+  <HeaderComponent />
+  <router-view></router-view>
+  <FooterComponent />
 </template>
-
-<style scoped />
