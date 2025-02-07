@@ -30,7 +30,7 @@
 <style lang="scss" scoped>
 .home-view {
   &__hero {
-    background: url('@/assets/hero-background.jpg') no-repeat center center;
+    background: url('/src/assets/') no-repeat center center;
     background-size: cover;
     display: flex;
     flex-direction: column;
