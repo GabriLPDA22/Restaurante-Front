@@ -15,7 +15,7 @@
       </button>
       <button class="header__icon" aria-label="Cart">
         <i class="icon icon--cart"></i>
-        <span class="header__notification">1</span>
+        <span class="header__notification">4</span>
       </button>
       <button class="header__icon" aria-label="User Profile">
         <i class="icon icon--user"></i>
@@ -35,50 +35,48 @@ export default defineComponent({
 <style lang="scss" scoped>
 .header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background-color: #002c2c;
+  padding: 0.5rem 1rem;
+  background-color: #013031;
   color: #eaeaea;
   font-family: 'Arial', sans-serif;
 
-  &__info {
-    margin-bottom: 1rem;
-    text-align: center;
-  }
-
-  &__schedule {
+  .header__info {
+    flex: 1;
+    text-align: left;
     font-size: 0.875rem;
+    color: #eaeaea;
   }
 
-  &__icons {
+  .header__schedule {
+    margin: 0;
+  }
+
+  .header__icons {
     display: flex;
     gap: 1rem;
   }
 
-  &__icon {
+  .header__icon {
     background: none;
     border: none;
     cursor: pointer;
     position: relative;
+    color: #eaeaea;
+    font-size: 1.25rem;
 
     .icon {
       font-size: 1.5rem;
-      color: #eaeaea;
-
-      &--search {}
-      &--heart {}
-      &--cart {}
-      &--user {}
     }
   }
 
-  &__notification {
+  .header__notification {
     position: absolute;
     top: -0.5rem;
     right: -0.5rem;
     background-color: #d1a75f;
-    color: #002c2c;
+    color: #013031;
     font-size: 0.75rem;
     border-radius: 50%;
     width: 1.25rem;
@@ -92,14 +90,15 @@ export default defineComponent({
 
 @media (min-width: 768px) {
   .header {
-    flex-direction: row;
-    justify-content: space-between;
     padding: 1rem 2rem;
+  }
 
-    &__info {
-      margin-bottom: 0;
-      text-align: left;
-    }
+  .header__info {
+    font-size: 1rem;
+  }
+
+  .header__icon {
+    font-size: 1.5rem;
   }
 }
 </style>

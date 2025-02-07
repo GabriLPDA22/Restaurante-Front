@@ -1,0 +1,12 @@
+
+@use "sass:color";
+
+// _variables.scss
+$primary-color: #004d40; // Color principal
+$secondary-color: #d4af37; // Color secundario
+$text-color: #333; // Color de texto
+$background-color: #f9f9f9; // Color de fondo
+$font-size-base: 1rem; // Tamaño de fuente base
+
+// Breakpoints
+$breakpoint-md: 768px;

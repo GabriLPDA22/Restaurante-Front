@@ -1,0 +1,15 @@
+@use "sass:map";
+
+$breakpoints: (
+  md: 768px, // Definición para "md"
+);
+
+@mixin respond-to($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (min-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @error "Breakpoint #{$breakpoint} no está definido en $breakpoints.";
+  }
+}
