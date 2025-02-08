@@ -5,20 +5,6 @@
 <template>
   <main class="home-view">
     <section class="home-view__hero">
-      <nav class="home-view__nav">
-        <ul class="home-view__nav-list">
-          <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Menu</a></li>
-          <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Events</a></li>
-          <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">About Us</a></li>
-          <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Reservation</a></li>
-          <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Orders</a></li>
-          <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Contact Us</a></li>
-        </ul>
-      </nav>
-      <div class="home-view__logo">
-        <h1 class="home-view__brand">Partow Foods</h1>
-        <p class="home-view__tagline">Restaurant</p>
-      </div>
       <div class="home-view__content">
         <h1 class="home-view__title">Fresh Ingredients Sourced Globally</h1>
         <h2 class="home-view__subtitle">Italian Inspired Cuisine</h2>
