@@ -103,7 +103,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useHamburgerStore } from '@/stores/hamburger'; // Ajusta la ruta a tu store
+import { useHamburgerStore } from '@/stores/hamburger'; 
 
 export default defineComponent({
   name: 'HeaderComponent',
