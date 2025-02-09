@@ -9,7 +9,7 @@ export const useUsersStore = defineStore('users', () => {
     // users.value.push({ id: 1, name: 'John Doe' })
 
     function findAll(){
-        let data = [
+        const data = [
             {id: 1, name: 'John Doe'},
             {id: 2, name: 'Jane Doe'}
         ]
@@ -24,7 +24,7 @@ export const useUsersStore = defineStore('users', () => {
         users.value.push({id: 1, name: 'John Doe'})
     }
 
-    function update(user: any){
+    function update(users: any){
         return {id: 1, name: 'John Doe'}
     }
 
