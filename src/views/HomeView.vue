@@ -2,6 +2,7 @@
 // No specific logic required yet
 </script>
 
+
 <template>
   <main class="home-view">
     <section class="home-view__hero">
@@ -17,6 +18,7 @@
   </main>
 </template>
 
+
 <style lang="scss" scoped>
 .home-view {
   &__hero {
@@ -26,12 +28,16 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: 16px;
     min-height: 100vh;
     color: #f9efe6;
 
     @media (min-width: 768px) {
-      padding: 3rem 4rem;
+      padding: 32px 24px;
+    }
+
+    @media (min-width: 1024px) {
+      padding: 48px 64px;
     }
   }
 
@@ -39,17 +45,21 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 1rem;
+    margin-top: 12px;
 
     &-list {
       display: flex;
-      gap: 2rem;
+      gap: 16px;
       list-style: none;
       padding: 0;
       margin: 0;
 
       @media (min-width: 768px) {
-        gap: 3rem;
+        gap: 24px;
+      }
+
+      @media (min-width: 1024px) {
+        gap: 32px;
       }
     }
 
@@ -57,7 +67,7 @@
       text-decoration: none;
       color: #f9efe6;
       font-weight: 500;
-      font-size: 1rem;
+      font-size: 14px;
       transition: color 0.3s;
 
       &:hover {
@@ -65,79 +75,108 @@
       }
 
       @media (min-width: 768px) {
-        font-size: 1.125rem;
+        font-size: 16px;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 18px;
       }
     }
   }
 
   &__logo {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 24px;
 
     &__brand {
-      font-size: 2.5rem;
+      font-size: 24px;
       font-weight: 700;
       color: #d3b486;
-      margin-bottom: 0.5rem;
+      margin-bottom: 4px;
 
       @media (min-width: 768px) {
-        font-size: 3rem;
+        font-size: 32px;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 40px;
       }
     }
 
     &__tagline {
-      font-size: 1.125rem;
+      font-size: 14px;
       font-style: italic;
       color: #f9efe6;
 
       @media (min-width: 768px) {
-        font-size: 1.25rem;
+        font-size: 16px;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 18px;
       }
     }
   }
 
   &__content {
     text-align: center;
-    max-width: 700px;
-    margin-top: auto;
-    margin-bottom: auto;
+    max-width: 90%;
+    margin: auto;
 
     @media (min-width: 768px) {
+      max-width: 700px;
+    }
+
+    @media (min-width: 1024px) {
       max-width: 800px;
     }
   }
 
   &__title {
-    font-size: 2.5rem;
+    font-size: 24px;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 12px;
     color: #d3b486;
 
     @media (min-width: 768px) {
-      font-size: 3.5rem;
+      font-size: 32px;
+    }
+
+    @media (min-width: 1024px) {
+      font-size: 40px;
     }
   }
 
   &__subtitle {
-    font-size: 1.5rem;
+    font-size: 16px;
     font-weight: 400;
-    margin-bottom: 2.5rem;
+    margin-bottom: 24px;
 
     @media (min-width: 768px) {
-      font-size: 2rem;
+      font-size: 20px;
+    }
+
+    @media (min-width: 1024px) {
+      font-size: 24px;
     }
   }
 
   &__actions {
     display: flex;
-    gap: 1.5rem;
+    flex-direction: column;
+    gap: 12px;
     justify-content: center;
 
+    @media (min-width: 768px) {
+      flex-direction: row;
+      gap: 16px;
+    }
+
     &-button {
-      padding: 0.75rem 2.5rem;
-      font-size: 1rem;
+      padding: 10px 24px;
+      font-size: 14px;
       border: none;
-      border-radius: 0.5rem;
+      border-radius: 6px;
       cursor: pointer;
       text-transform: uppercase;
       font-weight: 600;
