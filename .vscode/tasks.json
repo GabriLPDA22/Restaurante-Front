@@ -1,28 +1,38 @@
 // .vscode/tasks.json
 {
-    "version": "2.0.0",
-    "tasks": [
-      {
-        // Tarea para npm install
-        "label": "npm: install",
-        "type": "npm",
-        "script": "install"
-      },
-      {
-        // Tarea para npm run dev
-        "label": "npm: dev",
-        "type": "npm",
-        "script": "dev",
-        // Esta tarea depende de "npm: install", así que se ejecutará primero "install"
-        "dependsOn": "npm: install"
-      },
-      {
-        // Tarea "auto-run" que depende de "npm: dev"
-        "label": "auto-run",
-        "runOptions": {
-          "runOn": "folderOpen"
-        },
-        "dependsOn": "npm: dev"
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // Tarea para generar package.json
+      "label": "npm: init",
+      "type": "shell",
+      "command": "npm init -y",
+      "group": {
+        "kind": "build",
+        "isDefault": true
       }
-    ]
-  }
+    },
+    {
+      // Tarea para npm install
+      "label": "npm: install",
+      "type": "npm",
+      "script": "install",
+      "dependsOn": "npm: init"
+    },
+    {
+      // Tarea para npm run dev
+      "label": "npm: dev",
+      "type": "npm",
+      "script": "dev",
+      "dependsOn": "npm: install"
+    },
+    {
+      // Tarea "auto-run" que depende de "npm: dev"
+      "label": "auto-run",
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "dependsOn": "npm: dev"
+    }
+  ]
+}
