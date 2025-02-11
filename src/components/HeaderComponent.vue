@@ -3,7 +3,7 @@
     <!-- BARRA MÓVIL -->
     <div class="header__mobile">
       <button class="header__burger" aria-label="Open Menu" @click="toggle">
-        <i class="fa fa-bars"></i>
+        <div>☰</div>
       </button>
 
       <div class="header__logo-mobile">
