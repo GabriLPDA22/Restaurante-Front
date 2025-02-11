@@ -8,11 +8,27 @@
       </button>
 
       <div class="header__logo-mobile">
-        <svg class="header__svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet">
-          <text x="50%" y="45%" text-anchor="middle" class="header__brand">
+        <!-- SVG "hecho a mano" sin etiqueta <style> interna, reducido a 200px -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 600 200"
+          preserveAspectRatio="xMidYMid meet"
+          style="width:200px;"
+        >
+          <text
+            x="50%"
+            y="50%"
+            text-anchor="middle"
+            style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;"
+          >
             PARTOW FOODS
           </text>
-          <text x="50%" y="65%" text-anchor="middle" class="header__tagline">
+          <text
+            x="50%"
+            y="75%"
+            text-anchor="middle"
+            style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;"
+          >
             RESTAURANT
           </text>
         </svg>
@@ -30,7 +46,7 @@
     </div>
 
     <!-- MENÚ DESPLEGABLE MÓVIL -->
-    <div :class="['header__mobile-menu', { 'active': isMenuOpen }]" @click="closeMenu">
+    <div :class="['header__mobile-menu', { active: isMenuOpen }]" @click="closeMenu">
       <nav class="header__nav" @click.stop>
         <ul>
           <li><a href="#" @click="closeMenu">Menu</a></li>
@@ -73,18 +89,41 @@
       <div class="header__container">
         <nav class="header__nav-left">
           <ul class="home-view__nav-list">
-            <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Menu</a></li>
-            <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Events</a></li>
-            <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">About Us</a></li>
+            <li class="home-view__nav-item">
+              <a href="#" class="home-view__nav-link">Menu</a>
+            </li>
+            <li class="home-view__nav-item">
+              <a href="#" class="home-view__nav-link">Events</a>
+            </li>
+            <li class="home-view__nav-item">
+              <a href="#" class="home-view__nav-link">About Us</a>
+            </li>
           </ul>
         </nav>
 
         <div class="header__logo">
-          <svg class="header__svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet" style="width:300px;">
-            <text x="50%" y="45%" text-anchor="middle" class="header__brand" style="font-size:70px;">
+          <svg
+            class="header__svg"
+            viewBox="0 0 600 200"
+            preserveAspectRatio="xMidYMid meet"
+            style="width:300px;"
+          >
+            <text
+              x="50%"
+              y="45%"
+              text-anchor="middle"
+              class="header__brand"
+              style="font-size:70px;"
+            >
               PARTOW FOODS
             </text>
-            <text x="50%" y="65%" text-anchor="middle" class="header__tagline" style="font-size:35px;">
+            <text
+              x="50%"
+              y="65%"
+              text-anchor="middle"
+              class="header__tagline"
+              style="font-size:35px;"
+            >
               RESTAURANT
             </text>
           </svg>
@@ -92,16 +131,21 @@
 
         <nav class="header__nav-right">
           <ul class="home-view__nav-list">
-            <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Reservation</a></li>
-            <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Orders</a></li>
-            <li class="home-view__nav-item"><a href="#" class="home-view__nav-link">Contact Us</a></li>
+            <li class="home-view__nav-item">
+              <a href="#" class="home-view__nav-link">Reservation</a>
+            </li>
+            <li class="home-view__nav-item">
+              <a href="#" class="home-view__nav-link">Orders</a>
+            </li>
+            <li class="home-view__nav-item">
+              <a href="#" class="home-view__nav-link">Contact Us</a>
+            </li>
           </ul>
         </nav>
       </div>
     </div>
   </header>
 </template>
-
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
@@ -113,6 +157,7 @@ export default defineComponent({
 
     const toggleMenu = () => {
       isMenuOpen.value = !isMenuOpen.value;
+      // Bloquea el scroll añadiendo la clase "no-scroll" en body y html
       document.body.classList.toggle('no-scroll', isMenuOpen.value);
       document.documentElement.classList.toggle('no-scroll', isMenuOpen.value);
     };
@@ -148,49 +193,43 @@ export default defineComponent({
   background-color: #000;
   padding: 0.75rem 1rem;
   z-index: 100;
+  position: relative;
 }
 
-/* Ícono hamburguesa y cierre */
 .header__burger {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 1.8rem;
   color: #d1a75f;
-  display: flex;
-  align-items: center;
-  z-index: 105;
-  transition: transform 0.3s ease-in-out;
+  position: relative;
+  z-index: 110;
 }
 
 .header__close {
   font-size: 2rem;
   color: #d1a75f;
+  position: relative;
+  z-index: 110;
 }
 
-/* Logo centrado */
 .header__logo-mobile {
   flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  position: relative;
+  z-index: 110;
 }
 
-.header__logo-mobile .header__svg {
-  width: 200px;
-  display: block;
-}
-
-/* Iconos a la derecha */
 .header__icons-mobile {
   display: flex;
   gap: 1rem;
   align-items: center;
-  z-index: 105;
+  z-index: 110;
 }
 
-/* Iconos circulares */
 .header__icon {
   background: #f5f2e9;
   width: 2.5rem;
@@ -202,14 +241,30 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-
-  i {
-    font-size: 1.2rem;
-    color: #0a403f;
-  }
 }
 
-/* MENÚ DESPLEGABLE ANIMADO */
+/* Estilos específicos para los iconos dentro de los botones */
+.header__icon i {
+  color: #000;  /* Color negro para los iconos */
+  font-size: 1rem;
+}
+
+.header__notification {
+  background: #d1a75f;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+}
+
 .header__mobile-menu {
   position: fixed;
   top: 0;
@@ -224,18 +279,16 @@ export default defineComponent({
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-  z-index: 90;
+  z-index: 99;
   pointer-events: none;
 }
 
-/* Cuando el menú está activo */
 .header__mobile-menu.active {
   opacity: 1;
   visibility: visible;
   pointer-events: all;
 }
 
-/* Lista del menú */
 .header__mobile-menu .header__nav ul {
   list-style: none;
   padding: 0;
@@ -259,12 +312,10 @@ export default defineComponent({
   }
 }
 
-/* Bloquear el scroll en todo el documento cuando el menú está abierto */
-body.no-scroll, html.no-scroll {
+/* Bloquea el scroll cuando el menú está abierto */
+body.no-scroll,
+html.no-scroll {
   overflow: hidden;
-  height: 100vh;
-  position: fixed;
-  width: 100%;
 }
 
 /* ================= DESKTOP (oculto en mobile) ================= */
@@ -273,7 +324,6 @@ body.no-scroll, html.no-scroll {
   display: none;
 }
 
-/* Barra superior (verde) */
 .header__top {
   background-color: #013031;
   padding: 0.75rem 0;
@@ -299,7 +349,6 @@ body.no-scroll, html.no-scroll {
   }
 }
 
-/* Barra inferior (negra) */
 .header__bottom {
   background-color: #000;
   padding: 1rem 0;
@@ -335,10 +384,8 @@ body.no-scroll, html.no-scroll {
     }
   }
 
-  /* Logo escritorio más grande */
   .header__logo .header__svg {
     width: 300px;
-    /* Ajusta para hacerlo más grande */
     display: block;
     margin: 0 auto;
   }
@@ -346,7 +393,6 @@ body.no-scroll, html.no-scroll {
   .header__brand {
     fill: #d1a75f;
     font-size: 42px;
-    /* Aún más grande */
     font-family: 'Times New Roman', serif;
     font-weight: 700;
   }
@@ -359,14 +405,11 @@ body.no-scroll, html.no-scroll {
   }
 }
 
-/* Media Query desktop */
 @media (min-width: 768px) {
-
   .header__mobile,
   .header__mobile-menu {
     display: none;
   }
-
   .header__top,
   .header__bottom {
     display: block;

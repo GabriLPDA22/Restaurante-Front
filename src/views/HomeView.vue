@@ -1,23 +1,47 @@
 <script setup lang="ts">
-// No specific logic required yet
-</script>
+import MenuCard from "@/components/MenuCard.vue";
+import ChefRecommendation from "@/components/ChefRecommendation.vue";
 
+const menuItems = [
+  { title: "Appetizers", image: "/src/assets/appetizers.jpg" },
+  { title: "Main Courses", image: "/src/assets/main-courses.jpg" },
+  { title: "Drinks", image: "/src/assets/drinks.jpg" },
+  { title: "Dessert", image: "/src/assets/dessert.jpg" },
+];
+
+const chefSpecial = {
+  title: "Risotto ai Funghi",
+  description:
+    "Creamy Arborio rice infused with a medley of wild mushrooms, Parmesan cheese, and a hint of truffle oil...",
+  price: "$24",
+  image: "/src/assets/chef-special.png",
+};
+</script>
 
 <template>
   <main class="home-view">
     <section class="home-view__hero">
       <div class="home-view__content">
-        <h1 class="home-view__title">Fresh Ingredients Sourced Globally</h1>
-        <h2 class="home-view__subtitle">Italian Inspired Cuisine</h2>
-        <div class="home-view__actions">
-          <button class="home-view__button home-view__button--reserve">Reserve Now</button>
-          <button class="home-view__button home-view__button--contact">Contact Us</button>
-        </div>
+        <p class="home-view__tagline">Fresh Ingredients Sourced Globally</p>
+        <h1 class="home-view__title">ITALIAN INSPIRED CUISINE</h1>
+      </div>
+      <div class="home-view__actions">
+        <button class="home-view__button home-view__button--reserve">Reserve Now</button>
+        <button class="home-view__button home-view__button--contact">Contact Us</button>
       </div>
     </section>
+
+    <section class="menu-section">
+      <h2 class="menu-section__title">View Our Menu</h2>
+      <div class="menu-section__grid">
+        <MenuCard v-for="item in menuItems" :key="item.title" :title="item.title" :image="item.image" />
+      </div>
+    </section>
+
+    <ChefRecommendation :title="chefSpecial.title" :description="chefSpecial.description" :price="chefSpecial.price"
+      :image="chefSpecial.image" />
   </main>
 </template>
-
 
 <style lang="scss" scoped>
 .home-view {
@@ -27,182 +51,145 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 16px;
+    justify-content: flex-start;
+    padding: 10vh 5vw;
     min-height: 100vh;
     color: #f9efe6;
+    text-align: center;
 
     @media (min-width: 768px) {
-      padding: 32px 24px;
-    }
-
-    @media (min-width: 1024px) {
-      padding: 48px 64px;
-    }
-  }
-
-  &__nav {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 12px;
-
-    &-list {
-      display: flex;
-      gap: 16px;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      @media (min-width: 768px) {
-        gap: 24px;
-      }
-
-      @media (min-width: 1024px) {
-        gap: 32px;
-      }
-    }
-
-    &-link {
-      text-decoration: none;
-      color: #f9efe6;
-      font-weight: 500;
-      font-size: 14px;
-      transition: color 0.3s;
-
-      &:hover {
-        color: #d3b486;
-      }
-
-      @media (min-width: 768px) {
-        font-size: 16px;
-      }
-
-      @media (min-width: 1024px) {
-        font-size: 18px;
-      }
-    }
-  }
-
-  &__logo {
-    text-align: center;
-    margin-bottom: 24px;
-
-    &__brand {
-      font-size: 24px;
-      font-weight: 700;
-      color: #d3b486;
-      margin-bottom: 4px;
-
-      @media (min-width: 768px) {
-        font-size: 32px;
-      }
-
-      @media (min-width: 1024px) {
-        font-size: 40px;
-      }
-    }
-
-    &__tagline {
-      font-size: 14px;
-      font-style: italic;
-      color: #f9efe6;
-
-      @media (min-width: 768px) {
-        font-size: 16px;
-      }
-
-      @media (min-width: 1024px) {
-        font-size: 18px;
-      }
+      padding: 13vh 10vw;
     }
   }
 
   &__content {
-    text-align: center;
     max-width: 90%;
-    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8vh;
 
     @media (min-width: 768px) {
-      max-width: 700px;
+      max-width: 600px;
     }
+  }
 
-    @media (min-width: 1024px) {
-      max-width: 800px;
+  &__tagline {
+    font-size: 4vw;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1vh;
+
+    @media (min-width: 768px) {
+      font-size: 1.5rem;
     }
   }
 
   &__title {
-    font-size: 24px;
+    font-size: 8vw;
     font-weight: 700;
-    margin-bottom: 12px;
+    text-transform: uppercase;
     color: #d3b486;
+    line-height: 1.1;
+    margin-bottom: 6vh;
 
     @media (min-width: 768px) {
-      font-size: 32px;
-    }
-
-    @media (min-width: 1024px) {
-      font-size: 40px;
-    }
-  }
-
-  &__subtitle {
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: 24px;
-
-    @media (min-width: 768px) {
-      font-size: 20px;
-    }
-
-    @media (min-width: 1024px) {
-      font-size: 24px;
+      font-size: 3rem;
     }
   }
 
   &__actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    justify-content: center;
+    width: 100%;
+    max-width: 280px;
+    gap: 24px;
+    margin-top: 10vh;
 
     @media (min-width: 768px) {
       flex-direction: row;
-      gap: 16px;
+      max-width: 100%;
+      justify-content: center;
+    }
+  }
+
+  &__button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-align: center;
+
+    &--reserve {
+      background-color: #d3b486;
+      color: #093035;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #bf9a22;
+      }
     }
 
-    &-button {
-      padding: 10px 24px;
-      font-size: 14px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      text-transform: uppercase;
-      font-weight: 600;
+    &--contact {
+      background-color: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+      transition: background-color 0.3s, color 0.3s;
 
-      &--reserve {
-        background-color: #d3b486;
+      &:hover {
+        background-color: #fff;
         color: #093035;
-        transition: background-color 0.3s;
-
-        &:hover {
-          background-color: #bf9a22;
-        }
-      }
-
-      &--contact {
-        background-color: transparent;
-        color: #fff;
-        border: 1px solid #fff;
-        transition: background-color 0.3s, color 0.3s;
-
-        &:hover {
-          background-color: #fff;
-          color: #093035;
-        }
       }
     }
   }
+}
+
+.menu-section {
+  text-align: center;
+  padding: 40px 16px;
+  background: #000;
+
+  &__title {
+    color: #d3b486;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    justify-content: center;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .chef-section {
+    text-align: center;
+    padding: 60px 20px;
+    background: #000;
+
+    &__title {
+      color: #d3b486;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 768px) {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      text-align: left;
+    }
+  }
+
 }
 </style>

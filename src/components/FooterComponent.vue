@@ -1,95 +1,66 @@
 <template>
   <footer class="footer">
     <div class="footer__top">
-      <h1 class="footer__title">RESTAURANT</h1>
-      <nav class="footer__nav">
-        <ul class="footer__menu">
-          <li class="footer__menu-item"><a href="#menu">Menu</a></li>
-          <li class="footer__menu-item"><a href="#events">Events</a></li>
-          <li class="footer__menu-item"><a href="#about-us">About US</a></li>
-          <li class="footer__menu-item"><a href="#reservation">Reservation</a></li>
-          <li class="footer__menu-item"><a href="#order">Order</a></li>
-          <li class="footer__menu-item"><a href="#contact-us">Contact us</a></li>
-        </ul>
-      </nav>
+      <h1 class="footer__title">PARTOW FOODS</h1>
+      <p class="footer__subtitle">RESTAURANT</p>
       <p class="footer__description">
         Lorem ipsum dolor sit amet consectetur. Sagittis mattis mauris at condimentum arcu eget. Sed posuere cursus
         pharetra tortor eu purus rhoncus lectus. Enim ut ligula sit nec donec. Hendrerit in.
       </p>
       <p class="footer__hours">
-        SUNDAY - THURSDAY: 11:30AM - 11PM | FRIDAY & SATURDAY: 11:30AM - 12AM
+        SUNDAY - THURSDAY: 11:30AM - 11PM <br />
+        FRIDAY & SATURDAY: 11:30AM - 12AM
       </p>
     </div>
     <div class="footer__bottom">
       <button class="footer__button footer__button--reserve">Reserve Now</button>
       <button class="footer__button footer__button--contact">Contact Us</button>
       <div class="footer__social">
-        <a href="#" class="footer__social-icon">🔗</a>
-        <a href="#" class="footer__social-icon">🔗</a>
+        <a href="#" class="footer__social-icon">📷</a>
+        <a href="#" class="footer__social-icon">📷</a>
       </div>
     </div>
     <p class="footer__copyright">COPYRIGHT 2024</p>
   </footer>
 </template>
 
-<script lang="js">
+<script lang="ts">
 export default {
-  name: 'Footer',
+  name: 'FooterComponent',
 };
 </script>
 
 <style lang="scss" scoped>
 .footer {
-  padding: 3rem 1rem;
+  padding: 2rem 1rem;
   background-color: #032b31;
   color: #f3d2a4;
   text-align: center;
   font-family: 'Arial', sans-serif;
 
   &__top {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
   &__title {
     font-size: 2rem;
-    letter-spacing: 0.2rem;
-    margin-bottom: 1.5rem;
     font-weight: bold;
   }
 
-  &__nav {
-    margin-bottom: 2rem;
-  }
-
-  &__menu {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-
-    &-item a {
-      text-decoration: none;
-      color: inherit;
-      font-size: 1rem;
-      font-weight: bold;
-      transition: color 0.3s;
-
-      &:hover {
-        color: #ffad33;
-      }
-    }
+  &__subtitle {
+    font-size: 1rem;
+    letter-spacing: 0.2rem;
+    margin-bottom: 1rem;
   }
 
   &__description {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     font-size: 1rem;
     line-height: 1.5;
   }
 
   &__hours {
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
     font-size: 1rem;
     font-weight: bold;
   }
@@ -98,12 +69,7 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
-
-    @media (min-width: 768px) {
-      flex-direction: row;
-      justify-content: center;
-    }
+    gap: 1rem;
   }
 
   &__button {
@@ -138,7 +104,8 @@ export default {
 
   &__social {
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
+    margin-top: 1rem;
 
     &-icon {
       font-size: 1.5rem;
@@ -152,7 +119,7 @@ export default {
   }
 
   &__copyright {
-    margin-top: 3rem;
+    margin-top: 2rem;
     font-size: 0.875rem;
     letter-spacing: 0.05rem;
   }
