@@ -2,8 +2,9 @@
   <header class="header">
     <!-- BARRA MÓVIL -->
     <div class="header__mobile">
-      <button class="header__burger" aria-label="Open Menu" @click="toggle">
-        <div>☰</div>
+      <button class="header__burger" aria-label="Toggle Menu" @click="toggleMenu">
+        <span v-if="!isMenuOpen">☰</span>
+        <span v-else class="header__close">✖</span>
       </button>
 
       <div class="header__logo-mobile">
@@ -28,16 +29,16 @@
       </div>
     </div>
 
-    <!-- MENÚ DESPLEGABLE MÓVIL: se muestra si hamburger.isOpen === true -->
-    <div v-if="hamburger.isOpen" class="header__mobile-menu">
-      <nav class="header__nav">
+    <!-- MENÚ DESPLEGABLE MÓVIL -->
+    <div :class="['header__mobile-menu', { 'active': isMenuOpen }]" @click="closeMenu">
+      <nav class="header__nav" @click.stop>
         <ul>
-          <li><a href="#" @click="hamburger.close">Menu</a></li>
-          <li><a href="#" @click="hamburger.close">Events</a></li>
-          <li><a href="#" @click="hamburger.close">About Us</a></li>
-          <li><a href="#" @click="hamburger.close">Reservation</a></li>
-          <li><a href="#" @click="hamburger.close">Orders</a></li>
-          <li><a href="#" @click="hamburger.close">Contact Us</a></li>
+          <li><a href="#" @click="closeMenu">Menu</a></li>
+          <li><a href="#" @click="closeMenu">Events</a></li>
+          <li><a href="#" @click="closeMenu">About Us</a></li>
+          <li><a href="#" @click="closeMenu">Reservation</a></li>
+          <li><a href="#" @click="closeMenu">Orders</a></li>
+          <li><a href="#" @click="closeMenu">Contact Us</a></li>
         </ul>
       </nav>
     </div>
@@ -103,23 +104,29 @@
 
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { useHamburgerStore } from '@/stores/hamburger'; 
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'HeaderComponent',
   setup() {
-    // Usamos el store de pinia
-    const hamburger = useHamburgerStore();
+    const isMenuOpen = ref(false);
 
-    // Podríamos exponer un atajo para togglear
-    const toggle = () => {
-      hamburger.toggle();
+    const toggleMenu = () => {
+      isMenuOpen.value = !isMenuOpen.value;
+      document.body.classList.toggle('no-scroll', isMenuOpen.value);
+      document.documentElement.classList.toggle('no-scroll', isMenuOpen.value);
+    };
+
+    const closeMenu = () => {
+      isMenuOpen.value = false;
+      document.body.classList.remove('no-scroll');
+      document.documentElement.classList.remove('no-scroll');
     };
 
     return {
-      hamburger,
-      toggle,
+      isMenuOpen,
+      toggleMenu,
+      closeMenu,
     };
   },
 });
@@ -136,33 +143,51 @@ export default defineComponent({
 /* ================= MOBILE ================= */
 .header__mobile {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   background-color: #000;
   padding: 0.75rem 1rem;
+  z-index: 100;
 }
 
-/* Ícono hamburguesa */
+/* Ícono hamburguesa y cierre */
 .header__burger {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+  color: #d1a75f;
+  display: flex;
+  align-items: center;
+  z-index: 105;
+  transition: transform 0.3s ease-in-out;
+}
+
+.header__close {
+  font-size: 2rem;
   color: #d1a75f;
 }
 
-/* Logo móvil más grande */
-.header__logo-mobile .header__svg {
-  width: 200px;
-  /* Ajusta el tamaño */
-  display: block;
-  margin: 0 auto;
+/* Logo centrado */
+.header__logo-mobile {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
-/* Iconos a la derecha en móvil */
+.header__logo-mobile .header__svg {
+  width: 200px;
+  display: block;
+}
+
+/* Iconos a la derecha */
 .header__icons-mobile {
   display: flex;
   gap: 1rem;
+  align-items: center;
+  z-index: 105;
 }
 
 /* Iconos circulares */
@@ -184,64 +209,62 @@ export default defineComponent({
   }
 }
 
-.header__notification {
-  position: absolute;
-  top: -0.2rem;
-  right: -0.2rem;
-  background-color: #d1a75f;
-  color: #013031;
-  font-size: 0.75rem;
-  border-radius: 50%;
-  width: 1.2rem;
-  height: 1.2rem;
+/* MENÚ DESPLEGABLE ANIMADO */
+.header__mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  z-index: 90;
+  pointer-events: none;
 }
 
-/* Tipos & colores SVG en móvil */
-.header__brand {
-  fill: #d1a75f;
-  font-size: 28px;
-  font-family: 'Times New Roman', serif;
-  font-weight: 700;
+/* Cuando el menú está activo */
+.header__mobile-menu.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
 }
 
-.header__tagline {
-  fill: #7a7a7a;
-  font-size: 16px;
-  letter-spacing: 0.1rem;
-  font-weight: 400;
-}
+/* Lista del menú */
+.header__mobile-menu .header__nav ul {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+  margin: 0;
 
-/* Menú desplegable en móvil */
-.header__mobile-menu {
-  background-color: #000;
-  padding: 1rem;
+  li {
+    margin-bottom: 1.5rem;
+  }
 
-  .header__nav {
-    ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
+  a {
+    color: #eaeaea;
+    font-size: 1.5rem;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
 
-      li {
-        margin-bottom: 0.75rem;
-
-        a {
-          color: #eaeaea;
-          text-decoration: none;
-          text-transform: uppercase;
-          font-weight: 600;
-
-          &:hover {
-            color: #d1a75f;
-          }
-        }
-      }
+    &:hover {
+      color: #d1a75f;
     }
   }
+}
+
+/* Bloquear el scroll en todo el documento cuando el menú está abierto */
+body.no-scroll, html.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+  position: fixed;
+  width: 100%;
 }
 
 /* ================= DESKTOP (oculto en mobile) ================= */
