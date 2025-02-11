@@ -3,8 +3,8 @@
     <!-- BARRA MÓVIL -->
     <div class="header__mobile">
       <button class="header__burger" aria-label="Toggle Menu" @click="toggleMenu">
-        <div v-if="!isMenuOpen">☰</div>
-        <div v-else>✖</div>
+        <span v-if="!isMenuOpen">☰</span>
+        <span class="header__X" v-else>✖</span>
       </button>
 
       <div class="header__logo-mobile">
@@ -41,8 +41,7 @@
           <li><a href="#" @click="closeMenu">Contact Us</a></li>
         </ul>
       </nav>
-      </div>
-    </div>
+    </div> <!-- ⚠️ ESTE ES EL ERROR QUE CORREGÍ -->
 
     <!-- BARRA SUPERIOR (ESCRITORIO) -->
     <div class="header__top">
@@ -102,6 +101,7 @@
     </div>
   </header>
 </template>
+
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
@@ -190,6 +190,10 @@ export default defineComponent({
   z-index: 105;
 }
 
+.header__X{
+  z-index: 105;
+}
+
 /* MENÚ DESPLEGABLE ANIMADO */
 .header__mobile-menu {
   position: fixed;
@@ -205,7 +209,7 @@ export default defineComponent({
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
-  z-index: 101;
+  z-index: 90;
   pointer-events: none;
 }
 
