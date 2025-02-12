@@ -151,9 +151,8 @@ const chefSpecial = {
 
 .menu-section {
   text-align: center;
-  padding: 40px 16px;
-  background: #000;
-
+  background: #000; 
+  padding-top: 40px;
   &__title {
     color: #d3b486;
     font-size: 1.8rem;
@@ -163,12 +162,13 @@ const chefSpecial = {
   &__grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+    justify-items: center;
     gap: 20px;
-    justify-content: center;
-
+    
     @media (min-width: 768px) {
       grid-template-columns: repeat(4, 1fr);
-    }
+    } 
   }
 
   .chef-section {

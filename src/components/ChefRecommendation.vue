@@ -11,7 +11,7 @@ defineProps({
   <section class="chef-recommendation">
     <h2 class="chef-recommendation__title">Today's <br /> Chef-Recommended <br /> Delight</h2>
     <div class="chef-recommendation__content">
-      <img :src="image" :alt="title" class="chef-recommendation__image" />
+      
       <div class="chef-recommendation__details">
         <div class="chef-recommendation__header">
           <h3 class="chef-recommendation__dish">{{ title }}</h3>
@@ -19,12 +19,13 @@ defineProps({
         </div>
         <div class="chef-recommendation__rating">⭐ ⭐ ⭐ ⭐ ⭐</div>
         <p class="chef-recommendation__description">{{ description }}</p>
-        <p class="chef-recommendation__signature">Bon Appétit!</p>
+        <p class="chef-recommendation__signature">Buon Appetito!</p>
         <div class="chef-recommendation__actions">
           <button class="chef-recommendation__button chef-recommendation__button--buy">Buy Now</button>
           <button class="chef-recommendation__button chef-recommendation__button--learn">Learn More</button>
         </div>
       </div>
+      <img :src="image" :alt="title" class="chef-recommendation__image" />
     </div>
   </section>
 </template>

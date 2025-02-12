@@ -17,7 +17,6 @@ defineProps({
 <style lang="scss" scoped>
 .menu-card {
   background: #000;
-  border-radius: 8px;
   overflow: hidden;
   text-align: center;
   color: #f9efe6;
@@ -25,10 +24,16 @@ defineProps({
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  width: 150px;
+  height: 200px;
+  @media (min-width: 768px) {
+      padding: 0px, 50px, 0px, 50px;
+      width: 300px;
+      height: 300px;
+    }
   &__image-wrapper {
     width: 100%;
-    height: 180px; /* Altura fija */
+    height: 100%;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -38,6 +43,7 @@ defineProps({
   &__image {
     width: 100%;
     height: 100%;
+    border-radius: 8px;
     object-fit: cover; /* Evita la distorsión */
   }
 
