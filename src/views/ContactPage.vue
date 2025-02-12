@@ -1,14 +1,12 @@
 <template>
     <div class="contact-page">
-        <contact-header />
-        <div class="contact-page__content">
-            <div class="contact-page__left">
-                <contact-form />
-                <contact-info />
-            </div>
-            <div class="contact-page__right">
-                <contact-map />
-            </div>
+        <div class="contact-page__left">
+            <contact-header />
+            <contact-form />
+            <contact-info />
+        </div>
+        <div class="contact-page__right">
+            <contact-map />
         </div>
     </div>
 </template>
@@ -32,29 +30,35 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/_mixins.scss";
-
 .contact-page {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 2rem;
-
-    &__content {
-        display: flex;
-        flex-direction: column;
-
-        @include respond-to(md) {
-            flex-direction: row;
-            gap: 2rem;
-        }
-    }
+    padding: 2rem 1rem;
+    max-width: 500px;
+    margin: 0 auto;
 
     &__left {
-        flex: 1;
+        width: 100%;
     }
 
     &__right {
-        flex: 1;
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+        max-width: 900px;
+        justify-content: space-between;
+
+        &__left {
+            width: 50%;
+        }
+
+        &__right {
+            width: 50%;
+        }
     }
 }
 </style>

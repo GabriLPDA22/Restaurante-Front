@@ -1,14 +1,7 @@
 <template>
     <div class="contact-map">
-        <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18..."
-            width="100%"
-            height="100%"
-            style="border:0;"
-            :allowfullscreen="true"
-            loading="lazy"
-            class="contact-map__iframe"
-        ></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18..." class="contact-map__iframe" allowfullscreen
+            loading="lazy"></iframe>
     </div>
 </template>
 
@@ -22,7 +15,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .contact-map {
-    height: 300px;
+    width: 100%;
+    height: 250px;
     border-radius: 0.5rem;
     overflow: hidden;
 

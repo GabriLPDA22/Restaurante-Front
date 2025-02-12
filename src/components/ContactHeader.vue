@@ -19,24 +19,24 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/styles/_variables.scss";
-
 .contact-header {
     text-align: center;
+    margin-bottom: 1.5rem;
 
     &__title {
-        font-size: 2rem;
+        font-size: 1.8rem;
         font-weight: bold;
+        margin-bottom: 0.5rem;
     }
 
     &__highlight {
-        color: $secondary-color;
+        color: #d4af37; // Dorado
     }
 
     &__description {
-        margin-top: 0.5rem;
         font-size: 1rem;
-        color: $text-color;
+        color: #333;
+        line-height: 1.6;
     }
 }
 </style>
