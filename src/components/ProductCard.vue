@@ -10,7 +10,10 @@
                 Creamy Arborio rice infused with a medley of wild mushrooms, Parmesan cheese, and a hint of truffle oil.
             </p>
             <div class="product-card__icons">
-                <font-awesome-icon :icon="['fas', 'bell']" class="product-card__icon" />
+                <transition name="icon-animation">
+                    <font-awesome-icon :icon="['fas', 'bell']" class="product-card__icon"
+                        :class="{ 'product-card__icon--active': isNotificationClicked }" @click="toggleNotification" />
+                </transition>
                 <font-awesome-icon :icon="['fas', 'heart']" class="product-card__icon"
                     :class="{ 'product-card__icon--active': isFavorite }" @click="toggleFavorite" />
             </div>
@@ -27,11 +30,20 @@ import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const isFavorite = ref(false);
+const isNotificationClicked = ref(false);
+const isClicked = ref(false);
 
 const toggleFavorite = () => {
     isFavorite.value = !isFavorite.value;
 };
+const toggleNotification = () => {
+    isNotificationClicked.value = !isNotificationClicked.value;
+};
+const handleClick = () => {
+    isClicked.value = true;
+};
 </script>
+
 
 <style lang="scss" scoped>
 .product-card {
