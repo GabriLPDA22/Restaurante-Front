@@ -20,11 +20,13 @@ import {
   faSearch, 
   faHeart, 
   faShoppingCart, 
-  faUser 
+  faUser, 
+  faBell, 
+  faStar 
 } from '@fortawesome/free-solid-svg-icons';
 
 /* Add Icons to the Library */
-library.add(faInstagram, faFacebook, faSearch, faHeart, faShoppingCart, faUser);
+library.add(faInstagram, faFacebook, faSearch, faHeart, faShoppingCart, faUser, faBell, faStar);
 
 /* Set the Default Style */
 config.familyDefault = "classic";

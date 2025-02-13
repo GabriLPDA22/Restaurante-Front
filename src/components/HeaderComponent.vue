@@ -26,11 +26,11 @@
 
       <div class="header__icons-mobile">
         <button class="header__icon" aria-label="Cart">
-          <i class="fa fa-shopping-cart"></i>
+          <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
           <span class="header__notification">4</span>
         </button>
         <button class="header__icon" aria-label="User">
-          <i class="fa fa-user"></i>
+          <font-awesome-icon :icon="['fas', 'user']" class="icon" />
         </button>
       </div>
     </div>
@@ -57,22 +57,23 @@
         </p>
         <div class="header__icons">
           <button class="header__icon" aria-label="Search">
-            <i class="fa fa-search"></i>
+            <font-awesome-icon :icon="['fas', 'search']" class="icon" />
           </button>
           <button class="header__icon" aria-label="Favorites">
-            <i class="fa fa-heart"></i>
+            <font-awesome-icon :icon="['fas', 'heart']" class="icon" />
             <span class="header__notification">2</span>
           </button>
           <button class="header__icon" aria-label="Cart">
-            <i class="fa fa-shopping-cart"></i>
+            <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
             <span class="header__notification">4</span>
           </button>
           <button class="header__icon" aria-label="User Profile">
-            <i class="fa fa-user"></i>
+            <font-awesome-icon :icon="['fas', 'user']" class="icon" />
           </button>
         </div>
       </div>
     </div>
+
 
     <!-- BARRA INFERIOR (ESCRITORIO) -->
     <div class="header__bottom">
@@ -217,9 +218,9 @@ export default defineComponent({
 }
 
 /* Estilos específicos para los iconos dentro de los botones */
-.header__icon i {
-  color: #000;
-  /* Color negro para los iconos */
+.header__icon i,
+.header__icon .icon {
+  color: #093B35; // Aplicando el color específico a los íconos
   font-size: 1rem;
 }
 
@@ -320,6 +321,16 @@ html.no-scroll {
   .header__icons {
     display: flex;
     gap: 1rem;
+  }
+
+  .header__icon .icon {
+    color: #093B35; // Aplicando el color a los íconos
+    font-size: 1.2rem;
+    transition: color 0.3s ease-in-out;
+  }
+
+  .header__icon:hover .icon {
+    color: #d1a75f; // Color en hover
   }
 }
 

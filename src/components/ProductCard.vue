@@ -10,12 +10,12 @@
                 Creamy Arborio rice infused with a medley of wild mushrooms, Parmesan cheese, and a hint of truffle oil.
             </p>
             <div class="product-card__icons">
-                <font-awesome-icon icon="fa-solid fa-info-circle" class="product-card__icon" @click="showInfo" />
-                <font-awesome-icon icon="fa-solid fa-heart" class="product-card__icon"
+                <font-awesome-icon :icon="['fas', 'bell']" class="product-card__icon" />
+                <font-awesome-icon :icon="['fas', 'heart']" class="product-card__icon"
                     :class="{ 'product-card__icon--active': isFavorite }" @click="toggleFavorite" />
             </div>
             <div class="product-card__rating">
-                <font-awesome-icon v-for="n in 5" :key="n" icon="fa-solid fa-star" class="star star--active" />
+                <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="star star--active" />
             </div>
             <button class="product-card__button">ORDER NOW</button>
         </div>
@@ -31,16 +31,12 @@ const isFavorite = ref(false);
 const toggleFavorite = () => {
     isFavorite.value = !isFavorite.value;
 };
-
-const showInfo = () => {
-    alert("Información sobre: Risotto ai Funghi");
-};
 </script>
 
 <style lang="scss" scoped>
 .product-card {
-    background: #ffffff;
-    border-radius: 16px;
+    background: #fef3c7;
+    border-radius: 12px;
     overflow: hidden;
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -53,6 +49,8 @@ const showInfo = () => {
 
     &__image {
         position: relative;
+        border-radius: 12px;
+        overflow: hidden;
 
         img {
             width: 100%;
@@ -66,9 +64,10 @@ const showInfo = () => {
         right: 10px;
         background: #064e3b;
         color: #fff;
-        padding: 8px;
+        padding: 6px 10px;
         border-radius: 50px;
         font-weight: bold;
+        font-size: 14px;
     }
 
     &__content {
@@ -76,24 +75,26 @@ const showInfo = () => {
     }
 
     &__title {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: bold;
+        color: #2d2d2d;
     }
 
     &__description {
         font-size: 14px;
         color: #666;
+        margin-bottom: 10px;
     }
 
     &__icons {
         display: flex;
         justify-content: center;
         gap: 10px;
-        margin: 10px 0;
+        margin-bottom: 10px;
     }
 
     &__icon {
-        font-size: 18px;
+        font-size: 20px;
         cursor: pointer;
         transition: color 0.3s;
 
@@ -103,8 +104,13 @@ const showInfo = () => {
     }
 
     &__rating {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-bottom: 10px;
+
         .star {
-            font-size: 20px;
+            font-size: 18px;
             color: #facc15;
         }
     }
@@ -115,9 +121,10 @@ const showInfo = () => {
         padding: 12px;
         width: 100%;
         border: none;
-        border-radius: 8px;
+        border-radius: 25px;
         font-weight: bold;
         cursor: pointer;
+        font-size: 16px;
         transition: background 0.3s;
 
         &:hover {

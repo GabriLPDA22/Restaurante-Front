@@ -15,7 +15,8 @@
     <div class="footer__bottom">
       <div class="footer__actions">
         <button class="footer__button footer__button--reserve">Reserve Now</button>
-        <button class="footer__button footer__button--contact">Contact Us</button>
+        <router-link to="/contact" class="footer__button footer__button--contact" style="text-decoration: none;">Contact
+          Us</router-link>
       </div>
       <div class="footer__social">
         <a href="https://www.facebook.com" class="footer__social-icon">
