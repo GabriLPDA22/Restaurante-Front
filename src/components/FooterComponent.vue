@@ -13,11 +13,17 @@
       </p>
     </div>
     <div class="footer__bottom">
-      <button class="footer__button footer__button--reserve">Reserve Now</button>
-      <button class="footer__button footer__button--contact">Contact Us</button>
+      <div class="footer__actions">
+        <button class="footer__button footer__button--reserve">Reserve Now</button>
+        <button class="footer__button footer__button--contact">Contact Us</button>
+      </div>
       <div class="footer__social">
-        <a href="#" class="footer__social-icon">📷</a>
-        <a href="#" class="footer__social-icon">📷</a>
+        <a href="https://www.facebook.com" class="footer__social-icon">
+          <font-awesome-icon :icon="['fab', 'facebook']" />
+        </a>
+        <a href="https://www.instagram.com" class="footer__social-icon">
+          <font-awesome-icon :icon="['fab', 'instagram']" />
+        </a>
       </div>
     </div>
     <p class="footer__copyright">COPYRIGHT 2024</p>
@@ -25,38 +31,46 @@
 </template>
 
 <script lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
 export default {
   name: 'FooterComponent',
+  components: {
+    FontAwesomeIcon
+  }
 };
 </script>
 
 <style lang="scss" scoped>
 .footer {
-  padding: 2rem 1rem;
+  padding: 3rem 2rem;
   background-color: #032b31;
   color: #f3d2a4;
   text-align: center;
   font-family: 'Arial', sans-serif;
 
   &__top {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
   }
 
   &__title {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: bold;
   }
 
   &__subtitle {
-    font-size: 1rem;
+    font-size: 1.2rem;
     letter-spacing: 0.2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   &__description {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     font-size: 1rem;
-    line-height: 1.5;
+    line-height: 1.6;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   &__hours {
@@ -69,12 +83,24 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 1.5rem;
+
+    @media (min-width: 1024px) {
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+    }
+  }
+
+  &__actions {
+    display: flex;
     gap: 1rem;
   }
 
   &__button {
     border: none;
-    padding: 1rem 2rem;
+    padding: 0.7rem 1.3rem;
     border-radius: 2rem;
     font-size: 1rem;
     cursor: pointer;
@@ -104,22 +130,23 @@ export default {
 
   &__social {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     margin-top: 1rem;
 
     &-icon {
-      font-size: 1.5rem;
-      color: inherit;
-      transition: color 0.3s;
+      font-size: 1.8rem;
+      color: #BF9A22;
+      transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
 
       &:hover {
         color: #ffad33;
+        transform: scale(1.1);
       }
     }
   }
 
   &__copyright {
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     font-size: 0.875rem;
     letter-spacing: 0.05rem;
   }

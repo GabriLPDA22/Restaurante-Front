@@ -8,30 +8,20 @@
       </button>
 
       <div class="header__logo-mobile">
-        <!-- SVG "hecho a mano" sin etiqueta <style> interna, reducido a 200px -->
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 600 200"
-          preserveAspectRatio="xMidYMid meet"
-          style="width:200px;"
-        >
-          <text
-            x="50%"
-            y="50%"
-            text-anchor="middle"
-            style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;"
-          >
-            PARTOW FOODS
-          </text>
-          <text
-            x="50%"
-            y="75%"
-            text-anchor="middle"
-            style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;"
-          >
-            RESTAURANT
-          </text>
-        </svg>
+        <router-link to="/" aria-label="Ir a la página de inicio">
+          <!-- SVG "hecho a mano" sin etiqueta <style> interna, reducido a 200px -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet"
+            style="width:200px;">
+            <text x="50%" y="50%" text-anchor="middle"
+              style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;">
+              PARTOW FOODS
+            </text>
+            <text x="50%" y="75%" text-anchor="middle"
+              style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;">
+              RESTAURANT
+            </text>
+          </svg>
+        </router-link>
       </div>
 
       <div class="header__icons-mobile">
@@ -49,12 +39,12 @@
     <div :class="['header__mobile-menu', { active: isMenuOpen }]" @click="closeMenu">
       <nav class="header__nav" @click.stop>
         <ul>
-          <li><a href="#" @click="closeMenu">Menu</a></li>
-          <li><a href="#" @click="closeMenu">Events</a></li>
-          <li><a href="#" @click="closeMenu">About Us</a></li>
-          <li><a href="#" @click="closeMenu">Reservation</a></li>
-          <li><a href="#" @click="closeMenu">Orders</a></li>
-          <li><a href="#" @click="closeMenu">Contact Us</a></li>
+          <li><router-link to="/menu" @click="closeMenu">Menu</router-link></li>
+          <li><router-link to="#" @click="closeMenu">Events</router-link></li>
+          <li><router-link to="#" @click="closeMenu">About Us</router-link></li>
+          <li><router-link to="#" @click="closeMenu">Reservation</router-link></li>
+          <li><router-link to="#" @click="closeMenu">Orders</router-link></li>
+          <li><router-link to="/contact" @click="closeMenu">Contact Us</router-link></li>
         </ul>
       </nav>
     </div>
@@ -102,28 +92,11 @@
         </nav>
 
         <div class="header__logo">
-          <svg
-            class="header__svg"
-            viewBox="0 0 600 200"
-            preserveAspectRatio="xMidYMid meet"
-            style="width:300px;"
-          >
-            <text
-              x="50%"
-              y="45%"
-              text-anchor="middle"
-              class="header__brand"
-              style="font-size:70px;"
-            >
+          <svg class="header__svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet" style="width:300px;">
+            <text x="50%" y="45%" text-anchor="middle" class="header__brand" style="font-size:70px;">
               PARTOW FOODS
             </text>
-            <text
-              x="50%"
-              y="65%"
-              text-anchor="middle"
-              class="header__tagline"
-              style="font-size:35px;"
-            >
+            <text x="50%" y="65%" text-anchor="middle" class="header__tagline" style="font-size:35px;">
               RESTAURANT
             </text>
           </svg>
@@ -138,7 +111,7 @@
               <a href="#" class="home-view__nav-link">Orders</a>
             </li>
             <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">Contact Us</a>
+              <router-link to="/contact" class="home-view__nav-link">Contact Us</router-link>
             </li>
           </ul>
         </nav>
@@ -245,7 +218,8 @@ export default defineComponent({
 
 /* Estilos específicos para los iconos dentro de los botones */
 .header__icon i {
-  color: #000;  /* Color negro para los iconos */
+  color: #000;
+  /* Color negro para los iconos */
   font-size: 1rem;
 }
 
@@ -406,10 +380,12 @@ html.no-scroll {
 }
 
 @media (min-width: 768px) {
+
   .header__mobile,
   .header__mobile-menu {
     display: none;
   }
+
   .header__top,
   .header__bottom {
     display: block;
