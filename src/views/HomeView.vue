@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import MenuCard from "@/components/MenuCard.vue";
 import ChefRecommendation from "@/components/ChefRecommendation.vue";
 
+const router = useRouter();
 const menuItems = [
   { title: "Appetizers", image: "/src/assets/appetizers.jpg" },
   { title: "Main Courses", image: "/src/assets/main-courses.jpg" },
@@ -16,6 +18,12 @@ const chefSpecial = {
   price: "$24",
   image: "/src/assets/chef-special.png",
 };
+
+const navigateToCategory = (category: string) => {
+  router.push({ name: 'menu', query: { category } });
+  window.scrollTo(0, 0);
+};
+
 </script>
 
 <template>
@@ -26,18 +34,19 @@ const chefSpecial = {
         <h1 class="home-view__title">ITALIAN INSPIRED CUISINE</h1>
       </div>
       <div class="home-view__actions">
-        <button class="home-view__button home-view__button--reserve">Reserve Now</button>
-        <button class="home-view__button home-view__button--contact">Contact Us</button>
+        <a href="/reserve" class="home-view__button home-view__button--reserve" style="text-decoration: none;">Reserve
+          Now</a>
+        <router-link to="/contact" class="home-view__button home-view__button--contact"
+          style="text-decoration: none;">Contact Us</router-link>
       </div>
     </section>
-
     <section class="menu-section">
       <h2 class="menu-section__title">View Our Menu</h2>
       <div class="menu-section__grid">
-        <MenuCard v-for="item in menuItems" :key="item.title" :title="item.title" :image="item.image" />
+        <MenuCard v-for="item in menuItems" :key="item.title" :title="item.title" :image="item.image"
+          @click="navigateToCategory(item.title)" />
       </div>
     </section>
-
     <ChefRecommendation :title="chefSpecial.title" :description="chefSpecial.description" :price="chefSpecial.price"
       :image="chefSpecial.image" />
   </main>
