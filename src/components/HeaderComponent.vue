@@ -29,9 +29,9 @@
           <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
           <span class="header__notification">4</span>
         </button>
-        <button class="header__icon" aria-label="User">
+        <router-link to="/login" class="header__icon" aria-label="User">
           <font-awesome-icon :icon="['fas', 'user']" class="icon" />
-        </button>
+        </router-link>
       </div>
     </div>
 
