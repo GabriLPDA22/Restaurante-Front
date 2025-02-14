@@ -8,17 +8,15 @@
         <button class="cart__details-cart" @click="addToCart(selectedProduct)">Añadir</button>
         <button class="cart__details-cart cart__details-cart--remove" @click="removeFromCart(selectedProduct)" v-if="cart[selectedProduct.id]">Quitar</button>
       </div>
-      <div class="cart__grid-wrapper">
-        <div class="cart__grid">
-          <div
-            v-for="product in products"
-            :key="product.id"
-            class="cart__item"
-            @click="selectProduct(product)"
-          >
-            <img :src="product.image" :alt="product.name" class="cart__image" />
-            <span v-if="cart[product.id]" class="cart__count">{{ cart[product.id] }}</span>
-          </div>
+      <div class="cart__grid">
+        <div
+          v-for="product in products"
+          :key="product.id"
+          class="cart__item"
+          @click="selectProduct(product)"
+        >
+          <img :src="product.image" :alt="product.name" class="cart__image" />
+          <span v-if="cart[product.id]" class="cart__count">{{ cart[product.id] }}</span>
         </div>
       </div>
     </div>
@@ -75,18 +73,12 @@
   
   <style lang="scss" scoped>
   .cart {
-    &__grid-wrapper {
-      max-height: 400px; // Ajustable según diseño
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 8px;
-    }
-  
     &__grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 16px;
       padding: 16px;
+      transition: transform 0.3s ease;
     }
   
     &__item {
