@@ -2,7 +2,6 @@
     <div class="menu">
         <CategoryCarousel :categories="categories" :selectedCategory="selectedCategory.toString()"
             @update:category="selectCategory" />
-
         <div class="menu__content">
             <ProductCard v-for="product in filteredProducts" :key="product.id" :image="product.image"
                 :price="product.price" :name="product.name" :description="product.description"
@@ -22,10 +21,14 @@ const route = useRoute();
 const selectedCategory = ref(route.query.category || categories.value[0]);
 
 const menuData = ref([
-    { id: 1, category: "Appetizers", name: "Bruschetta", price: 12, image: "image1.png", description: "Delicious Italian starter", rating: 5 },
-    { id: 2, category: "Main Courses", name: "Pasta Carbonara", price: 18, image: "image2.png", description: "Classic creamy pasta", rating: 4 },
-    { id: 3, category: "Drinks", name: "Mojito", price: 10, image: "image3.png", description: "Refreshing mint cocktail", rating: 5 },
-    { id: 4, category: "Dessert", name: "Tiramisu", price: 8, image: "image4.png", description: "Sweet Italian dessert", rating: 5 }
+    { id: 1, category: "Appetizers", name: "Fingers", price: 10, image: "src/assets/Fingers.png", description: "Deliciously crispy finger food, perfect for snacking and sharing.", rating: 4 },
+
+    { id: 2, category: "Main Courses", name: "Pasta Salad with Cherry Tomatoes", price: 15, image: "src/assets/EnsaladaPasta.png", description: "A light and refreshing pasta salad with juicy cherry tomatoes and a flavorful dressing.", rating: 3 },
+
+    { id: 3, category: "Drinks", name: "Citrus Cocktail", price: 8, image: "src/assets/CoctelCitrico.png", description: "A zesty and invigorating citrus cocktail, bursting with tangy flavors.", rating: 4 },
+
+    { id: 4, category: "Dessert", name: "Waffle with Whipped Cream, Blueberries, and Caramel Syrup", price: 12, image: "src/assets/Gofre.png", description: "A warm, golden waffle topped with fluffy whipped cream, fresh blueberries, and drizzled with rich caramel syrup.", rating: 5 }
+
 ]);
 
 const filteredProducts = computed(() => {
