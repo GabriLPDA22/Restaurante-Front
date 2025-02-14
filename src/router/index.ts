@@ -4,6 +4,7 @@ import UsersView from '@/views/UsersView.vue';
 import ContactPage from '../views/ContactPage.vue';
 import FoodDetail from '@/components/FoodDetail.vue';
 import ViewMenu from '../views/ViewMenu.vue';
+import AboutUs from '../views/AboutUs.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
       path: '/menu',
       name: 'menu',
       component: ViewMenu,
+    },
+    {
+      path: '/about',
+      name: 'AboutUs',
+      component: AboutUs,
     },
     {
       path: '/about',
