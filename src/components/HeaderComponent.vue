@@ -79,14 +79,12 @@
       <div class="cart-dropdown__items" v-if="cartStore.cart.length > 0">
         <div v-for="item in cartStore.cart" :key="item.id" class="cart-item">
           <img :src="item.image" :alt="item.name" class="cart-item__image" />
-          <div class="cart-item__details">
-            <p class="cart-item__name">{{ item.name }}</p>
-            <p class="cart-item__price">${{ item.price }} x {{ item.quantity }}</p>
-            <div class="cart-item__actions">
-              <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity - 1)">-</button>
-              <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity + 1)">+</button>
-              <button class="cart-button cart-button--delete" @click="cartStore.removeFromCart(item.id)">🗑️</button>
-            </div>
+          <p class="cart-item__name">{{ item.name }}</p>
+          <p class="cart-item__price">${{ item.price }} x {{ item.quantity }}</p>
+          <div class="cart-item__actions">
+            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity - 1)">-</button>
+            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity + 1)">+</button>
+            <button class="cart-button cart-button--delete" @click="cartStore.removeFromCart(item.id)">🗑️</button>
           </div>
         </div>
       </div>
@@ -457,21 +455,20 @@ html.no-scroll {
   padding: 8px;
   border-bottom: 1px solid #d1a75f;
   width: 100%;
+  justify-content: space-between;
 }
 
 .cart-item__image {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
   border-radius: 5px;
 }
 
-.cart-item__details {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+.cart-item__name, .cart-item__price {
   font-size: 14px;
   color: #2d2d2d;
+  margin: 0;
 }
 
 .cart-item__actions {
