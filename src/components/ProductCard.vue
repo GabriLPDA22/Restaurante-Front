@@ -1,13 +1,13 @@
 <template>
     <div class="product-card">
         <div class="product-card__image">
-            <img src="@/assets/RisottoaiFunghi.png" alt="Risotto ai Funghi" />
-            <div class="product-card__price">$24</div>
+            <img :src="image" :alt="name" />
+            <div class="product-card__price">${{ price }}</div>
         </div>
         <div class="product-card__content">
-            <h3 class="product-card__title">Risotto ai Funghi</h3>
+            <h3 class="product-card__title">{{ name }}</h3>
             <p class="product-card__description">
-                Creamy Arborio rice infused with a medley of wild mushrooms, Parmesan cheese, and a hint of truffle oil.
+                {{ description }}
             </p>
             <div class="product-card__icons">
                 <font-awesome-icon :icon="['fas', 'bell']" class="product-card__icon" />
@@ -15,7 +15,7 @@
                     :class="{ 'product-card__icon--active': isFavorite }" @click="toggleFavorite" />
             </div>
             <div class="product-card__rating">
-                <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="star star--active" />
+                <font-awesome-icon v-for="n in rating" :key="n" :icon="['fas', 'star']" class="star star--active" />
             </div>
             <button class="product-card__button">ORDER NOW</button>
         </div>
@@ -23,8 +23,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, defineProps } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+const props = defineProps<{
+    image: string;
+    price: number;
+    name: string;
+    description: string;
+    rating: number;
+}>();
 
 const isFavorite = ref(false);
 
@@ -42,6 +50,10 @@ const toggleFavorite = () => {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 16px;
     transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column; // Distribuye el contenido verticalmente
+    justify-content: space-between; // Asegura que los elementos se distribuyan bien
+    height: 100%; // Todas las tarjetas tendrán la misma altura
 
     &:hover {
         transform: scale(1.05);
@@ -51,9 +63,13 @@ const toggleFavorite = () => {
         position: relative;
         border-radius: 12px;
         overflow: hidden;
+        width: 100%;
+        height: 200px;
 
         img {
             width: 100%;
+            height: 100%;
+            object-fit: cover;
             border-radius: 12px;
         }
     }
@@ -71,6 +87,10 @@ const toggleFavorite = () => {
     }
 
     &__content {
+        flex-grow: 1; // Permite que la descripción ocupe espacio sin empujar los otros elementos
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; // Mantiene el botón e íconos en la parte inferior
         padding: 16px;
     }
 
@@ -84,6 +104,18 @@ const toggleFavorite = () => {
         font-size: 14px;
         color: #666;
         margin-bottom: 10px;
+        min-height: 60px; // Asegura que todas las descripciones tengan la misma altura mínima
+        max-height: 80px; // Evita que las descripciones sean demasiado largas
+        overflow: hidden; // Oculta el texto que exceda la altura máxima
+        text-overflow: ellipsis; // Muestra "..." si el texto es muy largo
+        display: -webkit-box;
+        -webkit-line-clamp: 3; // Limita la descripción a 3 líneas
+        -webkit-box-orient: vertical;
+    }
+
+    &__bottom {
+        margin-top: auto; // Empuja estos elementos a la parte inferior
+        padding-top: 10px;
     }
 
     &__icons {
