@@ -1,8 +1,10 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
+
 import App from './App.vue';
 import router from './router';
+import GoogleLoginPlugin from 'vue3-google-login';
 
 /* Import FontAwesome Core */
 import { library, config } from '@fortawesome/fontawesome-svg-core';
@@ -44,6 +46,10 @@ const vuetify = createVuetify({
 });
 
 const app = createApp(App);
+
+app.use(GoogleLoginPlugin, {
+  clientId: "812430762080-ktkqmivkpjo15cnid2ch4dd217r04v4l.apps.googleusercontent.com"
+});
 
 app.component('font-awesome-icon', FontAwesomeIcon);
 app.use(createPinia());

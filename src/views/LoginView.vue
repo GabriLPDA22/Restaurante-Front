@@ -10,46 +10,52 @@
                 <div class="input-group">
                     <input v-model="email" type="email" class="input-group__field" placeholder="Email" required />
                 </div>
-
                 <div class="input-group">
                     <input v-model="password" type="password" class="input-group__field" placeholder="Password"
                         required />
                 </div>
-
-                <div class="auth__options">
-                    <a href="#" class="auth__link">Forgot Password?</a>
-                </div>
-
                 <button class="auth__button">Login</button>
             </form>
 
             <div class="auth__divider">Or Login with</div>
 
-            <button class="auth__google-button" @click="loginWithGoogle">
-                <img :src="googleIcon" alt="Google Logo" class="auth__google-image">
+            <!-- Botón personalizado para abrir la ventana emergente de Google -->
+            <button class="auth__google-button" @click="onGoogleLoginClick">
+                <img :src="googleIcon" alt="Google Logo" class="auth__google-image" />
                 Continue with Google
             </button>
 
             <p class="auth__footer">
-                You don’t have an account? <router-link to="/register" class="auth__link">Sign up</router-link>
+                You don’t have an account?
+                <router-link to="/register" class="auth__link">Sign up</router-link>
             </p>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import googleIcon from '@/assets/google.png';
+import { useAuthStore } from '@/stores/authStore';
 
+const authStore = useAuthStore();
 const email = ref('');
 const password = ref('');
 
+// Inicializamos Google cuando se monta el componente
+onMounted(() => {
+    authStore.initializeGoogleAuth();
+});
+
+// Acción al hacer submit del form
 const handleLogin = () => {
     console.log('Logging in with', email.value, password.value);
 };
 
-const loginWithGoogle = () => {
-    console.log('Logging in with Google');
+
+const onGoogleLoginClick = () => {
+    // Llamamos a la función que abre la ventana emergente de Google
+    authStore.triggerGooglePrompt();
 };
 </script>
 

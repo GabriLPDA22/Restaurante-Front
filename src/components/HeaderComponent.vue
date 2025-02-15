@@ -29,7 +29,20 @@
           <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
           <span class="header__notification">4</span>
         </button>
-        <router-link to="/login" class="header__icon" aria-label="User">
+
+        <!-- 🔥 Si el usuario está autenticado, mostrar su foto y menú desplegable -->
+        <div class="header__user-dropdown" v-if="authStore.user">
+          <img :src="(authStore.user as any).PictureUrl" alt="User Avatar" class="header__avatar"
+            @click="toggleDropdown" />
+          <div class="header__dropdown-menu" v-if="isDropdownOpen">
+            <p>{{ (authStore.user as any).Nombre }}</p>
+            <p>{{ (authStore.user as any).Correo }}</p>
+            <button @click="authStore.logout">Logout</button>
+          </div>
+        </div>
+
+        <!-- 🔥 Si NO está autenticado, mostrar el icono normal y redirigir a /login -->
+        <router-link v-else to="/login" class="header__icon" aria-label="User">
           <font-awesome-icon :icon="['fas', 'user']" class="icon" />
         </router-link>
       </div>
@@ -122,16 +135,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
+import { useAuthStore } from '../stores/authStore';
 
 export default defineComponent({
   name: 'HeaderComponent',
   setup() {
+    const authStore = useAuthStore();
     const isMenuOpen = ref(false);
+    const isDropdownOpen = ref(false);
 
     const toggleMenu = () => {
       isMenuOpen.value = !isMenuOpen.value;
-      // Bloquea el scroll añadiendo la clase "no-scroll" en body y html
       document.body.classList.toggle('no-scroll', isMenuOpen.value);
       document.documentElement.classList.toggle('no-scroll', isMenuOpen.value);
     };
@@ -142,14 +157,26 @@ export default defineComponent({
       document.documentElement.classList.remove('no-scroll');
     };
 
+    const toggleDropdown = () => {
+      isDropdownOpen.value = !isDropdownOpen.value;
+    };
+
+    onMounted(() => {
+      authStore.fetchUserFromDB();
+    });
+
     return {
+      authStore,
       isMenuOpen,
       toggleMenu,
       closeMenu,
+      isDropdownOpen,
+      toggleDropdown
     };
   },
 });
 </script>
+
 
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
@@ -168,6 +195,22 @@ export default defineComponent({
   padding: 0.75rem 1rem;
   z-index: 100;
   position: relative;
+}
+
+.header__user {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 50%;
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
+}
+
+.header__avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 .header__burger {
