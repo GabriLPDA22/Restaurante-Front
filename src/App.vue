@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import HeaderComponent from "./components/HeaderComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
-import { useAuthStore } from "@/stores/authStore";
+import { useGoogleAuthStore } from "@/stores/useGoogleAuthStore";
 import { onMounted } from "vue";
 
-const authStore = useAuthStore();
+const authStore = useGoogleAuthStore();
 
 // ✅ Función para cargar el script de Google dinámicamente
 const loadGoogleScript = () => {

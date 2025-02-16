@@ -8,16 +8,23 @@
 
             <form @submit.prevent="handleSubmit" class="auth__form">
                 <div class="input-group">
+                    <input v-model="form.nombre" type="text" class="input-group__field" placeholder="Full Name"
+                        required />
+                </div>
+                <div class="input-group">
                     <input v-model="form.email" type="email" class="input-group__field" placeholder="Email" required />
                 </div>
                 <div class="input-group">
-                    <input v-model="form.password" type="password" class="input-group__field" placeholder="Password" required />
+                    <input v-model="form.password" type="password" class="input-group__field" placeholder="Password"
+                        required />
                 </div>
                 <div class="input-group">
-                    <input v-model="form.confirmPassword" type="password" class="input-group__field" placeholder="Confirm Password" required />
+                    <input v-model="form.confirmPassword" type="password" class="input-group__field"
+                        placeholder="Confirm Password" required />
                 </div>
                 <button class="auth__button">Register</button>
             </form>
+
             <p class="auth__toggle">
                 Already have an account? <router-link to="/login" class="auth__link">Login</router-link>
             </p>
@@ -27,17 +34,27 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useAuthStore } from '@/stores/useAuthStore';
 
-const form = ref({ email: '', password: '', confirmPassword: '' });
+const authStore = useAuthStore();
 
-const handleSubmit = () => {
+const form = ref({ nombre: '', email: '', password: '', confirmPassword: '' });
+
+const handleSubmit = async () => {
     if (form.value.password !== form.value.confirmPassword) {
         alert('Passwords do not match!');
         return;
     }
-    console.log('Registering with', form.value);
+
+    try {
+        await authStore.register(form.value.nombre, form.value.email, form.value.password);
+    } catch (error) {
+        console.error('Error en el registro:', error);
+    }
 };
+
 </script>
+
 
 <style lang="scss" scoped>
 .auth {

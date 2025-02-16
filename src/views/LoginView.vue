@@ -1,7 +1,9 @@
 <template>
     <div class="auth">
         <div class="auth__container">
-            <h2 class="auth__title">Login <span class="auth__icon">👤</span></h2>
+            <h2 class="auth__title">
+                Login <span class="auth__icon">👤</span>
+            </h2>
             <p class="auth__subtitle">Welcome back, User</p>
 
             <h3 class="auth__heading">Enter Your Details</h3>
@@ -19,7 +21,6 @@
 
             <div class="auth__divider">Or Login with</div>
 
-            <!-- Botón personalizado para abrir la ventana emergente de Google -->
             <button class="auth__google-button" @click="onGoogleLoginClick">
                 <img :src="googleIcon" alt="Google Logo" class="auth__google-image" />
                 Continue with Google
@@ -36,28 +37,35 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import googleIcon from '@/assets/google.png';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useGoogleAuthStore } from '@/stores/useGoogleAuthStore';
 
-const authStore = useAuthStore();
+const authStore = useAuthStore(); // Store para login normal
+const googleAuthStore = useGoogleAuthStore(); // Store para login con Google
+
 const email = ref('');
 const password = ref('');
 
 // Inicializamos Google cuando se monta el componente
 onMounted(() => {
-    authStore.initializeGoogleAuth();
+    googleAuthStore.initializeGoogleAuth();
 });
 
-// Acción al hacer submit del form
-const handleLogin = () => {
-    console.log('Logging in with', email.value, password.value);
+// Login con email y contraseña
+const handleLogin = async () => {
+    try {
+        await authStore.login(email.value, password.value);
+    } catch (error) {
+        console.error('Error en el login:', error);
+    }
 };
 
-
+// Login con Google
 const onGoogleLoginClick = () => {
-    // Llamamos a la función que abre la ventana emergente de Google
-    authStore.triggerGooglePrompt();
+    googleAuthStore.triggerGooglePrompt();
 };
 </script>
+
 
 <style lang="scss" scoped>
 .auth {

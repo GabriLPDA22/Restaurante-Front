@@ -30,14 +30,13 @@
           <span class="header__notification">4</span>
         </button>
 
-        <!-- 🔥 Si el usuario está autenticado, mostrar su foto y menú desplegable -->
-        <div class="header__user-dropdown" v-if="authStore.user">
-          <img :src="(authStore.user as any).PictureUrl" alt="User Avatar" class="header__avatar"
-            @click="toggleDropdown" />
+        <!-- 🔥 Si el usuario está autenticado, mostrar su foto o icono de usuario -->
+        <div class="header__user-dropdown" v-if="isAuthenticated">
+          <img :src="userImage" alt="User Avatar" class="header__avatar" @click="toggleDropdown" />
           <div class="header__dropdown-menu" v-if="isDropdownOpen">
-            <p>{{ (authStore.user as any).Nombre }}</p>
-            <p>{{ (authStore.user as any).Correo }}</p>
-            <button @click="authStore.logout">Logout</button>
+            <p>{{ currentUser?.Nombre }}</p>
+            <p>{{ currentUser?.Correo }}</p>
+            <button @click="handleLogout">Logout</button>
           </div>
         </div>
 
@@ -134,48 +133,54 @@
   </header>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
-import { useAuthStore } from '../stores/authStore';
+<script setup lang="ts">
+import { computed, ref, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useGoogleAuthStore } from '@/stores/useGoogleAuthStore';
 
-export default defineComponent({
-  name: 'HeaderComponent',
-  setup() {
-    const authStore = useAuthStore();
-    const isMenuOpen = ref(false);
-    const isDropdownOpen = ref(false);
+const authStore = useAuthStore();
+const googleAuthStore = useGoogleAuthStore();
+const isMenuOpen = ref(false);
+const isDropdownOpen = ref(false);
 
-    const toggleMenu = () => {
-      isMenuOpen.value = !isMenuOpen.value;
-      document.body.classList.toggle('no-scroll', isMenuOpen.value);
-      document.documentElement.classList.toggle('no-scroll', isMenuOpen.value);
-    };
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
 
-    const closeMenu = () => {
-      isMenuOpen.value = false;
-      document.body.classList.remove('no-scroll');
-      document.documentElement.classList.remove('no-scroll');
-    };
+const closeMenu = () => {
+  isMenuOpen.value = false;
+};
 
-    const toggleDropdown = () => {
-      isDropdownOpen.value = !isDropdownOpen.value;
-    };
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
 
-    onMounted(() => {
-      authStore.fetchUserFromDB();
-    });
+const isAuthenticated = computed(() => !!authStore.user || !!googleAuthStore.user);
 
-    return {
-      authStore,
-      isMenuOpen,
-      toggleMenu,
-      closeMenu,
-      isDropdownOpen,
-      toggleDropdown
-    };
-  },
+interface IUser {
+  Nombre?: string;
+  Correo?: string;
+  PictureUrl?: string;
+}
+
+const currentUser = computed<IUser | null>(() => {
+  return (authStore.user || googleAuthStore.user) as IUser | null;
 });
+
+const userImage = computed(() => {
+  return currentUser.value?.PictureUrl || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+});
+
+onMounted(() => {
+  authStore.fetchUserFromDB();
+});
+
+const handleLogout = () => {
+  authStore.logout();
+  googleAuthStore.logout();
+};
 </script>
+
 
 
 <style lang="scss" scoped>
