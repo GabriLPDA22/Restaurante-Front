@@ -23,7 +23,9 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem("user", JSON.stringify(data));
       localStorage.setItem("token", token.value ?? "");
       
-      router.push("/");
+      // Después del redirect, hacer scroll al top
+      await router.push("/");
+      window.scrollTo(0, 0);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error("Failed to fetch user", error.response?.data?.message || error.message);
@@ -44,7 +46,8 @@ export const useAuthStore = defineStore('auth', () => {
         password
       });
       console.log("User registered successfully:", data);
-      router.push("/login");
+      await router.push("/login");
+      window.scrollTo(0, 0);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Registration failed:", error.response?.data?.message || "Unknown error");
@@ -61,7 +64,6 @@ export const useAuthStore = defineStore('auth', () => {
         console.warn("No token found, user is not authenticated.");
         return;
       }
-      // Ajustamos la ruta a /api/user/me según el UserController del backend
       const { data } = await axios.get("http://localhost:5021/api/user/me", {
         headers: { Authorization: `Bearer ${token.value}` },
         withCredentials: true,
@@ -94,11 +96,14 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null;
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    router.push("/login");
+    router.push("/login").then(() => window.scrollTo(0, 0));
   };
 
   onMounted(() => {
     loadUser();
+    if (token.value) {
+      fetchUserFromDB();
+    }
   });
 
   return {

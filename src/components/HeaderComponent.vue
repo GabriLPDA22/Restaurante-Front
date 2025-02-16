@@ -10,14 +10,26 @@
       <div class="header__logo-mobile">
         <router-link to="/" aria-label="Ir a la página de inicio">
           <!-- SVG "hecho a mano" sin etiqueta <style> interna, reducido a 200px -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet"
-            style="width:200px;">
-            <text x="50%" y="50%" text-anchor="middle"
-              style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 600 200"
+            preserveAspectRatio="xMidYMid meet"
+            style="width:200px;"
+          >
+            <text
+              x="50%"
+              y="50%"
+              text-anchor="middle"
+              style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;"
+            >
               PARTOW FOODS
             </text>
-            <text x="50%" y="75%" text-anchor="middle"
-              style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;">
+            <text
+              x="50%"
+              y="75%"
+              text-anchor="middle"
+              style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;"
+            >
               RESTAURANT
             </text>
           </svg>
@@ -30,17 +42,35 @@
           <span class="header__notification">4</span>
         </button>
 
-        <!-- 🔥 Si el usuario está autenticado, mostrar su foto o icono de usuario -->
+        <!-- 🔥 Dropdown del usuario si está autenticado -->
         <div class="header__user-dropdown" v-if="isAuthenticated">
-          <img :src="userImage" alt="User Avatar" class="header__avatar" @click="toggleDropdown" />
-          <div class="header__dropdown-menu" v-if="isDropdownOpen">
-            <p>{{ currentUser?.Nombre }}</p>
-            <p>{{ currentUser?.Correo }}</p>
-            <button @click="handleLogout">Logout</button>
+          <!-- Contenedor que muestra el avatar y el nombre, y abre/cierra el menú -->
+          <div class="header__avatar-container" @click="toggleDropdown">
+            <img :src="userImage" alt="User Avatar" class="header__avatar" />
+            <span class="header__avatar-name">{{ currentUser?.Nombre }}</span>
+            <i class="fa fa-chevron-down header__avatar-icon"></i>
           </div>
+
+          <!-- Menú desplegable con transición "fade" -->
+          <transition name="fade">
+            <div class="header__dropdown-menu" v-if="isDropdownOpen">
+              <p class="header__dropdown-name">{{ currentUser?.Nombre }}</p>
+              <p class="header__dropdown-email">{{ currentUser?.Correo }}</p>
+
+              <!-- Botón de Logout con Vuetify, estilizado con clase logout-btn -->
+              <v-btn
+                @click="handleLogout"
+                elevation="2"
+                rounded
+                class="logout-btn"
+              >
+                Logout
+              </v-btn>
+            </div>
+          </transition>
         </div>
 
-        <!-- 🔥 Si NO está autenticado, mostrar el icono normal y redirigir a /login -->
+        <!-- 🔥 Si NO está autenticado, icono normal que redirige a /login -->
         <router-link v-else to="/login" class="header__icon" aria-label="User">
           <font-awesome-icon :icon="['fas', 'user']" class="icon" />
         </router-link>
@@ -86,7 +116,6 @@
       </div>
     </div>
 
-
     <!-- BARRA INFERIOR (ESCRITORIO) -->
     <div class="header__bottom">
       <div class="header__container">
@@ -105,7 +134,12 @@
         </nav>
 
         <div class="header__logo">
-          <svg class="header__svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet" style="width:300px;">
+          <svg
+            class="header__svg"
+            viewBox="0 0 600 200"
+            preserveAspectRatio="xMidYMid meet"
+            style="width:300px;"
+          >
             <text x="50%" y="45%" text-anchor="middle" class="header__brand" style="font-size:70px;">
               PARTOW FOODS
             </text>
@@ -138,23 +172,28 @@ import { computed, ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useGoogleAuthStore } from '@/stores/useGoogleAuthStore';
 
+// Importa Vuetify para el <v-btn>
+import { VBtn } from 'vuetify/components';
+
 const authStore = useAuthStore();
 const googleAuthStore = useGoogleAuthStore();
+
 const isMenuOpen = ref(false);
 const isDropdownOpen = ref(false);
 
-const toggleMenu = () => {
+function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value;
-};
+}
 
-const closeMenu = () => {
+function closeMenu() {
   isMenuOpen.value = false;
-};
+}
 
-const toggleDropdown = () => {
+function toggleDropdown() {
   isDropdownOpen.value = !isDropdownOpen.value;
-};
+}
 
+// Usuario autenticado (ya sea con AuthStore o GoogleAuthStore)
 const isAuthenticated = computed(() => !!authStore.user || !!googleAuthStore.user);
 
 interface IUser {
@@ -163,25 +202,28 @@ interface IUser {
   PictureUrl?: string;
 }
 
+// Mezclamos los datos de usuario normal o Google
 const currentUser = computed<IUser | null>(() => {
   return (authStore.user || googleAuthStore.user) as IUser | null;
 });
 
+// Imagen de usuario (avatar). Si no hay, usamos un placeholder
 const userImage = computed(() => {
-  return currentUser.value?.PictureUrl || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+  return currentUser.value?.PictureUrl || "https://cdn-icons-png.flaticon.com/128/149/149071.png";
 });
 
+// Al montar, intentar refrescar datos del usuario
 onMounted(() => {
   authStore.fetchUserFromDB();
 });
 
-const handleLogout = () => {
+// Cerrar sesión
+function handleLogout() {
+  isDropdownOpen.value = false; 
   authStore.logout();
   googleAuthStore.logout();
-};
+}
 </script>
-
-
 
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
@@ -200,22 +242,6 @@ const handleLogout = () => {
   padding: 0.75rem 1rem;
   z-index: 100;
   position: relative;
-}
-
-.header__user {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  border-radius: 50%;
-  overflow: hidden;
-  width: 40px;
-  height: 40px;
-}
-
-.header__avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
 }
 
 .header__burger {
@@ -268,7 +294,7 @@ const handleLogout = () => {
 /* Estilos específicos para los iconos dentro de los botones */
 .header__icon i,
 .header__icon .icon {
-  color: #093B35; // Aplicando el color específico a los íconos
+  color: #093B35;
   font-size: 1rem;
 }
 
@@ -288,6 +314,79 @@ const handleLogout = () => {
   right: -5px;
 }
 
+/* Avatar y dropdown */
+.header__user-dropdown {
+  position: relative;
+}
+
+.header__avatar-container {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+}
+
+.header__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.header__avatar-name {
+  color: #eaeaea;
+  font-weight: 500;
+}
+
+.header__avatar-icon {
+  margin-left: 0.25rem;
+  color: #eaeaea;
+}
+
+.header__dropdown-menu {
+  position: absolute;
+  right: 0;
+  color: #000;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+.header__dropdown-name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.header__dropdown-email {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+/* Botón de logout con Vuetify */
+.logout-btn {
+  /* Reemplaza color="error" por tu color dorado */
+  background-color: #d1a75f !important; /* color principal */
+  color: #000 !important;              /* texto negro */
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+  width: 100%;
+  justify-content: center; /* Centra el texto en el v-btn */
+  border: solid 5px #fff;
+}
+
+/* Transición "fade" */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* ================= MENÚ MÓVIL ================= */
 .header__mobile-menu {
   position: fixed;
   top: 0;
@@ -335,13 +434,12 @@ const handleLogout = () => {
   }
 }
 
-/* Bloquea el scroll cuando el menú está abierto */
 body.no-scroll,
 html.no-scroll {
   overflow: hidden;
 }
 
-/* ================= DESKTOP (oculto en mobile) ================= */
+/* ================= DESKTOP ================= */
 .header__top,
 .header__bottom {
   display: none;
@@ -372,13 +470,13 @@ html.no-scroll {
   }
 
   .header__icon .icon {
-    color: #093B35; // Aplicando el color a los íconos
+    color: #093B35;
     font-size: 1.2rem;
     transition: color 0.3s ease-in-out;
   }
 
   .header__icon:hover .icon {
-    color: #d1a75f; // Color en hover
+    color: #d1a75f;
   }
 }
 
@@ -438,8 +536,8 @@ html.no-scroll {
   }
 }
 
+/* MOSTRAR BARRA SUPERIOR/INFERIOR EN ESCRITORIO, OCULTAR BARRA MÓVIL */
 @media (min-width: 768px) {
-
   .header__mobile,
   .header__mobile-menu {
     display: none;

@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
-// Declarar Google globalmente (esto es opcional si ya lo cargas vía plugin)
+// Declarar Google globalmente (opcional)
 declare const google: {
   accounts: {
     id: {
@@ -59,7 +59,8 @@ export const useGoogleAuthStore = defineStore('googleAuth', () => {
       token.value = response.credential;
       localStorage.setItem("user", JSON.stringify(data));
       localStorage.setItem("token", token.value);
-      router.push("/");
+      await router.push("/");
+      window.scrollTo(0, 0);
     } catch (error) {
       console.error("Google login failed", error);
     }
@@ -70,7 +71,7 @@ export const useGoogleAuthStore = defineStore('googleAuth', () => {
     token.value = null;
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    router.push("/login");
+    router.push("/login").then(() => window.scrollTo(0, 0));
   };
 
   return {
