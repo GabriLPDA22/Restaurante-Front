@@ -10,26 +10,14 @@
       <div class="header__logo-mobile">
         <router-link to="/" aria-label="Ir a la página de inicio">
           <!-- SVG "hecho a mano" sin etiqueta <style> interna, reducido a 200px -->
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 600 200"
-            preserveAspectRatio="xMidYMid meet"
-            style="width:200px;"
-          >
-            <text
-              x="50%"
-              y="50%"
-              text-anchor="middle"
-              style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;"
-            >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet"
+            style="width:200px;">
+            <text x="50%" y="50%" text-anchor="middle"
+              style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;">
               PARTOW FOODS
             </text>
-            <text
-              x="50%"
-              y="75%"
-              text-anchor="middle"
-              style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;"
-            >
+            <text x="50%" y="75%" text-anchor="middle"
+              style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;">
               RESTAURANT
             </text>
           </svg>
@@ -58,12 +46,7 @@
               <p class="header__dropdown-email">{{ currentUser?.Correo }}</p>
 
               <!-- Botón de Logout con Vuetify, estilizado con clase logout-btn -->
-              <v-btn
-                @click="handleLogout"
-                elevation="2"
-                rounded
-                class="logout-btn"
-              >
+              <v-btn @click="handleLogout" elevation="2" rounded class="logout-btn">
                 Logout
               </v-btn>
             </div>
@@ -134,12 +117,7 @@
         </nav>
 
         <div class="header__logo">
-          <svg
-            class="header__svg"
-            viewBox="0 0 600 200"
-            preserveAspectRatio="xMidYMid meet"
-            style="width:300px;"
-          >
+          <svg class="header__svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet" style="width:300px;">
             <text x="50%" y="45%" text-anchor="middle" class="header__brand" style="font-size:70px;">
               PARTOW FOODS
             </text>
@@ -219,7 +197,7 @@ onMounted(() => {
 
 // Cerrar sesión
 function handleLogout() {
-  isDropdownOpen.value = false; 
+  isDropdownOpen.value = false;
   authStore.logout();
   googleAuthStore.logout();
 }
@@ -348,7 +326,7 @@ function handleLogout() {
   right: 0;
   color: #000;
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 10;
 }
 
@@ -366,13 +344,16 @@ function handleLogout() {
 /* Botón de logout con Vuetify */
 .logout-btn {
   /* Reemplaza color="error" por tu color dorado */
-  background-color: #d1a75f !important; /* color principal */
-  color: #000 !important;              /* texto negro */
+  background-color: #d1a75f !important;
+  /* color principal */
+  color: #000 !important;
+  /* texto negro */
   font-weight: 600;
   text-transform: uppercase;
   margin-top: 0.5rem;
   width: 100%;
-  justify-content: center; /* Centra el texto en el v-btn */
+  justify-content: center;
+  /* Centra el texto en el v-btn */
   border: solid 5px #fff;
 }
 
@@ -381,6 +362,7 @@ function handleLogout() {
 .fade-leave-active {
   transition: opacity 0.2s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
@@ -538,6 +520,7 @@ html.no-scroll {
 
 /* MOSTRAR BARRA SUPERIOR/INFERIOR EN ESCRITORIO, OCULTAR BARRA MÓVIL */
 @media (min-width: 768px) {
+
   .header__mobile,
   .header__mobile-menu {
     display: none;
