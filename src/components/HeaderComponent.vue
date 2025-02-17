@@ -163,13 +163,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useCartStore } from '../stores/CartStore';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useGoogleAuthStore } from '@/stores/useGoogleAuthStore';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { VBtn } from 'vuetify/components';
 
 const cartStore = useCartStore();
+const authStore = useAuthStore();
+const googleAuthStore = useGoogleAuthStore();
+
 const isCartOpen = ref(false);
 const isMenuOpen = ref(false);
+const isDropdownOpen = ref(false);
 
 const toggleCart = () => {
   isCartOpen.value = !isCartOpen.value;
@@ -185,6 +192,36 @@ const closeMenu = () => {
   isMenuOpen.value = false;
   document.body.classList.remove('no-scroll');
   document.documentElement.classList.remove('no-scroll');
+};
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const isAuthenticated = computed(() => !!authStore.user || !!googleAuthStore.user);
+
+interface IUser {
+  Nombre?: string;
+  Correo?: string;
+  PictureUrl?: string;
+}
+
+const currentUser = computed<IUser | null>(() => {
+  return (authStore.user || googleAuthStore.user) as IUser | null;
+});
+
+const userImage = computed(() => {
+  return currentUser.value?.PictureUrl || "https://cdn-icons-png.flaticon.com/128/149/149071.png";
+});
+
+onMounted(() => {
+  authStore.fetchUserFromDB();
+});
+
+const handleLogout = () => {
+  isDropdownOpen.value = false;
+  authStore.logout();
+  googleAuthStore.logout();
 };
 </script>
 
