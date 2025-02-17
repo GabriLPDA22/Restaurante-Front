@@ -9,7 +9,6 @@
 
       <div class="header__logo-mobile">
         <router-link to="/" aria-label="Ir a la página de inicio">
-          <!-- SVG "hecho a mano" sin etiqueta <style> interna, reducido a 200px -->
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet"
             style="width:200px;">
             <text x="50%" y="50%" text-anchor="middle"
@@ -25,9 +24,9 @@
       </div>
 
       <div class="header__icons-mobile">
-        <button class="header__icon" aria-label="Cart">
+        <button class="header__icon" aria-label="Cart" @click="toggleCart">
           <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
-          <span class="header__notification">4</span>
+          <span v-if="cartStore.totalQuantity > 0" class="header__notification">{{ cartStore.totalQuantity }}</span>
         </button>
 
         <!-- 🔥 Dropdown del usuario si está autenticado -->
@@ -99,6 +98,24 @@
       </div>
     </div>
 
+    <!-- DESPLEGABLE DEL CARRITO -->
+    <div v-if="isCartOpen" class="cart-dropdown">
+      <h3 class="cart-dropdown__title">Shopping Cart</h3>
+      <div class="cart-dropdown__items" v-if="cartStore.cart.length > 0">
+        <div v-for="item in cartStore.cart" :key="item.id" class="cart-item">
+          <img :src="item.image" :alt="item.name" class="cart-item__image" />
+          <p class="cart-item__name">{{ item.name }}</p>
+          <p class="cart-item__price">${{ item.price }} x {{ item.quantity }}</p>
+          <div class="cart-item__actions">
+            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity - 1)">-</button>
+            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity + 1)">+</button>
+            <button class="cart-button cart-button--delete" @click="cartStore.removeFromCart(item.id)">🗑️</button>
+          </div>
+        </div>
+      </div>
+      <p v-else class="cart-dropdown__empty">Your cart is empty.</p>
+    </div>
+
     <!-- BARRA INFERIOR (ESCRITORIO) -->
     <div class="header__bottom">
       <div class="header__container">
@@ -146,61 +163,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useGoogleAuthStore } from '@/stores/useGoogleAuthStore';
+import { ref } from 'vue';
+import { useCartStore } from '../stores/CartStore';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-// Importa Vuetify para el <v-btn>
-import { VBtn } from 'vuetify/components';
-
-const authStore = useAuthStore();
-const googleAuthStore = useGoogleAuthStore();
-
+const cartStore = useCartStore();
+const isCartOpen = ref(false);
 const isMenuOpen = ref(false);
-const isDropdownOpen = ref(false);
 
-function toggleMenu() {
+const toggleCart = () => {
+  isCartOpen.value = !isCartOpen.value;
+};
+
+const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
-}
+  document.body.classList.toggle('no-scroll', isMenuOpen.value);
+  document.documentElement.classList.toggle('no-scroll', isMenuOpen.value);
+};
 
-function closeMenu() {
+const closeMenu = () => {
   isMenuOpen.value = false;
-}
-
-function toggleDropdown() {
-  isDropdownOpen.value = !isDropdownOpen.value;
-}
-
-// Usuario autenticado (ya sea con AuthStore o GoogleAuthStore)
-const isAuthenticated = computed(() => !!authStore.user || !!googleAuthStore.user);
-
-interface IUser {
-  Nombre?: string;
-  Correo?: string;
-  PictureUrl?: string;
-}
-
-// Mezclamos los datos de usuario normal o Google
-const currentUser = computed<IUser | null>(() => {
-  return (authStore.user || googleAuthStore.user) as IUser | null;
-});
-
-// Imagen de usuario (avatar). Si no hay, usamos un placeholder
-const userImage = computed(() => {
-  return currentUser.value?.PictureUrl || "https://cdn-icons-png.flaticon.com/128/149/149071.png";
-});
-
-// Al montar, intentar refrescar datos del usuario
-onMounted(() => {
-  authStore.fetchUserFromDB();
-});
-
-// Cerrar sesión
-function handleLogout() {
-  isDropdownOpen.value = false;
-  authStore.logout();
-  googleAuthStore.logout();
-}
+  document.body.classList.remove('no-scroll');
+  document.documentElement.classList.remove('no-scroll');
+};
 </script>
 
 <style lang="scss" scoped>
@@ -530,5 +515,98 @@ html.no-scroll {
   .header__bottom {
     display: block;
   }
+}
+
+/* CARD MENU MODAL MOBILE */
+
+.cart-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  width: 300px;
+  max-height: 250px;
+  background: #fef3c7;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  padding: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.cart-dropdown__title {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 10px;
+  color: #064e3b;
+}
+
+.cart-dropdown__items {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-bottom: 1px solid #d1a75f;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.cart-item__image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.cart-item__name,
+.cart-item__price {
+  font-size: 14px;
+  color: #2d2d2d;
+  margin: 0;
+}
+
+.cart-item__actions {
+  display: flex;
+  gap: 5px;
+}
+
+.cart-button {
+  background: #064e3b;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: background 0.3s;
+
+  &:hover {
+    background: #043d2a;
+  }
+}
+
+.cart-button--delete {
+  background: #d9534f;
+
+  &:hover {
+    background: #c9302c;
+  }
+}
+
+.cart-dropdown__empty {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  padding: 10px;
 }
 </style>
