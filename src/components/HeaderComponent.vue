@@ -26,7 +26,6 @@
       <div class="header__icons-mobile">
         <button class="header__icon" aria-label="Cart" @click="toggleCart">
           <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
-          <span v-if="cartStore.totalQuantity > 0" class="header__notification">{{ cartStore.totalQuantity }}</span>
         </button>
         <button class="header__icon" aria-label="User">
           <font-awesome-icon :icon="['fas', 'user']" class="icon" />
@@ -71,24 +70,6 @@
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- DESPLEGABLE DEL CARRITO -->
-    <div v-if="isCartOpen" class="cart-dropdown">
-      <h3 class="cart-dropdown__title">Shopping Cart</h3>
-      <div class="cart-dropdown__items" v-if="cartStore.cart.length > 0">
-        <div v-for="item in cartStore.cart" :key="item.id" class="cart-item">
-          <img :src="item.image" :alt="item.name" class="cart-item__image" />
-          <p class="cart-item__name">{{ item.name }}</p>
-          <p class="cart-item__price">${{ item.price }} x {{ item.quantity }}</p>
-          <div class="cart-item__actions">
-            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity - 1)">-</button>
-            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity + 1)">+</button>
-            <button class="cart-button cart-button--delete" @click="cartStore.removeFromCart(item.id)">🗑️</button>
-          </div>
-        </div>
-      </div>
-      <p v-else class="cart-dropdown__empty">Your cart is empty.</p>
     </div>
 
     <!-- BARRA INFERIOR (ESCRITORIO) -->
@@ -139,10 +120,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useCartStore } from '../stores/CartStore';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-const cartStore = useCartStore();
 const isCartOpen = ref(false);
 const isMenuOpen = ref(false);
 
@@ -232,7 +211,7 @@ const closeMenu = () => {
 /* Estilos específicos para los iconos dentro de los botones */
 .header__icon i,
 .header__icon .icon {
-  color: #093B35; // Aplicando el color específico a los íconos
+  color: #093B35; 
   font-size: 1rem;
 }
 

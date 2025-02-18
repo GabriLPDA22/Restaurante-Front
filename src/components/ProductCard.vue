@@ -17,14 +17,12 @@
             <div class="product-card__rating">
                 <font-awesome-icon v-for="n in rating" :key="n" :icon="['fas', 'star']" class="star star--active" />
             </div>
-            <button class="product-card__button" @click="addToCart">ORDER NOW</button>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, defineProps } from 'vue';
-import { useCartStore } from '../stores/CartStore';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const props = defineProps<{
@@ -35,21 +33,10 @@ const props = defineProps<{
     rating: number;
 }>();
 
-const cartStore = useCartStore();
 const isFavorite = ref(false);
 
 const toggleFavorite = () => {
     isFavorite.value = !isFavorite.value;
-};
-
-const addToCart = () => {
-    cartStore.addToCart({
-        id: Math.random(), // Debería ser un ID real
-        name: props.name,
-        price: props.price,
-        image: props.image,
-        quantity: 1,
-    });
 };
 </script>
 
