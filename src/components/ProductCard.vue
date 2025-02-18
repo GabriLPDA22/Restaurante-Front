@@ -17,6 +17,9 @@
             <div class="product-card__rating">
                 <font-awesome-icon v-for="n in rating" :key="n" :icon="['fas', 'star']" class="star star--active" />
             </div>
+            <div class="product-card__bottom">
+                <button class="product-card__button">Details</button>
+            </div>
         </div>
     </div>
 </template>
