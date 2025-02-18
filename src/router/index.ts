@@ -16,6 +16,7 @@ const routes = [
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/register', name: 'Register', component: RegisterView },
   { path: '/cart', name: 'cart', component: ShoppingCart, },
+  { path: '/reservation', name: 'reservation', component: () => import('../views/ReservationView.vue') },
 ];
 
 const router = createRouter({
