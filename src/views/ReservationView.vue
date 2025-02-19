@@ -75,6 +75,13 @@ const submitReservation = () => {
     /* Fondo de imagen solo en escritorio (>=768px) */
     @media (min-width: 768px) {
         background: url('../assets/ordders.png') center center / cover no-repeat;
+        padding: 0;
+
+        .reservation {
+            border-radius: 0;
+            width: 100%;
+            margin: 0;
+        }
     }
 
     /* En móvil (<=767px), sin fondo */
@@ -89,12 +96,10 @@ const submitReservation = () => {
   */
 .reservation {
     background-color: rgba(255, 255, 255, 0.9);
-    /* Blanco semi-transparente */
     padding: 2rem;
     border-radius: 12px;
     max-width: 600px;
     width: 100%;
-    /* Para que en móvil ocupe todo el ancho */
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     font-family: 'Poppins', sans-serif;
 
