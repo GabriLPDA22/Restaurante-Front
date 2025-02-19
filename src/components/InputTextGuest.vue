@@ -3,7 +3,7 @@
         <label v-if="label">{{ label }}</label>
         <div class="input-guest__wrapper">
             <img :src="tableIcon" alt="mesa" class="input-guest__icon">
-            <button @click="openModal" class="input-guest__button">Seleccionar Mesa</button>
+            <button type="button" @click="openModal" class="input-guest__button">Seleccionar Mesa</button>
         </div>
         <div v-if="isModalOpen" class="input-guest__modal">
             <div class="input-guest__modal-content">

@@ -1,35 +1,46 @@
 <template>
-    <!-- Contenedor general que controlará el fondo en escritorio -->
     <div class="reservation-container">
         <div class="reservation">
             <h2 class="reservation__title">Reservation</h2>
             <form class="reservation__form" @submit.prevent="submitReservation">
-                <!-- FILA: Date y Time -->
                 <div class="reservation__row">
-                    <InputDate v-model="form.date" label="Date*" />
-                    <InputTime v-model="form.time" label="Time*" />
+                    <div class="reservation__field">
+                        <InputDate v-model="form.date" label="Date*" required />
+                        <span v-if="errors.date" class="reservation__error">{{ errors.date }}</span>
+                    </div>
+                    <div class="reservation__field">
+                        <InputTime v-model="form.time" label="Time*" required />
+                        <span v-if="errors.time" class="reservation__error">{{ errors.time }}</span>
+                    </div>
                 </div>
 
-                <!-- Guests -->
-                <InputTextGuest v-model="form.guests" label="Guest" type="number" />
+                <InputTextGuest v-model="form.guests" label="Guest" type="number" required />
+                <span v-if="errors.guests" class="reservation__error">{{ errors.guests }}</span>
 
-
-                <!-- FILA: First Name y Last Name -->
-                <div class="reservation__row">
-                    <InputText v-model="form.firstName" label="First Name" type="text" />
-                    <InputText v-model="form.lastName" label="Last Name" type="text" />
+                <div class="reservation__field reservation__row">
+                    <div class="reservation__column">
+                        <InputText v-model="form.firstName" label="First Name" type="text" required />
+                        <span v-if="errors.firstName" class="reservation__error">{{ errors.firstName }}</span>
+                    </div>
+                    <div class="reservation__column">
+                        <InputText v-model="form.lastName" label="Last Name" type="text" required />
+                        <span v-if="errors.lastName" class="reservation__error">{{ errors.lastName }}</span>
+                    </div>
                 </div>
 
-                <!-- FILA: Email y Phone -->
                 <div class="reservation__row">
-                    <InputText v-model="form.email" label="Email" type="email" />
-                    <InputText v-model="form.phone" label="Phone" type="tel" />
+                    <div class="reservation__column">
+                        <InputText v-model="form.email" label="Email" type="email" required />
+                        <span v-if="errors.email" class="reservation__error">{{ errors.email }}</span>
+                    </div>
+                    <div class="reservation__column">
+                        <InputText v-model="form.phone" label="Phone" type="tel" required />
+                        <span v-if="errors.phone" class="reservation__error">{{ errors.phone }}</span>
+                    </div>
                 </div>
 
-                <!-- Comment -->
                 <InputText v-model="form.comment" label="Comment" type="textarea" />
 
-                <!-- Botón -->
                 <button type="submit" class="reservation__button">BOOK NOW</button>
             </form>
         </div>
@@ -39,11 +50,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-// Ajusta las rutas de tus componentes personalizados
 import InputDate from '@/components/InputDate.vue'
 import InputTime from '@/components/InputTime.vue'
-import InputText from '@/components/InputText.vue'
 import InputTextGuest from '@/components/InputTextGuest.vue'
+import InputText from '@/components/InputText.vue'
 
 const form = ref({
     date: '',
@@ -56,17 +66,35 @@ const form = ref({
     comment: ''
 })
 
+const errors = ref({})
+
+const validateForm = () => {
+    errors.value = {}
+
+    if (!form.value.date) errors.value.date = "Date required."
+    if (!form.value.time) errors.value.time = "Time required."
+    if (!form.value.guests) errors.value.guests = "Guest required."
+    if (!form.value.firstName) errors.value.firstName = "First Name required."
+    if (!form.value.lastName) errors.value.lastName = "Last Name required."
+    if (!form.value.email) errors.value.email = "Email required."
+    if (!form.value.phone) errors.value.phone = "Phone required."
+
+    return Object.keys(errors.value).length === 0
+}
+
 const submitReservation = () => {
-    console.log('Reservation submitted', form.value)
-    // Aquí tu lógica de envío (API, etc.)
+    if (validateForm()) {
+        alert('Reservation submitted successfully!')
+    } else {
+        alert('Please fill in all required fields.')
+    }
 }
 </script>
-
 <style lang="scss">
-/* 
-    1. Contenedor principal (fondo solo en escritorio).
-    2. Centramos el formulario vertical/horizontalmente.
-  */
+.reservation__error {
+    color: red;
+    font-size: 0.8em;
+}
 .reservation-container {
     min-height: 100vh;
     display: flex;
@@ -74,7 +102,6 @@ const submitReservation = () => {
     justify-content: center;
     padding: 2rem;
 
-    /* Fondo de imagen solo en escritorio (>=768px) */
     @media (min-width: 768px) {
         background: url('../assets/ordders.png') center center / cover no-repeat;
         padding: 0;
@@ -86,16 +113,11 @@ const submitReservation = () => {
         }
     }
 
-    /* En móvil (<=767px), sin fondo */
     @media (max-width: 767px) {
         background: none;
     }
 }
 
-/* 
-    El formulario como "tarjeta" encima del fondo.
-    Ajusta colores y transparencias a tu gusto.
-  */
 .reservation {
     background-color: rgba(255, 255, 255, 0.9);
     padding: 2rem;
@@ -109,7 +131,6 @@ const submitReservation = () => {
         font-size: 2rem;
         text-align: center;
         color: #253e2c;
-        /* Verde oscuro (aprox.) */
         margin-bottom: 1.5rem;
     }
 
@@ -128,7 +149,6 @@ const submitReservation = () => {
             flex: 1;
         }
 
-        /* En pantallas pequeñas, cada input en su propia fila */
         @media (max-width: 768px) {
             flex-direction: column;
         }
@@ -136,7 +156,6 @@ const submitReservation = () => {
 
     &__button {
         background: #2c3e2e;
-        /* Botón verde oscuro */
         color: #fff;
         padding: 1rem;
         border: none;
@@ -153,7 +172,6 @@ const submitReservation = () => {
         }
     }
 
-    /* Inputs y textarea (si tus componentes no llevan estilos propios) */
     input,
     textarea {
         width: 100%;
