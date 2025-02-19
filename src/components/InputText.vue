@@ -1,8 +1,8 @@
 <template>
     <div class="input-text">
         <label v-if="label">{{ label }}</label>
-        <input :type="type" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)"
-            class="input-text__input" />
+        <input :type="type" :value="modelValue"
+            @input="$event.target && $emit('update:modelValue', $event.target.value)" class="input-text__input" />
     </div>
 </template>
 

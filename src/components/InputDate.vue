@@ -4,7 +4,6 @@
         <div class="input-date__wrapper">
             <input type="date" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)"
                 class="input-date__field" />
-            <span class="input-date__icon"></span>
         </div>
     </div>
 </template>

@@ -11,7 +11,8 @@
                 </div>
 
                 <!-- Guests -->
-                <InputText v-model="form.guests" label="Guest*" type="number" />
+                <InputTextGuest v-model="form.guests" label="Guest" type="number" />
+
 
                 <!-- FILA: First Name y Last Name -->
                 <div class="reservation__row">
@@ -42,6 +43,7 @@ import { ref } from 'vue'
 import InputDate from '@/components/InputDate.vue'
 import InputTime from '@/components/InputTime.vue'
 import InputText from '@/components/InputText.vue'
+import InputTextGuest from '@/components/InputTextGuest.vue'
 
 const form = ref({
     date: '',
