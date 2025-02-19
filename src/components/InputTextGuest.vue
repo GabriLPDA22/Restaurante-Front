@@ -1,9 +1,13 @@
+```vue
 <template>
     <div class="input-guest">
         <label v-if="label">{{ label }}</label>
         <div class="input-guest__wrapper">
             <img :src="tableIcon" alt="mesa" class="input-guest__icon">
             <button type="button" @click="openModal" class="input-guest__button">Seleccionar Mesa</button>
+            <span v-if="selectedTables.length" class="input-guest__selected-tables">
+                Mesas seleccionadas: {{ selectedTables.join(', ') }}
+            </span>
         </div>
         <div v-if="isModalOpen" class="input-guest__modal">
             <div class="input-guest__modal-content">
@@ -13,7 +17,7 @@
                     <div v-for="(mesa, index) in mesas" :key="index" class="input-guest__table">
                         <img :src="tableIcon" alt="mesa" class="input-guest__table-icon">
                         <div class="input-guest__table-number">{{ mesa }}</div>
-                        <input type="checkbox" :id="'mesa-' + index" :value="mesa" class="input-guest__checkbox">
+                        <input type="checkbox" :id="'mesa-' + index" :value="mesa" v-model="selectedTables" class="input-guest__checkbox">
                     </div>
                 </div>
                 <p v-if="reservationMessage">{{ reservationMessage }}</p>
@@ -29,7 +33,8 @@ export default {
     data() {
         return {
             isModalOpen: false,
-            mesas: [4, 4, 6, 8, 8],
+            mesas: [1, 2, 3, 4, 5], // Ejemplo de mesas disponibles
+            selectedTables: [],
             reservationMessage: '',
             tableIcon
         };
@@ -37,10 +42,14 @@ export default {
     props: {
         label: String
     },
+    watch: {
+        selectedTables(newVal) {
+            this.$emit('update:modelValue', newVal.length ? newVal : null);
+        }
+    },
     methods: {
         openModal() {
             this.isModalOpen = true;
-            this.reservationMessage = '';
         },
         closeModal() {
             this.isModalOpen = false;
