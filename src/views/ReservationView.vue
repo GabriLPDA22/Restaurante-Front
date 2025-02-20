@@ -84,17 +84,48 @@ const validateForm = () => {
 
 const submitReservation = () => {
     if (validateForm()) {
-        alert('Reservation submitted successfully!')
+        const reservationData = {
+            id: 0,
+            dateTime: new Date().toISOString(),
+            customerName: `${form.value.firstName} ${form.value.lastName}`,
+            tableId: parseInt(form.value.guests) // Parse the guests field as an integer
+
+        }
+
+        console.log('Reservation Data:', reservationData) // Add this line to log the reservation data
+
+        fetch('http://localhost:5021/api/Reservations', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json', // Set the Accept header to application/json
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(reservationData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Reservation submitted successfully!')
+                } else {
+                    alert('Failed to submit reservation.')
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting reservation:', error)
+                alert('An error occurred while submitting the reservation.')
+            })
     } else {
         alert('Please fill in all required fields.')
     }
 }
 </script>
+
+
 <style lang="scss">
 .reservation__error {
     color: red;
     font-size: 0.8em;
 }
+
 .reservation-container {
     min-height: 100vh;
     display: flex;
