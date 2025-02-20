@@ -47,7 +47,6 @@
                             <img src="../assets/peanuts.svg" alt="Cacahuetes" />
                             <span>Cacahuetes</span>
                         </div>
-                        <!-- Agrega más según necesites -->
                     </div>
                 </div>
                 <button class="product-card__button" @click="flipCard">
