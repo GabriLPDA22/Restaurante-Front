@@ -33,7 +33,7 @@ export default {
     data() {
         return {
             isModalOpen: false,
-            mesas: [1, 2, 3, 4, 5], // Ejemplo de mesas disponibles
+            mesas: [4, 4, 6, 8, 8],
             selectedTables: [],
             reservationMessage: '',
             tableIcon
