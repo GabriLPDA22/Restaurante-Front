@@ -34,7 +34,7 @@ const navigateToCategory = (category: string) => {
         <h1 class="home-view__title">ITALIAN INSPIRED CUISINE</h1>
       </div>
       <div class="home-view__actions">
-        <a href="/reserve" class="home-view__button home-view__button--reserve" style="text-decoration: none;">Reserve
+        <a href="#" class="home-view__button home-view__button--reserve" style="text-decoration: none;">Reserve
           Now</a>
         <router-link to="/contact" class="home-view__button home-view__button--contact"
           style="text-decoration: none;">Contact Us</router-link>

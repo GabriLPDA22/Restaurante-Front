@@ -26,7 +26,6 @@
       <div class="header__icons-mobile">
         <button class="header__icon" aria-label="Cart" @click="toggleCart">
           <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
-          <span v-if="cartStore.totalQuantity > 0" class="header__notification">{{ cartStore.totalQuantity }}</span>
         </button>
 
         <!-- 🔥 Dropdown del usuario si está autenticado -->
@@ -98,24 +97,6 @@
       </div>
     </div>
 
-    <!-- DESPLEGABLE DEL CARRITO -->
-    <div v-if="isCartOpen" class="cart-dropdown">
-      <h3 class="cart-dropdown__title">Shopping Cart</h3>
-      <div class="cart-dropdown__items" v-if="cartStore.cart.length > 0">
-        <div v-for="item in cartStore.cart" :key="item.id" class="cart-item">
-          <img :src="item.image" :alt="item.name" class="cart-item__image" />
-          <p class="cart-item__name">{{ item.name }}</p>
-          <p class="cart-item__price">${{ item.price }} x {{ item.quantity }}</p>
-          <div class="cart-item__actions">
-            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity - 1)">-</button>
-            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity + 1)">+</button>
-            <button class="cart-button cart-button--delete" @click="cartStore.removeFromCart(item.id)">🗑️</button>
-          </div>
-        </div>
-      </div>
-      <p v-else class="cart-dropdown__empty">Your cart is empty.</p>
-    </div>
-
     <!-- BARRA INFERIOR (ESCRITORIO) -->
     <div class="header__bottom">
       <div class="header__container">
@@ -163,16 +144,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useCartStore } from '../stores/CartStore';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useGoogleAuthStore } from '@/stores/useGoogleAuthStore';
+import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { VBtn } from 'vuetify/components';
-
-const cartStore = useCartStore();
-const authStore = useAuthStore();
-const googleAuthStore = useGoogleAuthStore();
 
 const isCartOpen = ref(false);
 const isMenuOpen = ref(false);

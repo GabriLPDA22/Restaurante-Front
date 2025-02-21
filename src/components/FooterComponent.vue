@@ -27,7 +27,7 @@
         </a>
       </div>
     </div>
-    <p class="footer__copyright">COPYRIGHT 2024</p>
+    <p class="footer__copyright">COPYRIGHT 2025</p>
   </footer>
 </template>
 
