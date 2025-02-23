@@ -24,7 +24,13 @@
       </div>
 
       <div class="header__icons-mobile">
+<<<<<<< HEAD
         <!-- Se quita el botón de Carrito -->
+=======
+        <button class="header__icon" aria-label="Cart" @click="toggleCart">
+          <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
+        </button>
+>>>>>>> 3ca585284da3ee1a75516017bca6f0877b03898c
         <button class="header__icon" aria-label="User">
           <font-awesome-icon :icon="['fas', 'user']" class="icon" />
         </button>
@@ -117,8 +123,13 @@
 import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+<<<<<<< HEAD
 // Se elimina el import de useCartStore y la lógica del carrito
 // const cartStore = useCartStore();
+=======
+const isCartOpen = ref(false);
+const isMenuOpen = ref(false);
+>>>>>>> 3ca585284da3ee1a75516017bca6f0877b03898c
 
 const isMenuOpen = ref(false);
 // Se elimina isCartOpen y toggleCart
@@ -205,7 +216,7 @@ const closeMenu = () => {
 /* Estilos específicos para los iconos dentro de los botones */
 .header__icon i,
 .header__icon .icon {
-  color: #093B35; // Aplicando el color específico a los íconos
+  color: #093B35; 
   font-size: 1rem;
 }
 

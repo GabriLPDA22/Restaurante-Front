@@ -35,6 +35,7 @@ const navigateToCategory = (category: string) => {
         <p class="home-view__hero-subtitle">FRESH INGREDIENTS SOURCED GLOBALLY</p>
         <h1 class="home-view__hero-title">ITALIAN INSPIRED CUISINE</h1>
       </div>
+<<<<<<< HEAD
 
       <!-- Botones debajo -->
       <div class="home-view__hero-actions">
@@ -45,6 +46,13 @@ const navigateToCategory = (category: string) => {
           style="text-decoration: none;">
           CONTACT US
         </router-link>
+=======
+      <div class="home-view__actions">
+        <a href="#" class="home-view__button home-view__button--reserve" style="text-decoration: none;">Reserve
+          Now</a>
+        <router-link to="/contact" class="home-view__button home-view__button--contact"
+          style="text-decoration: none;">Contact Us</router-link>
+>>>>>>> 3ca585284da3ee1a75516017bca6f0877b03898c
       </div>
     </section>
 
