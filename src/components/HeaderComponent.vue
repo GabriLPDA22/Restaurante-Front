@@ -144,9 +144,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { VBtn } from 'vuetify/components';
+
+// Importa tus stores, ajusta las rutas según tu estructura de proyecto
+import { useAuthStore } from '../stores/useAuthStore';
+import { useGoogleAuthStore } from '../stores/useGoogleAuthStore';
+
+const authStore = useAuthStore();
+const googleAuthStore = useGoogleAuthStore();
 
 const isCartOpen = ref(false);
 const isMenuOpen = ref(false);
