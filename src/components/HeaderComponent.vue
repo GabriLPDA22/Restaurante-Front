@@ -87,9 +87,9 @@
             <span class="header__notification">2</span>
           </button>
           <!-- Se quita el botón de Carrito -->
-          <button class="header__icon" aria-label="User Profile">
+          <router-link to="/login" class="header__icon" aria-label="User Profile">
             <font-awesome-icon :icon="['fas', 'user']" class="icon" />
-          </button>
+          </router-link>
         </div>
       </div>
     </div>
@@ -112,6 +112,7 @@
         </nav>
 
         <div class="header__logo">
+          <router-link to="/" aria-label="Ir a la página de inicio">
           <svg class="header__svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet" style="width:300px;">
             <text x="50%" y="45%" text-anchor="middle" class="header__brand" style="font-size:70px;">
               PARTOW FOODS
@@ -120,12 +121,13 @@
               RESTAURANT
             </text>
           </svg>
+        </router-link>
         </div>
 
         <nav class="header__nav-right">
           <ul class="home-view__nav-list">
             <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">Reservation</a>
+              <router-link to="/reservation" class="home-view__nav-link">Reservation</router-link>
             </li>
             <li class="home-view__nav-item">
               <a href="#" class="home-view__nav-link">Orders</a>
