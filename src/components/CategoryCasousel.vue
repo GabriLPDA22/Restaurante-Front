@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const props = defineProps<{
+defineProps<{
     categories: string[];
     selectedCategory: string;
 }>();
@@ -81,6 +81,13 @@ const scrollRight = () => {
         &--right {
             margin-left: 8px;
         }
+    }
+}
+
+/* Ocultar carrusel en desktop (≥ 992px) */
+@media (min-width: 992px) {
+    .category-carousel {
+        display: none;
     }
 }
 </style>
