@@ -2,41 +2,58 @@
     <div class="reservation-container">
         <div class="reservation">
             <h2 class="reservation__title">Reservation</h2>
+            <!-- Mantenemos exactamente la misma estructura -->
             <form class="reservation__form" @submit.prevent="submitReservation">
                 <div class="reservation__row">
                     <div class="reservation__field">
-                        <InputDate v-model="form.date" label="Date*" required />
-                        <span v-if="errors.date" class="reservation__error">{{ errors.date }}</span>
+                        <!-- Usamos InputDate con placeholder y un rango de fechas -->
+                        <InputDate v-model="form.date" label="Date*" placeholder="dd/mm/yyyy" required />
+                        <span v-if="errors.date" class="reservation__error">
+                            {{ errors.date }}
+                        </span>
                     </div>
                     <div class="reservation__field">
-                        <InputTime v-model="form.time" label="Time*" required />
-                        <span v-if="errors.time" class="reservation__error">{{ errors.time }}</span>
+                        <InputTime v-model="form.time" :selectedDate="form.date" label="Time*" placeholder="HH:mm"
+                            minTime="09:00" maxTime="23:00" :step="1800" required />
+                        <span v-if="errors.time" class="reservation__error">
+                            {{ errors.time }}
+                        </span>
                     </div>
+
                 </div>
 
-                <!-- Cambiamos el v-model para que se enlace con form.selectedTables -->
                 <InputTextGuest v-model="form.selectedTables" label="Selecciona Mesa" required />
-                <span v-if="errors.selectedTables" class="reservation__error">{{ errors.selectedTables }}</span>
+                <span v-if="errors.selectedTables" class="reservation__error">
+                    {{ errors.selectedTables }}
+                </span>
 
                 <div class="reservation__field reservation__row">
                     <div class="reservation__column">
                         <InputText v-model="form.firstName" label="First Name" type="text" required />
-                        <span v-if="errors.firstName" class="reservation__error">{{ errors.firstName }}</span>
+                        <span v-if="errors.firstName" class="reservation__error">
+                            {{ errors.firstName }}
+                        </span>
                     </div>
                     <div class="reservation__column">
                         <InputText v-model="form.lastName" label="Last Name" type="text" required />
-                        <span v-if="errors.lastName" class="reservation__error">{{ errors.lastName }}</span>
+                        <span v-if="errors.lastName" class="reservation__error">
+                            {{ errors.lastName }}
+                        </span>
                     </div>
                 </div>
 
                 <div class="reservation__row">
                     <div class="reservation__column">
                         <InputText v-model="form.email" label="Email" type="email" required />
-                        <span v-if="errors.email" class="reservation__error">{{ errors.email }}</span>
+                        <span v-if="errors.email" class="reservation__error">
+                            {{ errors.email }}
+                        </span>
                     </div>
                     <div class="reservation__column">
                         <InputText v-model="form.phone" label="Phone" type="tel" required />
-                        <span v-if="errors.phone" class="reservation__error">{{ errors.phone }}</span>
+                        <span v-if="errors.phone" class="reservation__error">
+                            {{ errors.phone }}
+                        </span>
                     </div>
                 </div>
 
@@ -49,91 +66,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
+import { useReservationStore } from '@/stores/reservation'
+
 import InputDate from '@/components/InputDate.vue'
 import InputTime from '@/components/InputTime.vue'
 import InputTextGuest from '../components/InputTextGuest.vue'
 import InputText from '@/components/InputText.vue'
 
-const form = ref({
-    date: '',
-    time: '',
-    selectedTables: [],
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    comment: ''
-})
+const reservationStore = useReservationStore()
+const form = reservationStore.form
+const errors = reservationStore.errors
 
-const errors = ref<{
-    date?: string;
-    time?: string;
-    selectedTables?: string;
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    phone?: string
-}>({})
-
-watch(form, () => {
-    console.log('Current form values:', form.value);
-}, { deep: true });
-
-const validateForm = () => {
-    errors.value = {}
-
-    if (!form.value.date.trim()) errors.value.date = "Date required."
-    if (!form.value.time.trim()) errors.value.time = "Time required."
-    if (!form.value.selectedTables || form.value.selectedTables.length === 0) errors.value.selectedTables = "At least one table must be selected."
-    if (!form.value.firstName.trim()) errors.value.firstName = "First Name required."
-    if (!form.value.lastName.trim()) errors.value.lastName = "Last Name required."
-    if (!form.value.email.trim()) errors.value.email = "Email required."
-    if (!form.value.phone.trim()) errors.value.phone = "Phone required."
-
-    console.log('Validation errors:', errors.value);
-    return Object.keys(errors.value).length === 0
+function submitReservation() {
+    reservationStore.submitReservation()
 }
 
-const submitReservation = () => {
-    if (validateForm()) {
-        const reservations = form.value.selectedTables.map(tableId => ({
-            id: 0,
-            dateTime: `${form.value.date}T${form.value.time}:00.000Z`,
-            customerName: `${form.value.firstName} ${form.value.lastName}`,
-            tableId,
-            email: form.value.email,
-            phone: form.value.phone,
-            comment: form.value.comment
-        }));
-
-        console.log('Reservations Data:', reservations)
-
-        Promise.all(reservations.map(reservationData =>
-            fetch('http://localhost:5021/api/Reservations', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(reservationData)
-            })
-        ))
-            .then(responses => {
-                if (responses.every(response => response.ok)) {
-                    alert('Reservations submitted successfully!')
-                } else {
-                    alert('Failed to submit some reservations.')
-                }
-            })
-            .catch(error => {
-                console.error('Error submitting reservations:', error)
-                alert('An error occurred while submitting the reservations.')
-            })
-    } else {
-        alert('Please fill in all required fields.')
-    }
-}
+watch(form, (newVal) => {
+    console.log('Current form values:', newVal)
+}, { deep: true })
 </script>
 
 
