@@ -52,10 +52,21 @@ import { ref } from 'vue'
 
 import InputDate from '@/components/InputDate.vue'
 import InputTime from '@/components/InputTime.vue'
-import InputTextGuest from '@/components/InputTextGuest.vue'
+import InputTextGuest from '../components/InputTextGuest.vue'
 import InputText from '@/components/InputText.vue'
 
-const form = ref({
+interface ReservationForm {
+    date: string;
+    time: string;
+    guests: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    comment: string;
+}
+
+const form = ref<ReservationForm>({
     date: '',
     time: '',
     guests: '',
@@ -66,7 +77,7 @@ const form = ref({
     comment: ''
 })
 
-const errors = ref({})
+const errors = ref<Partial<Record<keyof ReservationForm, string>>>({})
 
 const validateForm = () => {
     errors.value = {}

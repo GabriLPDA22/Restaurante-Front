@@ -22,8 +22,8 @@
     </div>
 </template>
 
-<script>
-import tableIcon from '@/assets/table.svg';
+<script lang="ts">
+import tableIcon from '../assets/svg/table.svg';
 
 export default {
     data() {
