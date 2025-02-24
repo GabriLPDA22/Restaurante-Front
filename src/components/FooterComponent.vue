@@ -73,7 +73,6 @@
         </a>
       </div>
     </div>
-<<<<<<< HEAD
 
     <!-- Parte inferior (copyright) -->
     <div class="footer__bottom">
@@ -81,9 +80,6 @@
         COPYRIGHT 2025
       </p>
     </div>
-=======
-    <p class="footer__copyright">COPYRIGHT 2025</p>
->>>>>>> 3ca585284da3ee1a75516017bca6f0877b03898c
   </footer>
 </template>
 

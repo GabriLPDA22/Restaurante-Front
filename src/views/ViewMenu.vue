@@ -1,6 +1,5 @@
 <template>
     <div class="menu">
-        <FloatingDecor />
         <div class="menu__container">
             <!-- Barra de navegación SOLO en escritorio -->
             <nav class="menu__desktop-nav">
@@ -84,10 +83,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-
 import CategoryCarousel from '../components/CategoryCasousel.vue'
 import ProductCard from '@/components/ProductCard.vue'
-import FloatingDecor from '@/components/FloatingDecor.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 const categories = ref(["All", "Appetizers", "Main Courses", "Drinks", "Dessert"])
