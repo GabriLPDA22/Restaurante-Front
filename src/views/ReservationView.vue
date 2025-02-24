@@ -14,8 +14,9 @@
                     </div>
                 </div>
 
-                <InputTextGuest v-model="form.guests" label="Guest" type="number" required />
-                <span v-if="errors.guests" class="reservation__error">{{ errors.guests }}</span>
+                <!-- Cambiamos el v-model para que se enlace con form.selectedTables -->
+                <InputTextGuest v-model="form.selectedTables" label="Selecciona Mesa" required />
+                <span v-if="errors.selectedTables" class="reservation__error">{{ errors.selectedTables }}</span>
 
                 <div class="reservation__field reservation__row">
                     <div class="reservation__column">
@@ -48,17 +49,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
+import { ref, watch } from 'vue'
 import InputDate from '@/components/InputDate.vue'
 import InputTime from '@/components/InputTime.vue'
-import InputTextGuest from '@/components/InputTextGuest.vue'
+import InputTextGuest from '../components/InputTextGuest.vue'
 import InputText from '@/components/InputText.vue'
 
 const form = ref({
     date: '',
     time: '',
-    guests: '',
+    selectedTables: [],
     firstName: '',
     lastName: '',
     email: '',
@@ -66,52 +66,69 @@ const form = ref({
     comment: ''
 })
 
-const errors = ref({})
+const errors = ref<{
+    date?: string;
+    time?: string;
+    selectedTables?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string
+}>({})
+
+watch(form, () => {
+    console.log('Current form values:', form.value);
+}, { deep: true });
 
 const validateForm = () => {
     errors.value = {}
 
-    if (!form.value.date) errors.value.date = "Date required."
-    if (!form.value.time) errors.value.time = "Time required."
-    if (!form.value.guests) errors.value.guests = "Guest required."
-    if (!form.value.firstName) errors.value.firstName = "First Name required."
-    if (!form.value.lastName) errors.value.lastName = "Last Name required."
-    if (!form.value.email) errors.value.email = "Email required."
-    if (!form.value.phone) errors.value.phone = "Phone required."
+    if (!form.value.date.trim()) errors.value.date = "Date required."
+    if (!form.value.time.trim()) errors.value.time = "Time required."
+    if (!form.value.selectedTables || form.value.selectedTables.length === 0) errors.value.selectedTables = "At least one table must be selected."
+    if (!form.value.firstName.trim()) errors.value.firstName = "First Name required."
+    if (!form.value.lastName.trim()) errors.value.lastName = "Last Name required."
+    if (!form.value.email.trim()) errors.value.email = "Email required."
+    if (!form.value.phone.trim()) errors.value.phone = "Phone required."
 
+    console.log('Validation errors:', errors.value);
     return Object.keys(errors.value).length === 0
 }
 
 const submitReservation = () => {
     if (validateForm()) {
-        const reservationData = {
+        const reservations = form.value.selectedTables.map(tableId => ({
             id: 0,
-            dateTime: new Date().toISOString(),
+            dateTime: `${form.value.date}T${form.value.time}:00.000Z`,
             customerName: `${form.value.firstName} ${form.value.lastName}`,
-            tableId: parseInt(form.value.guests) // Parse the guests field as an integer
+            tableId,
+            email: form.value.email,
+            phone: form.value.phone,
+            comment: form.value.comment
+        }));
 
-        }
+        console.log('Reservations Data:', reservations)
 
-        console.log('Reservation Data:', reservationData) // Add this line to log the reservation data
-
-        fetch('http://localhost:5021/api/Reservations', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json', // Set the Accept header to application/json
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(reservationData)
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert('Reservation submitted successfully!')
+        Promise.all(reservations.map(reservationData =>
+            fetch('http://localhost:5021/api/Reservations', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reservationData)
+            })
+        ))
+            .then(responses => {
+                if (responses.every(response => response.ok)) {
+                    alert('Reservations submitted successfully!')
                 } else {
-                    alert('Failed to submit reservation.')
+                    alert('Failed to submit some reservations.')
                 }
             })
             .catch(error => {
-                console.error('Error submitting reservation:', error)
-                alert('An error occurred while submitting the reservation.')
+                console.error('Error submitting reservations:', error)
+                alert('An error occurred while submitting the reservations.')
             })
     } else {
         alert('Please fill in all required fields.')

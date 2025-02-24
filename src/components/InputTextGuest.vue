@@ -1,4 +1,3 @@
-```vue
 <template>
     <div class="input-guest">
         <label v-if="label">{{ label }}</label>
@@ -27,25 +26,32 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import tableIcon from '@/assets/table.svg';
 
 export default {
+    props: {
+        label: String,
+        modelValue: {
+            type: Array,
+            default: () => []
+        }
+    },
     data() {
         return {
             isModalOpen: false,
             mesas: [1, 2, 3, 4, 5],
-            selectedTables: [],
+            selectedTables: this.modelValue,
             reservationMessage: '',
             tableIcon
         };
     },
-    props: {
-        label: String
-    },
     watch: {
         selectedTables(newVal) {
-            this.$emit('update:modelValue', newVal.length ? newVal : null);
+            this.$emit('update:modelValue', newVal.length ? newVal : []);
+        },
+        modelValue(newVal) {
+            this.selectedTables = newVal;
         }
     },
     methods: {
@@ -58,6 +64,7 @@ export default {
     }
 };
 </script>
+
 
 <style scoped>
 .input-guest__wrapper {
