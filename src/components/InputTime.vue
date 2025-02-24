@@ -92,10 +92,8 @@ const filteredTimes = computed(() => {
 
 .input-time__label {
     font-size: 1.2rem;
-    text-align: center;
     color: #253e2c;
     margin-bottom: 0.5rem;
-    font-weight: bold;
 }
 
 .input-time__wrapper {
