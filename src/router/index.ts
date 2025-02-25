@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue';
 import ContactPage from '../views/ContactPage.vue';
 import FoodDetail from '@/components/FoodDetail.vue';
 import ViewMenu from '../views/ViewMenu.vue';
-import AboutUs from '../views/AboutUs.vue';
+import AboutView from '../views/AboutView.vue';
 import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ShoppingCart from '@/views/ShoppingCart.vue';

@@ -28,7 +28,7 @@
           <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
         </button>
 
-        <!-- 🔥 Dropdown del usuario si está autenticado -->
+        <!-- Dropdown del usuario si está autenticado -->
         <div class="header__user-dropdown" v-if="isAuthenticated">
           <!-- Contenedor que muestra el avatar y el nombre, y abre/cierra el menú -->
           <div class="header__avatar-container" @click="toggleDropdown">
@@ -51,7 +51,7 @@
           </transition>
         </div>
 
-        <!-- 🔥 Si NO está autenticado, icono normal que redirige a /login -->
+        <!-- Si NO está autenticado, icono normal que redirige a /login -->
         <router-link v-else to="/login" class="header__icon" aria-label="User">
           <font-awesome-icon :icon="['fas', 'user']" class="icon" />
         </router-link>
@@ -100,13 +100,14 @@
         <nav class="header__nav-left">
           <ul class="home-view__nav-list">
             <li class="home-view__nav-item">
-              <router-link to="/menu" class="home-view__nav-link">Menu</router-link>
+              <router-link to="/" class="home-view__nav-link">Menu</router-link>
+            </li>
+            <!--Igual añadimos este mas adelante pero se queda para que se vea simetrico-->
+            <li class="home-view__nav-item">
+              <a class="home-view__nav-link">Events</a>
             </li>
             <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">Events</a>
-            </li>
-            <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">About Us</a>
+              <router-link to="/about" class="home-view__nav-link">About us</router-link>
             </li>
           </ul>
         </nav>
@@ -130,7 +131,7 @@
               <router-link to="/reservation" class="home-view__nav-link">Reservation</router-link>
             </li>
             <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">Orders</a>
+              <router-link to="/cart" class="home-view__nav-link">Orders</router-link>
             </li>
             <li class="home-view__nav-item">
               <router-link to="/contact" class="home-view__nav-link">Contact Us</router-link>
@@ -146,8 +147,6 @@
 import { ref, computed, onMounted } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { VBtn } from 'vuetify/components';
-
-// Importa tus stores, ajusta las rutas según tu estructura de proyecto
 import { useAuthStore } from '../stores/useAuthStore';
 import { useGoogleAuthStore } from '../stores/useGoogleAuthStore';
 
@@ -266,7 +265,6 @@ const handleLogout = () => {
   justify-content: center;
 }
 
-/* Estilos específicos para los iconos dentro de los botones */
 .header__icon i,
 .header__icon .icon {
   color: #093B35;

@@ -25,16 +25,16 @@
             <router-link to="/menu" class="footer__nav-link">Menu</router-link>
           </li>
           <li class="footer__nav-item">
-            <router-link to="#" class="footer__nav-link">Events</router-link>
+            <a class="footer__nav-link">Events</a>
           </li>
           <li class="footer__nav-item">
-            <router-link to="#" class="footer__nav-link">About Us</router-link>
+            <router-link to="/about" class="footer__nav-link">About Us</router-link>
           </li>
           <li class="footer__nav-item">
             <router-link to="/reservation" class="footer__nav-link">Reservation</router-link>
           </li>
           <li class="footer__nav-item">
-            <router-link to="#" class="footer__nav-link">Order</router-link>
+            <router-link to="/cart" class="footer__nav-link">Order</router-link>
           </li>
           <li class="footer__nav-item">
             <router-link to="/contact" class="footer__nav-link">Contact Us</router-link>
