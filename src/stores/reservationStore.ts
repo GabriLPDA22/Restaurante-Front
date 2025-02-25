@@ -77,30 +77,12 @@ export const useReservationStore = defineStore('reservation', () => {
         } catch (error) {
             console.error('Error fetching reservations:', error);
             loadingError.value = `Error al cargar reservas: ${error instanceof Error ? error.message : 'Error desconocido'}`;
-
-            // Si hay un error, fallback a modo simulación para pruebas de UI
-            useFallbackMockData(date);
         } finally {
             isLoadingReservations.value = false;
         }
     };
 
-    // Función para usar datos simulados en caso de error
-    const useFallbackMockData = (date: string) => {
-        console.warn('Using fallback mock data due to API error');
-
-        if (date === '2025-02-25') {
-            existingReservations.value = [
-                { tableId: 3, dateTime: `${date}T${form.value.time || '12:00'}:00.000Z` },
-                { tableId: 7, dateTime: `${date}T${form.value.time || '12:00'}:00.000Z` },
-                { tableId: 10, dateTime: `${date}T${form.value.time || '12:00'}:00.000Z` }
-            ];
-            loadingError.value += ' (Usando datos de simulación)';
-        } else {
-            existingReservations.value = [];
-        }
-    };
-
+   
     // Función para verificar si una mesa está disponible
     const isTableAvailable = (tableId: number) => {
         if (!form.value.date || !form.value.time) return true;
@@ -139,8 +121,7 @@ export const useReservationStore = defineStore('reservation', () => {
     // Obtener mesas ocupadas
     const getOccupiedTables = () => {
         if (!form.value.date || !form.value.time) return [];
-
-        // Suponemos que tienes 15 mesas en total
+        
         const allTableIds = Array.from({ length: 15 }, (_, i) => i + 1);
 
         return allTableIds.filter(tableId => !isTableAvailable(tableId));
