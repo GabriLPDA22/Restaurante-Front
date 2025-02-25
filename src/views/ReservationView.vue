@@ -19,7 +19,6 @@
                             {{ errors.time }}
                         </span>
                     </div>
-
                 </div>
 
                 <InputTextGuest v-model="form.selectedTables" label="Selecciona Mesa" required />
@@ -59,14 +58,17 @@
 
                 <InputText v-model="form.comment" label="Comment" type="textarea" />
 
-                <button type="submit" class="reservation__button">BOOK NOW</button>
+                <button type="submit" class="reservation__button"
+                    :class="{ 'reservation__button--disabled': !isFormValid }" :disabled="!isFormValid">
+                    BOOK NOW
+                </button>
             </form>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { watch, computed } from 'vue'
 import { useReservationStore } from '@/stores/reservationStore'
 
 import InputDate from '@/components/InputDate.vue'
@@ -77,6 +79,19 @@ import InputText from '@/components/InputText.vue'
 const reservationStore = useReservationStore()
 const form = reservationStore.form
 const errors = reservationStore.errors
+
+// Computamos si el formulario es válido
+const isFormValid = computed(() => {
+    return Boolean(
+        form.date &&
+        form.time &&
+        form.selectedTables.length > 0 &&
+        form.firstName &&
+        form.lastName &&
+        form.email &&
+        form.phone
+    );
+});
 
 function submitReservation() {
     reservationStore.submitReservation()
@@ -164,10 +179,22 @@ watch(form, (newVal) => {
         text-transform: uppercase;
         font-weight: bold;
         width: 100%;
-        transition: background 0.3s;
+        transition: all 0.3s;
 
         &:hover {
             background: #223022;
+        }
+
+        /* Estilo para cuando el botón está deshabilitado */
+        &--disabled {
+            background: #a0a0a0;
+            cursor: not-allowed;
+            opacity: 0.7;
+
+            &:hover {
+                background: #a0a0a0;
+                transform: none;
+            }
         }
     }
 

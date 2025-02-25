@@ -115,7 +115,7 @@ export const useReservationStore = defineStore('reservation', () => {
         const selectedTimeInMinutes = hours * 60 + minutes;
 
         // Ventana de 2 horas para la reserva
-        const reservationWindow = 120; // minutos
+        const reservationWindow = 120;
 
         // Buscar reservas que se superpongan para esta mesa
         const hasOverlap = existingReservations.value.some(reservation => {
