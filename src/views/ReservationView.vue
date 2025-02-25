@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
-import { useReservationStore } from '@/stores/reservation'
+import { useReservationStore } from '@/stores/reservationStore'
 
 import InputDate from '@/components/InputDate.vue'
 import InputTime from '@/components/InputTime.vue'

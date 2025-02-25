@@ -7,7 +7,13 @@
                     {{ time }}
                 </option>
             </select>
-            <span class="input-time__icon">🕒</span>
+            <span class="input-time__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+            </span>
         </div>
     </div>
 </template>
@@ -82,7 +88,7 @@ const filteredTimes = computed(() => {
 })
 </script>
 
-<style lang="scss">
+<style scoped>
 .input-time {
     font-family: 'Poppins', sans-serif;
     display: flex;
@@ -90,11 +96,7 @@ const filteredTimes = computed(() => {
     color: #333;
 }
 
-.input-time__label {
-    font-size: 1.2rem;
-    color: #253e2c;
-    margin-bottom: 0.5rem;
-}
+
 
 .input-time__wrapper {
     position: relative;
@@ -110,6 +112,12 @@ const filteredTimes = computed(() => {
     outline: none;
     transition: border 0.3s;
     color: #253e2c;
+
+    /* Eliminar apariencia nativa del select */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
 }
 
 .input-time__field:focus {
@@ -122,6 +130,19 @@ const filteredTimes = computed(() => {
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
-    color: #007BFF;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Para Firefox */
+.input-time__field::-moz-focus-inner {
+    border: 0;
+}
+
+/* Personalización de la flecha desplegable */
+.input-time__field::-ms-expand {
+    display: none;
 }
 </style>
