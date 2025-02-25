@@ -201,7 +201,7 @@ export default defineComponent({
         transition: background-color 0.3s, transform 0.2s;
 
         &:hover {
-            background-color: darken(#223022, 5%);
+            background-color: #223022;
             transform: translateY(-2px);
         }
     }
