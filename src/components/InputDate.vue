@@ -1,16 +1,53 @@
 <template>
     <div class="input-date">
-        <label class="input-date__label">{{ label }}</label>
-        <div class="input-date__wrapper">
-            <input type="date" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)"
-                class="input-date__field" />
-        </div>
+        <label v-if="label">{{ label }}</label>
+        <input type="date" :min="minDate" :max="maxDate" v-model="internalValue" @input="emitValue" />
     </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{ label: string, modelValue: string }>();
-defineEmits(['update:modelValue']);
+import { ref, watch } from 'vue'
+
+const props = defineProps({
+    modelValue: {
+        type: String,
+        default: ''
+    },
+    label: {
+        type: String,
+        default: ''
+    },
+    required: {
+        type: Boolean,
+        default: false
+    }
+})
+
+const emit = defineEmits(['update:modelValue'])
+const internalValue = ref(props.modelValue)
+
+// Fecha mínima: hoy
+const now = new Date()
+const yyyy = now.getFullYear()
+const mm = String(now.getMonth() + 1).padStart(2, '0')
+const dd = String(now.getDate()).padStart(2, '0')
+const minDate = `${yyyy}-${mm}-${dd}`
+
+// Fecha máxima: hoy + 7 días (ajustable)
+const maxDateObj = new Date(now)
+maxDateObj.setDate(maxDateObj.getDate() + 7)
+const yyyyMax = maxDateObj.getFullYear()
+const mmMax = String(maxDateObj.getMonth() + 1).padStart(2, '0')
+const ddMax = String(maxDateObj.getDate()).padStart(2, '0')
+const maxDate = `${yyyyMax}-${mmMax}-${ddMax}`
+
+watch(() => props.modelValue, newVal => {
+    internalValue.value = newVal
+})
+
+function emitValue() {
+    emit('update:modelValue', internalValue.value)
+}
 </script>
 
 <style lang="scss">

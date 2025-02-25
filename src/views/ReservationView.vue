@@ -2,40 +2,58 @@
     <div class="reservation-container">
         <div class="reservation">
             <h2 class="reservation__title">Reservation</h2>
+            <!-- Mantenemos exactamente la misma estructura -->
             <form class="reservation__form" @submit.prevent="submitReservation">
                 <div class="reservation__row">
                     <div class="reservation__field">
-                        <InputDate v-model="form.date" label="Date*" required />
-                        <span v-if="errors.date" class="reservation__error">{{ errors.date }}</span>
+                        <!-- Usamos InputDate con placeholder y un rango de fechas -->
+                        <InputDate v-model="form.date" label="Date*" placeholder="dd/mm/yyyy" required />
+                        <span v-if="errors.date" class="reservation__error">
+                            {{ errors.date }}
+                        </span>
                     </div>
                     <div class="reservation__field">
-                        <InputTime v-model="form.time" label="Time*" required />
-                        <span v-if="errors.time" class="reservation__error">{{ errors.time }}</span>
+                        <InputTime v-model="form.time" :selectedDate="form.date" label="Time*" placeholder="HH:mm"
+                            minTime="09:00" maxTime="23:00" :step="1800" required />
+                        <span v-if="errors.time" class="reservation__error">
+                            {{ errors.time }}
+                        </span>
                     </div>
+
                 </div>
 
-                <InputTextGuest v-model="form.guests" label="Guest" type="number" required />
-                <span v-if="errors.guests" class="reservation__error">{{ errors.guests }}</span>
+                <InputTextGuest v-model="form.selectedTables" label="Selecciona Mesa" required />
+                <span v-if="errors.selectedTables" class="reservation__error">
+                    {{ errors.selectedTables }}
+                </span>
 
                 <div class="reservation__field reservation__row">
                     <div class="reservation__column">
                         <InputText v-model="form.firstName" label="First Name" type="text" required />
-                        <span v-if="errors.firstName" class="reservation__error">{{ errors.firstName }}</span>
+                        <span v-if="errors.firstName" class="reservation__error">
+                            {{ errors.firstName }}
+                        </span>
                     </div>
                     <div class="reservation__column">
                         <InputText v-model="form.lastName" label="Last Name" type="text" required />
-                        <span v-if="errors.lastName" class="reservation__error">{{ errors.lastName }}</span>
+                        <span v-if="errors.lastName" class="reservation__error">
+                            {{ errors.lastName }}
+                        </span>
                     </div>
                 </div>
 
                 <div class="reservation__row">
                     <div class="reservation__column">
                         <InputText v-model="form.email" label="Email" type="email" required />
-                        <span v-if="errors.email" class="reservation__error">{{ errors.email }}</span>
+                        <span v-if="errors.email" class="reservation__error">
+                            {{ errors.email }}
+                        </span>
                     </div>
                     <div class="reservation__column">
                         <InputText v-model="form.phone" label="Phone" type="tel" required />
-                        <span v-if="errors.phone" class="reservation__error">{{ errors.phone }}</span>
+                        <span v-if="errors.phone" class="reservation__error">
+                            {{ errors.phone }}
+                        </span>
                     </div>
                 </div>
 
@@ -48,64 +66,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { watch } from 'vue'
+import { useReservationStore } from '@/stores/reservationStore'
 
 import InputDate from '@/components/InputDate.vue'
 import InputTime from '@/components/InputTime.vue'
 import InputTextGuest from '../components/InputTextGuest.vue'
 import InputText from '@/components/InputText.vue'
 
-interface ReservationForm {
-    date: string;
-    time: string;
-    guests: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    comment: string;
+const reservationStore = useReservationStore()
+const form = reservationStore.form
+const errors = reservationStore.errors
+
+function submitReservation() {
+    reservationStore.submitReservation()
 }
 
-const form = ref<ReservationForm>({
-    date: '',
-    time: '',
-    guests: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    comment: ''
-})
-
-const errors = ref<Partial<Record<keyof ReservationForm, string>>>({})
-
-const validateForm = () => {
-    errors.value = {}
-
-    if (!form.value.date) errors.value.date = "Date required."
-    if (!form.value.time) errors.value.time = "Time required."
-    if (!form.value.guests) errors.value.guests = "Guest required."
-    if (!form.value.firstName) errors.value.firstName = "First Name required."
-    if (!form.value.lastName) errors.value.lastName = "Last Name required."
-    if (!form.value.email) errors.value.email = "Email required."
-    if (!form.value.phone) errors.value.phone = "Phone required."
-
-    return Object.keys(errors.value).length === 0
-}
-
-const submitReservation = () => {
-    if (validateForm()) {
-        alert('Reservation submitted successfully!')
-    } else {
-        alert('Please fill in all required fields.')
-    }
-}
+watch(form, (newVal) => {
+    console.log('Current form values:', newVal)
+}, { deep: true })
 </script>
+
+
 <style lang="scss">
 .reservation__error {
     color: red;
     font-size: 0.8em;
 }
+
 .reservation-container {
     min-height: 100vh;
     display: flex;
