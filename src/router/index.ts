@@ -7,6 +7,7 @@ import AboutView from '../views/AboutView.vue';
 import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ShoppingCart from '@/views/ShoppingCart.vue';
+import ThanksView from '@/views/ThanksView.vue';  // Importar el nuevo componente
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
@@ -18,6 +19,7 @@ const routes = [
   { path: '/register', name: 'Register', component: RegisterView },
   { path: '/cart', name: 'cart', component: ShoppingCart, },
   { path: '/reservation', name: 'reservation', component: () => import('../views/ReservationView.vue') },
+  { path: '/thanks', name: 'thanks', component: ThanksView },
 ];
 
 const router = createRouter({

@@ -35,7 +35,7 @@ const minDate = `${yyyy}-${mm}-${dd}`
 
 // Fecha máxima: hoy + 7 días (ajustable)
 const maxDateObj = new Date(now)
-maxDateObj.setDate(maxDateObj.getDate() + 7)
+maxDateObj.setDate(maxDateObj.getDate() + 30)
 const yyyyMax = maxDateObj.getFullYear()
 const mmMax = String(maxDateObj.getMonth() + 1).padStart(2, '0')
 const ddMax = String(maxDateObj.getDate()).padStart(2, '0')
