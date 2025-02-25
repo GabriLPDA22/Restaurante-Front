@@ -1,23 +1,69 @@
 <template>
   <footer class="footer">
     <div class="footer__top">
-      <h1 class="footer__title">PARTOW FOODS</h1>
-      <p class="footer__subtitle">RESTAURANT</p>
+      <div class="footer__logo">
+        <router-link to="/" aria-label="Ir a la página de inicio">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet"
+            style="width:200px;">
+            <text x="50%" y="50%" text-anchor="middle"
+              style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;">
+              PARTOW FOODS
+            </text>
+            <text x="50%" y="75%" text-anchor="middle"
+              style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;">
+              RESTAURANT
+            </text>
+          </svg>
+        </router-link>
+      </div>
+
+
+      <!-- Navegación (solo escritorio) -->
+      <nav class="footer__nav">
+        <ul class="footer__nav-list">
+          <li class="footer__nav-item">
+            <router-link to="/menu" class="footer__nav-link">Menu</router-link>
+          </li>
+          <li class="footer__nav-item">
+            <a class="footer__nav-link">Events</a>
+          </li>
+          <li class="footer__nav-item">
+            <router-link to="/about" class="footer__nav-link">About Us</router-link>
+          </li>
+          <li class="footer__nav-item">
+            <router-link to="/reservation" class="footer__nav-link">Reservation</router-link>
+          </li>
+          <li class="footer__nav-item">
+            <router-link to="/cart" class="footer__nav-link">Order</router-link>
+          </li>
+          <li class="footer__nav-item">
+            <router-link to="/contact" class="footer__nav-link">Contact Us</router-link>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Descripción -->
       <p class="footer__description">
-        Lorem ipsum dolor sit amet consectetur. Sagittis mattis mauris at condimentum arcu eget. Sed posuere cursus
-        pharetra tortor eu purus rhoncus lectus. Enim ut ligula sit nec donec. Hendrerit in.
+        Lorem ipsum dolor sit amet consectetur. Sagittis mattis mauris at condimentum arcu eget.
+        Sed posuere cursus pharetra tortor eu purus rhoncus lectus. Enim ut ligula sit nec donec.
+        Hendrerit in.
       </p>
+
+      <!-- Horarios -->
       <p class="footer__hours">
         SUNDAY - THURSDAY: 11:30AM - 11PM <br />
         FRIDAY & SATURDAY: 11:30AM - 12AM
       </p>
-    </div>
-    <div class="footer__bottom">
+
+      <!-- Botones -->
       <div class="footer__actions">
         <button class="footer__button footer__button--reserve">Reserve Now</button>
-        <router-link to="/contact" class="footer__button footer__button--contact" style="text-decoration: none;">Contact
-          Us</router-link>
+        <router-link to="/contact" class="footer__button footer__button--contact" style="text-decoration: none;">
+          Contact Us
+        </router-link>
       </div>
+
+      <!-- Redes sociales -->
       <div class="footer__social">
         <a href="https://www.facebook.com" class="footer__social-icon">
           <font-awesome-icon :icon="['fab', 'facebook']" />
@@ -27,7 +73,13 @@
         </a>
       </div>
     </div>
-    <p class="footer__copyright">COPYRIGHT 2024</p>
+
+    <!-- Parte inferior (copyright) -->
+    <div class="footer__bottom">
+      <p class="footer__copyright">
+        COPYRIGHT 2025
+      </p>
+    </div>
   </footer>
 </template>
 
@@ -59,6 +111,10 @@ export default {
     font-weight: bold;
   }
 
+  &__logo {
+    margin-bottom: 1.5rem;
+  }
+
   &__subtitle {
     font-size: 1.2rem;
     letter-spacing: 0.2rem;
@@ -80,23 +136,44 @@ export default {
     font-weight: bold;
   }
 
-  &__bottom {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
+  /* Nav visible solo en escritorio */
+  &__nav {
+    display: none;
+    /* Oculto en mobile */
+    margin-bottom: 2rem;
 
-    @media (min-width: 1024px) {
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
+    &-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
       gap: 2rem;
+      justify-content: center;
     }
+
+    &-link {
+      color: #f3d2a4;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #ffad33;
+      }
+    }
+  }
+
+  &__bottom {
+    // Cualquier estilo para la parte final
   }
 
   &__actions {
     display: flex;
     gap: 1rem;
+    justify-content: center;
+    /* Centra los botones */
+    margin-top: 1.5rem;
   }
 
   &__button {
@@ -110,8 +187,10 @@ export default {
 
     &--reserve {
       background-color: #f3d2a4;
+      /* Dorado */
       color: #032b31;
 
+      /* Verde oscuro */
       &:hover {
         background-color: #ffad33;
       }
@@ -129,10 +208,12 @@ export default {
     }
   }
 
+  /* Redes sociales con el estilo anterior */
   &__social {
     display: flex;
+    justify-content: center;
     gap: 1.5rem;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 
     &-icon {
       font-size: 1.8rem;
@@ -146,10 +227,60 @@ export default {
     }
   }
 
+  /* Copyright */
   &__copyright {
     margin-top: 2.5rem;
     font-size: 0.875rem;
     letter-spacing: 0.05rem;
   }
+}
+
+/* Estilos escritorio (≥ 1024px): mostramos nav y agrandamos botones */
+@media (min-width: 1024px) {
+  .footer__top {
+    max-width: 900px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+  }
+
+  .footer__title {
+    font-size: 3rem;
+  }
+
+  .footer__subtitle {
+    font-size: 1.4rem;
+  }
+
+  .footer__description,
+  .footer__hours {
+    font-size: 1.2rem;
+    max-width: 800px;
+  }
+
+  .footer__hours {
+    display: ruby;
+  }
+
+
+  .footer__nav {
+    display: block;
+    margin-top: 4px;
+  }
+
+  .footer__nav-link {
+    font-size: 1.1rem;
+  }
+
+  .footer__button {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+
+  .footer__social {
+    display: flex;
+    justify-content: center;
+  }
+
+
 }
 </style>

@@ -4,6 +4,7 @@ import MenuCard from "@/components/MenuCard.vue";
 import ChefRecommendation from "@/components/ChefRecommendation.vue";
 
 const router = useRouter();
+
 const menuItems = [
   { title: "Appetizers", image: "/src/assets/appetizers.jpg" },
   { title: "Main Courses", image: "/src/assets/main-courses.jpg" },
@@ -14,7 +15,7 @@ const menuItems = [
 const chefSpecial = {
   title: "Risotto ai Funghi",
   description:
-    "Creamy Arborio rice infused with a medley of wild mushrooms, Parmesan cheese, and a hint of truffle oil...",
+    "Creamy Arborio rice infused with a medley of wild mushrooms, Parmesan cheese, and a hint of truffle oil. This exquisite dish promises a symphony of flavors, meticulously crafted to elevate your dining experience. Immerse yourself in the taste of Italy, one delightful spoonful at a time.",
   price: "$24",
   image: "/src/assets/chef-special.png",
 };
@@ -23,23 +24,31 @@ const navigateToCategory = (category: string) => {
   router.push({ name: 'menu', query: { category } });
   window.scrollTo(0, 0);
 };
-
 </script>
 
 <template>
   <main class="home-view">
+    <!-- Sección Hero -->
     <section class="home-view__hero">
-      <div class="home-view__content">
-        <p class="home-view__tagline">Fresh Ingredients Sourced Globally</p>
-        <h1 class="home-view__title">ITALIAN INSPIRED CUISINE</h1>
+      <!-- Texto arriba -->
+      <div class="home-view__hero-texts">
+        <p class="home-view__hero-subtitle">FRESH INGREDIENTS SOURCED GLOBALLY</p>
+        <h1 class="home-view__hero-title">ITALIAN INSPIRED CUISINE</h1>
       </div>
-      <div class="home-view__actions">
-        <a href="/reserve" class="home-view__button home-view__button--reserve" style="text-decoration: none;">Reserve
-          Now</a>
-        <router-link to="/contact" class="home-view__button home-view__button--contact"
-          style="text-decoration: none;">Contact Us</router-link>
+
+      <!-- Botones debajo -->
+      <div class="home-view__hero-actions">
+        <a href="/reserve" class="home-view__hero-btn home-view__hero-btn--reserve" style="text-decoration: none;">
+          RESERVE NOW
+        </a>
+        <router-link to="/contact" class="home-view__hero-btn home-view__hero-btn--contact"
+          style="text-decoration: none;">
+          CONTACT US
+        </router-link>
       </div>
     </section>
+
+    <!-- Sección Menú -->
     <section class="menu-section">
       <h2 class="menu-section__title">View Our Menu</h2>
       <div class="menu-section__grid">
@@ -47,124 +56,119 @@ const navigateToCategory = (category: string) => {
           @click="navigateToCategory(item.title)" />
       </div>
     </section>
+
+    <!-- Recomendación del Chef -->
     <ChefRecommendation :title="chefSpecial.title" :description="chefSpecial.description" :price="chefSpecial.price"
       :image="chefSpecial.image" />
   </main>
 </template>
 
 <style lang="scss" scoped>
+// =======================
+// Variables de ejemplo
+// =======================
+$color-white: #fff;
+$color-gold: #d3b486;
+$color-dark: #093035;
+$color-gold-hover: #af8c3a;
+
 .home-view {
-  &__hero {
+  overflow: visible;
+
+  .home-view__hero {
+    position: relative;
     background: url('/src/assets/hero-background.jpg') no-repeat center center;
     background-size: cover;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 10vh 5vw;
-    min-height: 100vh;
-    color: #f9efe6;
+    padding: 5vh 5vw;
+    min-height: 110vh;
     text-align: center;
-
-    @media (min-width: 768px) {
-      padding: 13vh 10vw;
-    }
+    color: $color-white;
+    padding-top: 10vh;
   }
 
-  &__content {
-    max-width: 90%;
+  .home-view__hero-texts {
+    margin-bottom: 2vh;
     display: flex;
     flex-direction: column;
+    gap: 1rem;
     align-items: center;
-    justify-content: center;
-    margin-top: 8vh;
-
-    @media (min-width: 768px) {
-      max-width: 600px;
-    }
   }
 
-  &__tagline {
-    font-size: 4vw;
+
+  &__hero-subtitle {
+    font-size: 1.2rem;
     font-weight: 700;
     text-transform: uppercase;
-    margin-bottom: 1vh;
-
-    @media (min-width: 768px) {
-      font-size: 1.5rem;
-    }
+    letter-spacing: 1.5px;
   }
 
-  &__title {
-    font-size: 8vw;
+  &__hero-title {
+    font-size: 2rem;
     font-weight: 700;
     text-transform: uppercase;
-    color: #d3b486;
-    line-height: 1.1;
-    margin-bottom: 6vh;
-
-    @media (min-width: 768px) {
-      font-size: 3rem;
-    }
+    color: $color-gold;
+    line-height: 1.2;
+    max-width: 600px;
+    margin: 0 auto;
   }
 
-  &__actions {
+  &__hero-actions {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    max-width: 280px;
-    gap: 24px;
-    margin-top: 10vh;
-
-    @media (min-width: 768px) {
-      flex-direction: row;
-      max-width: 100%;
-      justify-content: center;
-    }
+    gap: 1rem;
+    margin-top: 3vh;
+    align-items: center;
   }
 
-  &__button {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    text-transform: uppercase;
+  &__hero-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    font-size: 1rem;
     font-weight: 600;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
     text-align: center;
+    display: inline-block;
 
     &--reserve {
-      background-color: #d3b486;
-      color: #093035;
+      background-color: $color-gold;
+      color: $color-dark;
       transition: background-color 0.3s;
 
       &:hover {
-        background-color: #bf9a22;
+        background-color: $color-gold-hover;
       }
     }
 
     &--contact {
       background-color: transparent;
-      color: #fff;
-      border: 2px solid #fff;
+      color: $color-white;
+      border: 2px solid $color-white;
       transition: background-color 0.3s, color 0.3s;
 
       &:hover {
-        background-color: #fff;
-        color: #093035;
+        background-color: $color-white;
+        color: $color-dark;
       }
     }
   }
 }
 
+// =======================
+// Menu Section
+// =======================
 .menu-section {
   text-align: center;
   background: #000; 
   padding-top: 40px;
   &__title {
-    color: #d3b486;
-    font-size: 1.8rem;
+    color: $color-gold;
+    font-size: 3.8rem;
     margin-bottom: 20px;
   }
 
@@ -179,26 +183,40 @@ const navigateToCategory = (category: string) => {
       grid-template-columns: repeat(4, 1fr);
     } 
   }
+}
 
-  .chef-section {
-    text-align: center;
-    padding: 60px 20px;
-    background: #000;
-
-    &__title {
-      color: #d3b486;
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-
-    @media (min-width: 768px) {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      text-align: left;
-    }
+// =======================
+// Breakpoints
+// =======================
+@media (min-width: 768px) {
+  .home-view__hero-subtitle {
+    font-size: 3.5rem;
   }
 
+  .home-view__hero-title {
+    font-size: 5rem;
+    max-width: 800px;
+  }
+
+  .home-view__hero-btn {
+    font-size: 2.1rem;
+
+  }
+
+  .home-view__hero-actions {
+    flex-direction: row;
+    margin-top: 30%;
+  }
+
+
+}
+
+@media (min-width: 992px) {
+  .home-view__hero {
+    mask-image: linear-gradient(black 100%, transparent);
+    background: url('/src/assets/hero-background.jpg') no-repeat center;
+    background-position: center top;
+    background-position: center 20%;
+  }
 }
 </style>

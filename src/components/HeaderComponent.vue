@@ -24,12 +24,11 @@
       </div>
 
       <div class="header__icons-mobile">
-        <button class="header__icon" aria-label="Cart" @click="toggleCart">
+        <button class="header__icon" aria-label="Cart">
           <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
-          <span v-if="cartStore.totalQuantity > 0" class="header__notification">{{ cartStore.totalQuantity }}</span>
         </button>
 
-        <!-- 🔥 Dropdown del usuario si está autenticado -->
+        <!-- Dropdown del usuario si está autenticado -->
         <div class="header__user-dropdown" v-if="isAuthenticated">
           <!-- Contenedor que muestra el avatar y el nombre, y abre/cierra el menú -->
           <div class="header__avatar-container" @click="toggleDropdown">
@@ -52,7 +51,7 @@
           </transition>
         </div>
 
-        <!-- 🔥 Si NO está autenticado, icono normal que redirige a /login -->
+        <!-- Si NO está autenticado, icono normal que redirige a /login -->
         <router-link v-else to="/login" class="header__icon" aria-label="User">
           <font-awesome-icon :icon="['fas', 'user']" class="icon" />
         </router-link>
@@ -64,10 +63,10 @@
       <nav class="header__nav" @click.stop>
         <ul>
           <li><router-link to="/menu" @click="closeMenu">Menu</router-link></li>
-          <li><router-link to="#" @click="closeMenu">Events</router-link></li>
-          <li><router-link to="#" @click="closeMenu">About Us</router-link></li>
+          <li><a>Events</a></li>
+          <li><router-link to="/about" @click="closeMenu">About Us</router-link></li>
           <li><router-link to="/reservation" @click="closeMenu">Reservation</router-link></li>
-          <li><router-link to="#" @click="closeMenu">Orders</router-link></li>
+          <li><router-link to="/cart" @click="closeMenu">Orders</router-link></li>
           <li><router-link to="/contact" @click="closeMenu">Contact Us</router-link></li>
         </ul>
       </nav>
@@ -87,33 +86,12 @@
             <font-awesome-icon :icon="['fas', 'heart']" class="icon" />
             <span class="header__notification">2</span>
           </button>
-          <button class="header__icon" aria-label="Cart">
-            <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
-            <span class="header__notification">4</span>
-          </button>
-          <button class="header__icon" aria-label="User Profile">
+          <!-- Se quita el botón de Carrito -->
+          <router-link to="/login" class="header__icon" aria-label="User Profile">
             <font-awesome-icon :icon="['fas', 'user']" class="icon" />
-          </button>
+          </router-link>
         </div>
       </div>
-    </div>
-
-    <!-- DESPLEGABLE DEL CARRITO -->
-    <div v-if="isCartOpen" class="cart-dropdown">
-      <h3 class="cart-dropdown__title">Shopping Cart</h3>
-      <div class="cart-dropdown__items" v-if="cartStore.cart.length > 0">
-        <div v-for="item in cartStore.cart" :key="item.id" class="cart-item">
-          <img :src="item.image" :alt="item.name" class="cart-item__image" />
-          <p class="cart-item__name">{{ item.name }}</p>
-          <p class="cart-item__price">${{ item.price }} x {{ item.quantity }}</p>
-          <div class="cart-item__actions">
-            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity - 1)">-</button>
-            <button class="cart-button" @click="cartStore.updateQuantity(item.id, item.quantity + 1)">+</button>
-            <button class="cart-button cart-button--delete" @click="cartStore.removeFromCart(item.id)">🗑️</button>
-          </div>
-        </div>
-      </div>
-      <p v-else class="cart-dropdown__empty">Your cart is empty.</p>
     </div>
 
     <!-- BARRA INFERIOR (ESCRITORIO) -->
@@ -122,18 +100,20 @@
         <nav class="header__nav-left">
           <ul class="home-view__nav-list">
             <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">Menu</a>
+              <router-link to="/" class="home-view__nav-link">Menu</router-link>
+            </li>
+            <!--Igual añadimos este mas adelante pero se queda para que se vea simetrico-->
+            <li class="home-view__nav-item">
+              <a class="home-view__nav-link">Events</a>
             </li>
             <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">Events</a>
-            </li>
-            <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">About Us</a>
+              <router-link to="/about" class="home-view__nav-link">About us</router-link>
             </li>
           </ul>
         </nav>
 
         <div class="header__logo">
+          <router-link to="/" aria-label="Ir a la página de inicio">
           <svg class="header__svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet" style="width:300px;">
             <text x="50%" y="45%" text-anchor="middle" class="header__brand" style="font-size:70px;">
               PARTOW FOODS
@@ -142,6 +122,7 @@
               RESTAURANT
             </text>
           </svg>
+        </router-link>
         </div>
 
         <nav class="header__nav-right">
@@ -150,7 +131,7 @@
               <router-link to="/reservation" class="home-view__nav-link">Reservation</router-link>
             </li>
             <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">Orders</a>
+              <router-link to="/cart" class="home-view__nav-link">Orders</router-link>
             </li>
             <li class="home-view__nav-item">
               <router-link to="/contact" class="home-view__nav-link">Contact Us</router-link>
@@ -164,23 +145,16 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useCartStore } from '../stores/CartStore';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useGoogleAuthStore } from '@/stores/useGoogleAuthStore';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { VBtn } from 'vuetify/components';
+import { useAuthStore } from '../stores/useAuthStore';
+import { useGoogleAuthStore } from '../stores/useGoogleAuthStore';
 
-const cartStore = useCartStore();
 const authStore = useAuthStore();
 const googleAuthStore = useGoogleAuthStore();
 
-const isCartOpen = ref(false);
 const isMenuOpen = ref(false);
 const isDropdownOpen = ref(false);
-
-const toggleCart = () => {
-  isCartOpen.value = !isCartOpen.value;
-};
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -291,7 +265,6 @@ const handleLogout = () => {
   justify-content: center;
 }
 
-/* Estilos específicos para los iconos dentro de los botones */
 .header__icon i,
 .header__icon .icon {
   color: #093B35;
@@ -551,98 +524,98 @@ html.no-scroll {
   .header__bottom {
     display: block;
   }
-}
 
-/* CARD MENU MODAL MOBILE */
+  /* CARD MENU MODAL MOBILE */
 
-.cart-dropdown {
-  position: absolute;
-  top: 50px;
-  right: 10px;
-  width: 300px;
-  max-height: 250px;
-  background: #fef3c7;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  padding: 10px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.cart-dropdown__title {
-  font-size: 16px;
-  font-weight: bold;
-  text-align: left;
-  margin-bottom: 10px;
-  color: #064e3b;
-}
-
-.cart-dropdown__items {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.cart-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-  border-bottom: 1px solid #d1a75f;
-  width: 100%;
-  justify-content: space-between;
-}
-
-.cart-item__image {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 5px;
-}
-
-.cart-item__name,
-.cart-item__price {
-  font-size: 14px;
-  color: #2d2d2d;
-  margin: 0;
-}
-
-.cart-item__actions {
-  display: flex;
-  gap: 5px;
-}
-
-.cart-button {
-  background: #064e3b;
-  color: white;
-  border: none;
-  padding: 5px 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 14px;
-  transition: background 0.3s;
-
-  &:hover {
-    background: #043d2a;
+  .cart-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    width: 300px;
+    max-height: 250px;
+    background: #fef3c7;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    padding: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
-}
 
-.cart-button--delete {
-  background: #d9534f;
-
-  &:hover {
-    background: #c9302c;
+  .cart-dropdown__title {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+    margin-bottom: 10px;
+    color: #064e3b;
   }
-}
 
-.cart-dropdown__empty {
-  text-align: center;
-  font-size: 14px;
-  color: #666;
-  padding: 10px;
-}
+  .cart-dropdown__items {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cart-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-bottom: 1px solid #d1a75f;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .cart-item__image {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+
+  .cart-item__name,
+  .cart-item__price {
+    font-size: 14px;
+    color: #2d2d2d;
+    margin: 0;
+  }
+
+  .cart-item__actions {
+    display: flex;
+    gap: 5px;
+  }
+
+  .cart-button {
+    background: #064e3b;
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.3s;
+
+    &:hover {
+      background: #043d2a;
+    }
+
+    .cart-button--delete {
+      background: #d9534f;
+
+      &:hover {
+        background: #c9302c;
+      }
+    }
+
+    .cart-dropdown__empty {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      padding: 10px;
+    }
+  }
+}   
 </style>
