@@ -164,15 +164,10 @@ export default {
     }
   }
 
-  &__bottom {
-    // Cualquier estilo para la parte final
-  }
-
   &__actions {
     display: flex;
     gap: 1rem;
     justify-content: center;
-    /* Centra los botones */
     margin-top: 1.5rem;
   }
 
@@ -208,7 +203,6 @@ export default {
     }
   }
 
-  /* Redes sociales con el estilo anterior */
   &__social {
     display: flex;
     justify-content: center;
