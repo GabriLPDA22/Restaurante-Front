@@ -74,7 +74,7 @@
 
 <script lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, defineComponent } from 'vue';
-import tableIcon from '@/assets/table.svg';
+import tableIcon from '../assets/svg/table.svg';
 import { useReservationStore } from '@/stores/reservationStore'; // Ruta corregida
 
 export default defineComponent({
