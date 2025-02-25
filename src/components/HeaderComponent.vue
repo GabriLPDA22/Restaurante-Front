@@ -63,10 +63,10 @@
       <nav class="header__nav" @click.stop>
         <ul>
           <li><router-link to="/menu" @click="closeMenu">Menu</router-link></li>
-          <li><router-link to="#" @click="closeMenu">Events</router-link></li>
-          <li><router-link to="#" @click="closeMenu">About Us</router-link></li>
+          <li><a>Events</a></li>
+          <li><router-link to="/about" @click="closeMenu">About Us</router-link></li>
           <li><router-link to="/reservation" @click="closeMenu">Reservation</router-link></li>
-          <li><router-link to="#" @click="closeMenu">Orders</router-link></li>
+          <li><router-link to="/cart" @click="closeMenu">Orders</router-link></li>
           <li><router-link to="/contact" @click="closeMenu">Contact Us</router-link></li>
         </ul>
       </nav>
