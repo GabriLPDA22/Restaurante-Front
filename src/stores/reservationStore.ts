@@ -1,7 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 export const useReservationStore = defineStore('reservation', () => {
+    // Obtener el router para la redirección
+    const router = useRouter()
+
     // Estado base del formulario
     const form = ref({
         date: '',
@@ -20,6 +24,7 @@ export const useReservationStore = defineStore('reservation', () => {
     // Estado para control de carga y errores
     const isLoadingReservations = ref(false)
     const loadingError = ref('')
+    const isSubmitting = ref(false)
 
     // Errores de validación
     const errors = ref<{
@@ -208,9 +213,16 @@ export const useReservationStore = defineStore('reservation', () => {
         return Object.keys(errors.value).length === 0;
     }
 
-    // Función para enviar la reserva
-    const submitReservation = () => {
-        if (validateForm()) {
+    // Función para enviar la reserva con redirección
+    const submitReservation = async () => {
+        if (!validateForm()) {
+            alert('Por favor, complete todos los campos requeridos.');
+            return;
+        }
+
+        isSubmitting.value = true;
+
+        try {
             const reservations = form.value.selectedTables.map(tableId => ({
                 id: 0,
                 dateTime: `${form.value.date}T${form.value.time}:00.000Z`,
@@ -221,9 +233,9 @@ export const useReservationStore = defineStore('reservation', () => {
                 comment: form.value.comment
             }));
 
-            console.log('Reservations Data:', reservations)
+            console.log('Submitting reservations:', reservations);
 
-            Promise.all(reservations.map(reservationData =>
+            const responses = await Promise.all(reservations.map(reservationData =>
                 fetch('http://localhost:5021/api/Reservations', {
                     method: 'POST',
                     headers: {
@@ -232,24 +244,53 @@ export const useReservationStore = defineStore('reservation', () => {
                     },
                     body: JSON.stringify(reservationData)
                 })
-            ))
-                .then(responses => {
-                    if (responses.every(response => response.ok)) {
-                        alert('Reservations submitted successfully!')
-                        // Recargar las reservas para actualizar el estado
-                        fetchReservationsByDate(form.value.date);
-                    } else {
-                        alert('Failed to submit some reservations.')
+            ));
+
+            const allSuccess = responses.every(response => response.ok);
+
+            if (allSuccess) {
+                console.log('All reservations submitted successfully');
+
+                // Guardar datos de reserva para mostrar en la página de confirmación
+                const reservationData = {
+                    customerName: `${form.value.firstName} ${form.value.lastName}`,
+                    date: form.value.date,
+                    time: form.value.time,
+                    tables: form.value.selectedTables
+                };
+
+                // Guardar en localStorage para recuperarlo en la página de agradecimiento
+                localStorage.setItem('lastReservation', JSON.stringify(reservationData));
+
+                // Resetear el formulario
+                resetForm();
+
+                // Redirigir a la página de agradecimiento (actualizada a la ruta "thanks")
+                router.push('/thanks');
+            } else {
+                // Mostrar error
+                const errorResponse = responses.find(response => !response.ok);
+                let errorMessage = 'Ha ocurrido un error al procesar su reserva.';
+
+                if (errorResponse) {
+                    try {
+                        const errorText = await errorResponse.text();
+                        errorMessage += ` ${errorResponse.status}: ${errorText}`;
+                    } catch (e) {
+                        // Si no se puede obtener el texto del error, solo mostrar el código
+                        errorMessage += ` Código: ${errorResponse.status}`;
                     }
-                })
-                .catch(error => {
-                    console.error('Error submitting reservations:', error)
-                    alert('An error occurred while submitting the reservations.')
-                })
-        } else {
-            alert('Please fill in all required fields.')
+                }
+
+                alert(errorMessage);
+            }
+        } catch (error) {
+            console.error('Error submitting reservations:', error);
+            alert(`Ha ocurrido un error al procesar su reserva: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+        } finally {
+            isSubmitting.value = false;
         }
-    }
+    };
 
     // Función para resetear el formulario
     const resetForm = () => {
@@ -276,9 +317,10 @@ export const useReservationStore = defineStore('reservation', () => {
         getOccupiedTables,
         getAvailableTables,
         isLoadingReservations,
+        isSubmitting,
         loadingError,
         existingReservations,
         simulateReservations,
         resetForm
-    }
-})
+    };
+});

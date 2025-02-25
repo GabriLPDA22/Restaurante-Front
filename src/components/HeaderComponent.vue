@@ -147,7 +147,7 @@
         <nav class="header__nav-right">
           <ul class="home-view__nav-list">
             <li class="home-view__nav-item">
-              <a href="#" class="home-view__nav-link">Reservation</a>
+              <router-link to="/reservation" class="home-view__nav-link">Reservation</router-link>
             </li>
             <li class="home-view__nav-item">
               <a href="#" class="home-view__nav-link">Orders</a>
