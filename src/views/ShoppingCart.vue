@@ -1,249 +1,567 @@
 <template>
-  <div class="cart">
-    <div v-if="selectedProduct" class="cart__details">
-      <div class="cart__details-left">
-        <div class="cart__details-image-container">
-          <img :src="selectedProduct.image" :alt="selectedProduct.name" class="cart__details-image" />
-          <p class="cart__details-price">Precio: ${{ selectedProduct.price }}</p>
+  <div class="restaurant-app">
+    <header class="restaurant-app__header">
+      <div class="header-content">
+        <h1 class="header-content__title">Buon Appetito!</h1>
+        <p class="header-content__subtitle">Experiencia gastronómica excepcional</p>
+        
+        <div class="search-container">
+          <input 
+            type="text" 
+            placeholder="Buscar platos..." 
+            v-model="searchQuery"
+            class="search-container__input"
+          />
         </div>
-        <div class="cart__details-info">
-          <h2 class="cart__details-title">{{ selectedProduct.name }}</h2>
-          <p class="cart__details-description">{{ selectedProduct.description }}</p>
+
+        <div class="category-filters">
+          <button 
+            v-for="category in categories" 
+            :key="category"
+            @click="selectedCategory = category"
+            :class="{
+              'category-filters__button': true, 
+              'category-filters__button--active': selectedCategory === category
+            }"
+          >
+            {{ category }}
+          </button>
         </div>
       </div>
-      <div class="cart__details-right">
-        <button class="cart__details-close" @click="closeDetails">Cerrar</button>
-        <button class="cart__details-cart" @click="addToCart(selectedProduct)">Añadir</button>
-        <button class="cart__details-cart cart__details-cart--remove" @click="removeFromCart(selectedProduct)" :disabled="!cart[selectedProduct.id]">Quitar</button>
-        <p class="cart__details-total">Total: ${{ cartTotal }}</p>
-        <button class="cart__details-checkout" @click="goToCheckout">Ir al pago</button>
+    </header>
+
+    <main class="restaurant-app__content">
+      <div class="product-grid">
+        <div 
+          v-for="product in filteredProducts" 
+          :key="product.id" 
+          class="product-card"
+        >
+          <div class="product-card__image-container">
+            <img 
+              :src="product.imagenUrl" 
+              :alt="product.nombre" 
+              class="product-card__image"
+            />
+          </div>
+          
+          <div class="product-card__details">
+            <h3 class="product-card__name">{{ product.nombre }}</h3>
+            <div class="product-card__rating">★★★★★</div>
+            <p class="product-card__description">{{ product.descripcion }}</p>
+            
+            <div class="product-card__footer">
+              <span class="product-card__price">€{{ product.precio.toFixed(2) }}</span>
+              <button 
+                @click="addToCart(product)"
+                class="product-card__add-button"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <div 
+      class="cart-float-button" 
+      @click="toggleCart"
+    >
+      <div class="cart-icon">
+        <span class="cart-icon-emoji">🛒</span>
+        <span v-if="cart.length" class="cart-count">
+          {{ totalCartItems }}
+        </span>
       </div>
     </div>
-    <div class="cart__grid-container">
-      <h2 class="cart__category">Apetizers</h2>
-      <div class="cart__grid">
-        <div v-for="product in products.slice(0, 5)" :key="product.id" class="cart__item" @click="selectProduct(product)">
-          <img :src="product.image" :alt="product.name" class="cart__image" />
-          <span v-if="cart[product.id]" class="cart__count">{{ cart[product.id] }}</span>
-        </div>
+
+    <div v-if="cart.length" class="small-cart-preview">
+      <div class="small-cart-preview__header">
+        <span>Tu Carrito</span>
+        <span class="cart-count">{{ cart.length }}</span>
       </div>
-      <h2 class="cart__category">Main Courses</h2>
-      <div class="cart__grid">
-        <div v-for="product in products.slice(5, 10)" :key="product.id" class="cart__item" @click="selectProduct(product)">
-          <img :src="product.image" :alt="product.name" class="cart__image" />
-          <span v-if="cart[product.id]" class="cart__count">{{ cart[product.id] }}</span>
-        </div>
+      <div class="small-cart-preview__content">
+  <div 
+    v-for="item in cart" 
+    :key="item.id" 
+    class="small-cart-preview__item"
+  >
+    <div class="cart-item-details">
+      <span class="small-cart-preview__name">{{ item.nombre }}</span>
+      <div class="cart-item-quantity">
+        <button 
+          @click="updateQuantity(item.id, item.quantity - 1)"
+          class="quantity-button"
+        >
+          -
+        </button>
+        <span>{{ item.quantity }}</span>
+        <button 
+          @click="updateQuantity(item.id, item.quantity + 1)"
+          class="quantity-button"
+        >
+          +
+        </button>
       </div>
-      <h2 class="cart__category">Drinks</h2>
-      <div class="cart__grid">
-        <div v-for="product in products.slice(10, 13)" :key="product.id" class="cart__item" @click="selectProduct(product)">
-          <img :src="product.image" :alt="product.name" class="cart__image" />
-          <span v-if="cart[product.id]" class="cart__count">{{ cart[product.id] }}</span>
-        </div>
-      </div>
-      <h2 class="cart__category">Desserts</h2>
-      <div class="cart__grid">
-        <div v-for="product in products.slice(13, 17)" :key="product.id" class="cart__item" @click="selectProduct(product)">
-          <img :src="product.image" :alt="product.name" class="cart__image" />
-          <span v-if="cart[product.id]" class="cart__count">{{ cart[product.id] }}</span>
-        </div>
-      </div>
+      <span class="small-cart-preview__price">€{{ (item.precio * item.quantity).toFixed(2) }}</span>
+      <button 
+        @click="removeFromCart(item.id)"
+        class="remove-item-button"
+      >
+        🗑️
+      </button>
+    </div>
+  </div>
+  <div class="small-cart-preview__total">
+    <span>Total:</span>
+    <span>€{{ calculateTotal().toFixed(2) }}</span>
+  </div>
+  <button class="small-cart-preview__checkout">
+    Ir al Pago
+  </button>
+</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue'
 
-type Product = {
+interface Product {
   id: number;
-  name: string;
-  image: string;
-  description: string;
-  price: number;
-};
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  categorias: string[];
+  imagenUrl?: string;
+}
 
-const products = ref<Product[]>(Array.from({ length: 17 }, (_, i) => ({
-  id: i + 1,
-  name: `Producto ${i + 1}`,
-  image: 'https://cdn.recetasderechupete.com/wp-content/uploads/2020/11/Tortilla-de-patatas-4.jpg',
-  description: `Descripción del producto ${i + 1}`,
-  price: (i + 1) * 5
-})));
+interface CartItem extends Product {
+  quantity: number;
+}
 
-const selectedProduct = ref<Product | null>(null);
-const cart = ref<{ [key: number]: number }>({});
+const products = ref<Product[]>([])
+const cart = ref<CartItem[]>([])
+const searchQuery = ref('')
+const selectedCategory = ref('Todos')
 
-const selectProduct = (product: Product) => {
-  selectedProduct.value = product;
-};
+const fetchProducts = async () => {
+  try {
+    const response = await fetch('http://localhost:5021/api/Productos', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
 
-const closeDetails = () => {
-  selectedProduct.value = null;
-};
-
-const addToCart = (product: Product | null) => {
-  if (!product) return;
-  if (cart.value[product.id]) {
-    cart.value[product.id]++;
-  } else {
-    cart.value[product.id] = 1;
-  }
-};
-
-const removeFromCart = (product: Product | null) => {
-  if (!product || !cart.value[product.id]) return;
-  if (cart.value[product.id] > 1) {
-    cart.value[product.id]--;
-  } else {
-    delete cart.value[product.id];
-  }
-};
-
-const cartTotal = computed(() => {
-  return Object.keys(cart.value).reduce((total, productId) => {
-    const product = products.value.find(p => p.id === Number(productId));
-    return product ? total + product.price * cart.value[Number(productId)] : total;
-  }, 0);
-});
-
-const goToCheckout = () => {
-  alert("Ir al pago - Total: $" + cartTotal.value);
-};
-</script>
-
-<style lang="scss" scoped>
-.cart {
-  &__grid-container {
-    padding-left: 50px;
-    padding-right: 50px;
-  }
-
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    padding: 16px;
-    transition: transform 0.3s ease;
-
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    if (!response.ok) {
+      throw new Error('No se pudo cargar los productos');
     }
 
+    products.value = await response.json();
+  } catch (err) {
+    console.error('Error fetching products:', err);
   }
+}
 
-  &__category {
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-    text-align: center;
-    font-size: 32px;
-    font-weight: bold;
-    margin-top: 20px;
+onMounted(fetchProducts)
+
+const categories = computed(() => {
+  const allCategories = products.value.flatMap(p => p.categorias);
+  return ['Todos', ...new Set(allCategories)];
+})
+
+const filteredProducts = computed(() => {
+  return products.value.filter(product => {
+    const matchesSearch = 
+      product.nombre.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      product.descripcion.toLowerCase().includes(searchQuery.value.toLowerCase());
+    
+    const matchesCategory = 
+      selectedCategory.value === 'Todos' || 
+      product.categorias.includes(selectedCategory.value);
+    
+    return matchesSearch && matchesCategory;
+  });
+})
+
+const totalCartItems = computed(() => 
+  cart.value.reduce((total, item) => total + item.quantity, 0)
+)
+
+const addToCart = (product: Product) => {
+  const existingItem = cart.value.find(item => item.id === product.id);
+  
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    cart.value.push({...product, quantity: 1});
   }
+}
 
-  &__item {
-    cursor: pointer;
-    text-align: center;
+const removeFromCart = (productId: number) => {
+  const index = cart.value.findIndex(item => item.id === productId);
+  if (index !== -1) {
+    cart.value.splice(index, 1);
+  }
+}
+
+const updateQuantity = (productId: number, newQuantity: number) => {
+  const item = cart.value.find(item => item.id === productId);
+  
+  if (item) {
+    if (newQuantity <= 0) {
+      removeFromCart(productId);
+    } else {
+      item.quantity = newQuantity;
+    }
+  }
+}
+
+const calculateTotal = () => {
+  return cart.value.reduce((total, item) => total + (item.precio * item.quantity), 0);
+}
+
+const toggleCart = () => {
+}
+</script>
+
+<style lang="scss">
+
+:root {
+  --primary-color: #2B7A78;
+  --secondary-color: #DEF2F1;
+  --accent-color: #FFC107;
+  --text-dark: #17252A;
+  --white: #FFFFFF;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.restaurant-app {
+  max-width: 1400px;
+  margin: 0 auto;
+
+  &__header {
     position: relative;
+    background: linear-gradient(135deg, rgba(black, 0.5) 0%, rgba(white,  0.4) 100%),
+    url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1074&q=80');
+    background-size: cover;
+    background-position: center;
+    color: var(--white);
+    padding: 2rem;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    text-align: center;
+  }
+
+  &__content {
+    display: flex;
+    padding: 2rem;
+    gap: 2rem;
+  }
+}
+
+.header-content {
+  &__title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__subtitle {
+    font-size: 1.2rem;
+  }
+}
+
+.search-container {
+  max-width: 600px;
+  margin: 1rem auto;
+
+  &__input {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 50px;
+    background: var(--white);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+}
+
+.category-filters {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  &__button {
+    background-color: rgba(255,255,255,0.2);
+    color: var(--white);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &--active {
+      background-color: var(--white);
+      color: var(--primary-color);
+      opacity: 1;
+    }
+  }
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  flex: 1;
+}
+
+.product-card {
+  background: var(--white);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+  &__image-container {
+    position: relative;
+    height: 250px;
   }
 
   &__image {
     width: 100%;
-    max-width: 300px;
-    height: auto;
-    border-radius: 8px;
+    height: 100%;
     object-fit: cover;
-
-    @media (max-width: 768px) {
-      max-width: 200px;
-    }
-}
-
-  &__count {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: red;
-    color: white;
-    border-radius: 50%;
-    padding: 5px 10px;
-    font-size: 14px;
   }
 
   &__details {
+    padding: 1rem;
+  }
+
+  &__name {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__rating {
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+  }
+
+  &__description {
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  &__footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
-    padding: 16px;
-    border-bottom: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 1000;
   }
 
-  &__details-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  &__price {
+    font-size: 1.2rem;
+    font-weight: bold;
   }
 
-  &__details-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    object-fit: cover;
-  }
-
-  &__details-info {
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__details-right {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-end;
-  }
-
-  &__details-close,
-  &__details-cart,
-  &__details-cart--remove,
-  &__details-checkout {
-    padding: 6px 12px;
+  &__add-button {
+    background-color: var(--accent-color);
     border: none;
-    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
-    font-size: 14px;
+  }
+}
+
+.cart-float-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--primary-color);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.cart-icon {
+  position: relative;
+}
+
+.cart-icon-emoji {
+  font-size: 1.5rem;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--accent-color);
+  color: var(--text-dark);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.small-cart-preview {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  z-index: 1000;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
   }
 
-  &__details-close {
-    background-color: #dc3545;
-    color: white;
+  &__content {
+    background-color: var(--white);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 1rem;
   }
 
-  &__details-cart {
-    background-color: #28a745;
-    color: white;
-  }
-
-  &__details-cart--remove {
-    background-color: #ffc107;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-    &:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-      opacity: 0.6;
+  &__item {
+    .cart-item-details {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 0.5rem;
     }
-    color: black;
+
+    .cart-item-quantity {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      .quantity-button {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+    }
+
+    .remove-item-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
   }
 
-  &__details-checkout {
-    background-color: #007bff;
-    color: white;
+  &__name {
+    color: var(--text-dark);
+    font-weight: bold;
+  }
+
+  &__price {
+    color: var(--primary-color);
+  }
+
+  &__total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
+  }
+
+  &__checkout {
+    width: 100%;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 5px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 1200px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .restaurant-app__content {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .small-cart-preview {
+    width: calc(100% - 2rem);
+    margin: 0 1rem;
+  }
+
+  .header-content {
+    &__title {
+      font-size: 2rem;
+    }
+
+    &__subtitle {
+      font-size: 1rem;
+    }
+  }
+
+  .category-filters {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    &__button {
+      flex-grow: 1;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+    }
   }
 }
 </style>
-
