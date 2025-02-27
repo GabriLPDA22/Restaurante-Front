@@ -4,26 +4,16 @@
       <div class="header-content">
         <h1 class="header-content__title">Buon Appetito!</h1>
         <p class="header-content__subtitle">Experiencia gastronómica excepcional</p>
-        
+
         <div class="search-container">
-          <input 
-            type="text" 
-            placeholder="Buscar platos..." 
-            v-model="searchQuery"
-            class="search-container__input"
-          />
+          <input type="text" placeholder="Buscar platos..." v-model="searchQuery" class="search-container__input" />
         </div>
 
         <div class="category-filters">
-          <button 
-            v-for="category in categories" 
-            :key="category"
-            @click="selectedCategory = category"
-            :class="{
-              'category-filters__button': true, 
-              'category-filters__button--active': selectedCategory === category
-            }"
-          >
+          <button v-for="category in categories" :key="category" @click="selectedCategory = category" :class="{
+            'category-filters__button': true,
+            'category-filters__button--active': selectedCategory === category
+          }">
             {{ category }}
           </button>
         </div>
@@ -32,30 +22,19 @@
 
     <main class="restaurant-app__content">
       <div class="product-grid">
-        <div 
-          v-for="product in filteredProducts" 
-          :key="product.id" 
-          class="product-card"
-        >
+        <div v-for="product in filteredProducts" :key="product.id" class="product-card">
           <div class="product-card__image-container">
-            <img 
-              :src="product.imagenUrl" 
-              :alt="product.nombre" 
-              class="product-card__image"
-            />
+            <img :src="product.imagenUrl" :alt="product.nombre" class="product-card__image" />
           </div>
-          
+
           <div class="product-card__details">
-            <h3 class="product-card__name">{{ product.nombre }}</h3>
+            <h3 class="product-card__name" style="color: #2b7a78;">{{ product.nombre }}</h3>
             <div class="product-card__rating">★★★★★</div>
             <p class="product-card__description">{{ product.descripcion }}</p>
-            
+
             <div class="product-card__footer">
               <span class="product-card__price">€{{ product.precio.toFixed(2) }}</span>
-              <button 
-                @click="addToCart(product)"
-                class="product-card__add-button"
-              >
+              <button @click="addToCart(product)" class="product-card__add-button">
                 +
               </button>
             </div>
@@ -63,11 +42,8 @@
         </div>
       </div>
     </main>
-    
-    <div 
-      class="cart-float-button" 
-      @click="toggleCart"
-    >
+
+    <div class="cart-float-button" @click="toggleCart">
       <div class="cart-icon">
         <span class="cart-icon-emoji">🛒</span>
         <span v-if="cart.length" class="cart-count">
@@ -82,45 +58,32 @@
         <span class="cart-count">{{ cart.length }}</span>
       </div>
       <div class="small-cart-preview__content">
-  <div 
-    v-for="item in cart" 
-    :key="item.id" 
-    class="small-cart-preview__item"
-  >
-    <div class="cart-item-details">
-      <span class="small-cart-preview__name">{{ item.nombre }}</span>
-      <div class="cart-item-quantity">
-        <button 
-          @click="updateQuantity(item.id, item.quantity - 1)"
-          class="quantity-button"
-        >
-          -
-        </button>
-        <span>{{ item.quantity }}</span>
-        <button 
-          @click="updateQuantity(item.id, item.quantity + 1)"
-          class="quantity-button"
-        >
-          +
+        <div v-for="item in cart" :key="item.id" class="small-cart-preview__item">
+          <div class="cart-item-details">
+            <span class="small-cart-preview__name">{{ item.nombre }}</span>
+            <div class="cart-item-quantity">
+              <button @click="updateQuantity(item.id, item.quantity - 1)" class="quantity-button">
+                -
+              </button>
+              <span>{{ item.quantity }}</span>
+              <button @click="updateQuantity(item.id, item.quantity + 1)" class="quantity-button">
+                +
+              </button>
+            </div>
+            <span class="small-cart-preview__price">€{{ (item.precio * item.quantity).toFixed(2) }}</span>
+            <button @click="removeFromCart(item.id)" class="remove-item-button">
+              🗑️
+            </button>
+          </div>
+        </div>
+        <div class="small-cart-preview__total">
+          <span>Total:</span>
+          <span>€{{ calculateTotal().toFixed(2) }}</span>
+        </div>
+        <button class="small-cart-preview__checkout">
+          Ir al Pago
         </button>
       </div>
-      <span class="small-cart-preview__price">€{{ (item.precio * item.quantity).toFixed(2) }}</span>
-      <button 
-        @click="removeFromCart(item.id)"
-        class="remove-item-button"
-      >
-        🗑️
-      </button>
-    </div>
-  </div>
-  <div class="small-cart-preview__total">
-    <span>Total:</span>
-    <span>€{{ calculateTotal().toFixed(2) }}</span>
-  </div>
-  <button class="small-cart-preview__checkout">
-    Ir al Pago
-  </button>
-</div>
     </div>
   </div>
 </template>
@@ -174,29 +137,29 @@ const categories = computed(() => {
 
 const filteredProducts = computed(() => {
   return products.value.filter(product => {
-    const matchesSearch = 
+    const matchesSearch =
       product.nombre.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       product.descripcion.toLowerCase().includes(searchQuery.value.toLowerCase());
-    
-    const matchesCategory = 
-      selectedCategory.value === 'Todos' || 
+
+    const matchesCategory =
+      selectedCategory.value === 'Todos' ||
       product.categorias.includes(selectedCategory.value);
-    
+
     return matchesSearch && matchesCategory;
   });
 })
 
-const totalCartItems = computed(() => 
+const totalCartItems = computed(() =>
   cart.value.reduce((total, item) => total + item.quantity, 0)
 )
 
 const addToCart = (product: Product) => {
   const existingItem = cart.value.find(item => item.id === product.id);
-  
+
   if (existingItem) {
     existingItem.quantity += 1;
   } else {
-    cart.value.push({...product, quantity: 1});
+    cart.value.push({ ...product, quantity: 1 });
   }
 }
 
@@ -209,7 +172,7 @@ const removeFromCart = (productId: number) => {
 
 const updateQuantity = (productId: number, newQuantity: number) => {
   const item = cart.value.find(item => item.id === productId);
-  
+
   if (item) {
     if (newQuantity <= 0) {
       removeFromCart(productId);
@@ -228,7 +191,6 @@ const toggleCart = () => {
 </script>
 
 <style lang="scss">
-
 :root {
   --primary-color: #2B7A78;
   --secondary-color: #DEF2F1;
@@ -250,8 +212,8 @@ const toggleCart = () => {
 
   &__header {
     position: relative;
-    background: linear-gradient(135deg, rgba(black, 0.5) 0%, rgba(white,  0.4) 100%),
-    url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1074&q=80');
+    background: linear-gradient(135deg, rgba(black, 0.5) 0%, rgba(white, 0.4) 100%),
+      url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1074&q=80');
     background-size: cover;
     background-position: center;
     color: var(--white);
@@ -289,7 +251,7 @@ const toggleCart = () => {
     border: none;
     border-radius: 50px;
     background: var(--white);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -300,7 +262,7 @@ const toggleCart = () => {
   margin-top: 1rem;
 
   &__button {
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(255, 255, 255, 0.2);
     color: var(--white);
     border: none;
     padding: 0.5rem 1rem;
@@ -327,7 +289,7 @@ const toggleCart = () => {
   background: var(--white);
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
   &__image-container {
     position: relative;
@@ -395,7 +357,7 @@ const toggleCart = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   z-index: 1000;
 }
@@ -431,7 +393,7 @@ const toggleCart = () => {
   width: 300px;
   background-color: var(--primary-color);
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 
   &__header {
@@ -464,7 +426,7 @@ const toggleCart = () => {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      
+
       .quantity-button {
         background-color: var(--primary-color);
         color: var(--white);
