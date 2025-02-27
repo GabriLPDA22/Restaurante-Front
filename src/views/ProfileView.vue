@@ -106,7 +106,7 @@ $color-text-light: #6B7280;
         overflow: hidden;
 
         .perfil-header {
-            background: linear-gradient(to right, $color-primary, darken($color-primary, 10%));
+            background: linear-gradient(to right, $color-primary);
             color: white;
             padding: 1.5rem;
             display: flex;
@@ -195,7 +195,7 @@ $color-text-light: #6B7280;
                                 transition: color 0.3s;
 
                                 &:hover {
-                                    color: darken($color-primary, 10%);
+                                    color: $color-primary;
                                 }
                             }
                         }
@@ -232,7 +232,7 @@ $color-text-light: #6B7280;
                     color: $color-text-dark;
 
                     &:hover {
-                        background-color: darken($color-background, 5%);
+                        background-color: $color-background;
                     }
                 }
 
@@ -241,7 +241,7 @@ $color-text-light: #6B7280;
                     color: white;
 
                     &:hover {
-                        background-color: darken($color-primary, 10%);
+                        background-color: $color-primary;
                     }
                 }
             }

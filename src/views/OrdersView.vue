@@ -159,7 +159,7 @@ $color-text-light: #6B7280;
         overflow: hidden;
 
         .pedidos-header {
-            background: linear-gradient(to right, $color-primary, darken($color-primary, 10%));
+            background: linear-gradient(to right, $color-primary);
             color: white;
 
             .header-content {
@@ -275,7 +275,7 @@ $color-text-light: #6B7280;
                     align-items: center;
                     padding: 1rem 1.5rem;
                     background-color: $color-background;
-                    border-bottom: 1px solid darken($color-background, 5%);
+                    border-bottom: 1px solid $color-background;
 
                     .pedido-info {
                         display: flex;
@@ -301,17 +301,17 @@ $color-text-light: #6B7280;
 
                         &.estado-entregado {
                             background-color: rgba(16, 185, 129, 0.1);
-                            color: darken(#10B981, 10%);
+                            color: #10B981;
                         }
 
                         &.estado-proceso {
                             background-color: rgba(245, 158, 11, 0.1);
-                            color: darken(#F59E0B, 10%);
+                            color: #F59E0B;
                         }
 
                         &.estado-preparando {
                             background-color: rgba(59, 130, 246, 0.1);
-                            color: darken(#3B82F6, 10%);
+                            color: #3B82F6;
                         }
                     }
                 }
@@ -380,7 +380,7 @@ $color-text-light: #6B7280;
                             transition: background-color 0.3s;
 
                             &:hover {
-                                background-color: darken($color-primary, 10%);
+                                background-color: $color-primary;
                             }
 
                             .icon-arrow-right {

@@ -201,7 +201,7 @@ $color-star: #f9c74f;
       color: $color-background-dark;
 
       &:hover {
-        background-color: darken($color-primary, 10%);
+        background-color: $color-primary;
       }
     }
 

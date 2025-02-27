@@ -72,7 +72,8 @@ const onGoogleLoginClick = () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    padding-top: 75px;
+    padding-bottom: 75px;
     background: #0d1b1e;
 
     &__container {
