@@ -252,7 +252,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { VBtn } from 'vuetify/components';
 import { useAuthStore } from '../stores/useAuthStore';
@@ -264,10 +264,6 @@ const googleAuthStore = useGoogleAuthStore();
 const isMenuOpen = ref(false);
 const isDropdownOpen = ref(false);
 const isSearchBarOpen = ref(false);
-const searchInput = ref(null);
-
-// Contador temporal para favoritos
-const favoriteCount = ref(3);
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -300,23 +296,29 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
 };
 
+const isAuthenticated = computed(() => {
+  return !!(authStore.user || googleAuthStore.user);
+});
 
-const isAuthenticated = computed(() => !!authStore.user || !!googleAuthStore.user);
+const currentUser = computed<User | null>(() => {
+  const user = authStore.user || googleAuthStore.user;
+  
+  if (!user) return null;
 
-interface IUser {
-  Nombre?: string;
-  Correo?: string;
-  PictureUrl?: string;
-}
+  // Intentar obtener el nombre de múltiples formas posibles
+  const nombre = 
+    user.nombre || 
+    'Usuario';
 
-const currentUser = computed<IUser | null>(() => {
-  return (authStore.user || googleAuthStore.user) as IUser | null;
+  return {
+    Nombre: nombre,
+    PictureUrl:  user.PictureUrl || user.pictureUrl || "https://cdn-icons-png.flaticon.com/128/149/149071.png"
+  };
 });
 
 const userImage = computed(() => {
   return currentUser.value?.PictureUrl || "https://cdn-icons-png.flaticon.com/128/149/149071.png";
 });
-
 
 const handleLogout = () => {
   isDropdownOpen.value = false;
@@ -546,6 +548,7 @@ const handleLogout = () => {
   width: 280px;
   background: #fff;
   border-radius: 10px;
+  border: #158d7f solid;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   z-index: 100;
