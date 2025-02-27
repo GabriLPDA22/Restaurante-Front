@@ -84,7 +84,6 @@ $color-gold-hover: #af8c3a;
     align-items: center;
     justify-content: flex-start;
     padding: 5vh 5vw;
-    min-height: 110vh;
     text-align: center;
     color: $color-white;
     padding-top: 10vh;
@@ -169,7 +168,7 @@ $color-gold-hover: #af8c3a;
 
   &__title {
     color: $color-gold;
-    font-size: 3.8rem;
+    font-size: 2rem;
     margin-bottom: 20px;
   }
 
