@@ -138,31 +138,15 @@
     <div class="header__top">
       <div class="header__container">
         <div class="header__schedule-wrapper">
-          <font-awesome-icon :icon="['far', 'clock']" class="header__schedule-icon" />
           <p class="header__schedule">
             SUNDAY – THURSDAY: 11:30AM – 11PM | FRIDAY & SATURDAY: 11:30AM – 12AM
           </p>
         </div>
         <div class="header__top-right">
-          <div class="header__social-desktop">
-            <a href="#" class="header__social-link" aria-label="Facebook">
-              <font-awesome-icon :icon="['fab', 'facebook']" />
-            </a>
-            <a href="#" class="header__social-link" aria-label="Instagram">
-              <font-awesome-icon :icon="['fab', 'instagram']" />
-            </a>
-            <a href="#" class="header__social-link" aria-label="Twitter">
-              <font-awesome-icon :icon="['fab', 'twitter']" />
-            </a>
-          </div>
           <div class="header__icons">
-            <button class="header__icon header__icon--search" aria-label="Search" @click="toggleSearchBar">
+            <button class="header__icon header__icon--search" aria-label="Search">
               <font-awesome-icon :icon="['fas', 'search']" class="icon" />
             </button>
-            <router-link to="/favorites" class="header__icon" aria-label="Favorites">
-              <font-awesome-icon :icon="['fas', 'heart']" class="icon" />
-              <span v-if="favoriteCount > 0" class="header__notification">{{ favoriteCount }}</span>
-            </router-link>
 
             <!-- User dropdown para desktop -->
             <div class="header__user-dropdown header__user-dropdown--desktop" v-if="isAuthenticated">
@@ -212,18 +196,6 @@
       </div>
     </div>
 
-    <!-- Barra de búsqueda expandible -->
-    <transition name="slide-down">
-      <div class="header__search-bar" v-if="isSearchBarOpen">
-        <div class="header__search-container">
-          <input type="text" placeholder="Buscar platos, ingredientes..." class="header__search-input"
-            ref="searchInput" />
-          <button class="header__search-close" @click="toggleSearchBar">
-            <font-awesome-icon :icon="['fas', 'times']" />
-          </button>
-        </div>
-      </div>
-    </transition>
 
     <!-- BARRA INFERIOR (ESCRITORIO) -->
     <div class="header__bottom">
@@ -328,15 +300,6 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
 };
 
-const toggleSearchBar = async () => {
-  isSearchBarOpen.value = !isSearchBarOpen.value;
-
-  if (isSearchBarOpen.value) {
-    await nextTick();
-    // Enfocar el input después de que se muestre
-    searchInput.value?.focus();
-  }
-};
 
 const isAuthenticated = computed(() => !!authStore.user || !!googleAuthStore.user);
 
@@ -354,17 +317,6 @@ const userImage = computed(() => {
   return currentUser.value?.PictureUrl || "https://cdn-icons-png.flaticon.com/128/149/149071.png";
 });
 
-onMounted(() => {
-  authStore.fetchUserFromDB();
-
-  // Cerrar dropdown al hacer clic fuera de él
-  document.addEventListener('click', (event) => {
-    const target = event.target as Element;
-    if (!target.closest('.header__user-dropdown') && isDropdownOpen.value) {
-      isDropdownOpen.value = false;
-    }
-  });
-});
 
 const handleLogout = () => {
   isDropdownOpen.value = false;

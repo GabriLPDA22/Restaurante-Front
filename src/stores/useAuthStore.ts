@@ -57,29 +57,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
-  // 🔹 Obtener usuario desde la base de datos
-  const fetchUserFromDB = async () => {
-    try {
-      if (!token.value) {
-        console.warn("No token found, user is not authenticated.");
-        return;
-      }
-      const { data } = await axios.get("http://localhost:5021/api/user/me", {
-        headers: { Authorization: `Bearer ${token.value}` },
-        withCredentials: true,
-      });
-      user.value = data;
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        console.error("Failed to fetch user", error.response?.data?.message || error.message);
-      } else if (error instanceof Error) {
-        console.error("Failed to fetch user", error.message);
-      } else {
-        console.error("Failed to fetch user", error);
-      }
-    }
-  };
-
   // 🔹 Cargar usuario desde LocalStorage
   const loadUser = () => {
     const storedUser = localStorage.getItem("user");
@@ -99,19 +76,12 @@ export const useAuthStore = defineStore('auth', () => {
     router.push("/login").then(() => window.scrollTo(0, 0));
   };
 
-  onMounted(() => {
-    loadUser();
-    if (token.value) {
-      fetchUserFromDB();
-    }
-  });
 
   return {
     user,
     token,
     login,
     register,
-    fetchUserFromDB,
     logout,
     loadUser,
   };
