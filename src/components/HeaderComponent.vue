@@ -3,49 +3,63 @@
     <!-- BARRA MÓVIL -->
     <div class="header__mobile">
       <button class="header__burger" aria-label="Toggle Menu" @click="toggleMenu">
-        <span v-if="!isMenuOpen">☰</span>
+        <span v-if="!isMenuOpen" class="header__burger-icon">☰</span>
         <span v-else class="header__close">✖</span>
       </button>
 
       <div class="header__logo-mobile">
         <router-link to="/" aria-label="Ir a la página de inicio">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet"
-            style="width:200px;">
-            <text x="50%" y="50%" text-anchor="middle"
-              style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;">
-              PARTOW FOODS
-            </text>
-            <text x="50%" y="75%" text-anchor="middle"
-              style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;">
-              RESTAURANT
-            </text>
-          </svg>
+          <div class="header__logo-animation">
+            <svg class="header__logo-svg" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f3cc74" />
+                  <stop offset="50%" stop-color="#d1a75f" />
+                  <stop offset="100%" stop-color="#9f7835" />
+                </linearGradient>
+              </defs>
+              <text x="50%" y="50%" text-anchor="middle" class="header__logo-text-main">PARTOW FOODS</text>
+              <text x="50%" y="75%" text-anchor="middle" class="header__logo-text-restaurant">RESTAURANT</text>
+            </svg>
+          </div>
         </router-link>
       </div>
 
       <div class="header__icons-mobile">
-        <button class="header__icon" aria-label="Cart">
-          <font-awesome-icon :icon="['fas', 'shopping-cart']" class="icon" />
-        </button>
-
         <!-- Dropdown del usuario si está autenticado -->
         <div class="header__user-dropdown" v-if="isAuthenticated">
-          <!-- Contenedor que muestra el avatar y el nombre, y abre/cierra el menú -->
           <div class="header__avatar-container" @click="toggleDropdown">
             <img :src="userImage" alt="User Avatar" class="header__avatar" />
             <span class="header__avatar-name">{{ currentUser?.Nombre }}</span>
-            <i class="fa fa-chevron-down header__avatar-icon"></i>
+            <font-awesome-icon :icon="['fas', 'chevron-down']" class="header__avatar-icon" />
           </div>
 
-          <!-- Menú desplegable con transición "fade" -->
-          <transition name="fade">
+          <transition name="slide-fade">
             <div class="header__dropdown-menu" v-if="isDropdownOpen">
-              <p class="header__dropdown-name">{{ currentUser?.Nombre }}</p>
-              <p class="header__dropdown-email">{{ currentUser?.Correo }}</p>
-
-              <!-- Botón de Logout con Vuetify, estilizado con clase logout-btn -->
-              <v-btn @click="handleLogout" elevation="2" rounded class="logout-btn">
-                Logout
+              <div class="header__dropdown-header">
+                <img :src="userImage" alt="User Avatar" class="header__dropdown-avatar" />
+                <div class="header__dropdown-info">
+                  <p class="header__dropdown-name">{{ currentUser?.Nombre }}</p>
+                  <p class="header__dropdown-email">{{ currentUser?.Correo }}</p>
+                </div>
+              </div>
+              <div class="header__dropdown-links">
+                <router-link to="/profile" class="header__dropdown-link">
+                  <font-awesome-icon :icon="['fas', 'user']" />
+                  <span>Mi Perfil</span>
+                </router-link>
+                <router-link to="/orders" class="header__dropdown-link">
+                  <font-awesome-icon :icon="['fas', 'receipt']" />
+                  <span>Mis Pedidos</span>
+                </router-link>
+                <router-link to="/favorites" class="header__dropdown-link">
+                  <font-awesome-icon :icon="['fas', 'heart']" />
+                  <span>Favoritos</span>
+                </router-link>
+              </div>
+              <v-btn @click="handleLogout" elevation="2" class="header__logout-btn">
+                <font-awesome-icon :icon="['fas', 'sign-out-alt']" class="header__logout-icon" />
+                Cerrar Sesión
               </v-btn>
             </div>
           </transition>
@@ -59,82 +73,204 @@
     </div>
 
     <!-- MENÚ DESPLEGABLE MÓVIL -->
-    <div :class="['header__mobile-menu', { active: isMenuOpen }]" @click="closeMenu">
-      <nav class="header__nav" @click.stop>
-        <ul>
-          <li><router-link to="/menu" @click="closeMenu">Menu</router-link></li>
-          <li><a>Events</a></li>
-          <li><router-link to="/about" @click="closeMenu">About Us</router-link></li>
-          <li><router-link to="/reservation" @click="closeMenu">Reservation</router-link></li>
-          <li><router-link to="/cart" @click="closeMenu">Orders</router-link></li>
-          <li><router-link to="/contact" @click="closeMenu">Contact Us</router-link></li>
-        </ul>
-      </nav>
-    </div>
+    <transition name="menu-reveal">
+      <div class="header__mobile-menu" v-if="isMenuOpen" @click="closeMenu">
+        <nav class="header__nav-mobile" @click.stop>
+          <!-- El título RESTAURANT se ha eliminado -->
+          <ul class="header__nav-list">
+            <li class="header__nav-item">
+              <router-link to="/cart" class="header__nav-link" @click="closeMenu">
+                <div class="header__nav-icon-box">
+                  <font-awesome-icon :icon="['fas', 'utensils']" class="header__nav-icon" />
+                </div>
+                <span class="header__nav-text">Menu</span>
+              </router-link>
+            </li>
+            <li class="header__nav-item">
+              <a class="header__nav-link">
+                <div class="header__nav-icon-box">
+                  <font-awesome-icon :icon="['fas', 'glass-cheers']" class="header__nav-icon" />
+                </div>
+                <span class="header__nav-text">Events</span>
+              </a>
+            </li>
+            <li class="header__nav-item">
+              <router-link to="/about" class="header__nav-link" @click="closeMenu">
+                <div class="header__nav-icon-box">
+                  <font-awesome-icon :icon="['fas', 'info-circle']" class="header__nav-icon" />
+                </div>
+                <span class="header__nav-text">About Us</span>
+              </router-link>
+            </li>
+            <li class="header__nav-item">
+              <router-link to="/reservation" class="header__nav-link" @click="closeMenu">
+                <div class="header__nav-icon-box">
+                  <font-awesome-icon :icon="['far', 'calendar-alt']" class="header__nav-icon" />
+                </div>
+                <span class="header__nav-text">Reservation</span>
+              </router-link>
+            </li>
+            <li class="header__nav-item">
+              <router-link to="/contact" class="header__nav-link" @click="closeMenu">
+                <div class="header__nav-icon-box">
+                  <font-awesome-icon :icon="['fas', 'phone-alt']" class="header__nav-icon" />
+                </div>
+                <span class="header__nav-text">Contact Us</span>
+              </router-link>
+            </li>
+          </ul>
+          <div class="header__social-links">
+            <a href="#" class="header__social-link" aria-label="Facebook">
+              <font-awesome-icon :icon="['fab', 'facebook']" />
+            </a>
+            <a href="#" class="header__social-link" aria-label="Instagram">
+              <font-awesome-icon :icon="['fab', 'instagram']" />
+            </a>
+            <a href="#" class="header__social-link header__social-link--twitter" aria-label="Twitter">
+              <font-awesome-icon :icon="['fab', 'twitter']" />
+            </a>
+          </div>
+        </nav>
+      </div>
+    </transition>
 
     <!-- BARRA SUPERIOR (ESCRITORIO) -->
     <div class="header__top">
       <div class="header__container">
-        <p class="header__schedule">
-          SUNDAY – THURSDAY: 11:30AM – 11PM | FRIDAY & SATURDAY: 11:30AM – 12AM
-        </p>
-        <div class="header__icons">
-          <button class="header__icon" aria-label="Search">
-            <font-awesome-icon :icon="['fas', 'search']" class="icon" />
-          </button>
-          <button class="header__icon" aria-label="Favorites">
-            <font-awesome-icon :icon="['fas', 'heart']" class="icon" />
-            <span class="header__notification">2</span>
-          </button>
-          <!-- Se quita el botón de Carrito -->
-          <router-link to="/login" class="header__icon" aria-label="User Profile">
-            <font-awesome-icon :icon="['fas', 'user']" class="icon" />
-          </router-link>
+        <div class="header__schedule-wrapper">
+          <font-awesome-icon :icon="['far', 'clock']" class="header__schedule-icon" />
+          <p class="header__schedule">
+            SUNDAY – THURSDAY: 11:30AM – 11PM | FRIDAY & SATURDAY: 11:30AM – 12AM
+          </p>
+        </div>
+        <div class="header__top-right">
+          <div class="header__social-desktop">
+            <a href="#" class="header__social-link" aria-label="Facebook">
+              <font-awesome-icon :icon="['fab', 'facebook']" />
+            </a>
+            <a href="#" class="header__social-link" aria-label="Instagram">
+              <font-awesome-icon :icon="['fab', 'instagram']" />
+            </a>
+            <a href="#" class="header__social-link" aria-label="Twitter">
+              <font-awesome-icon :icon="['fab', 'twitter']" />
+            </a>
+          </div>
+          <div class="header__icons">
+            <button class="header__icon header__icon--search" aria-label="Search" @click="toggleSearchBar">
+              <font-awesome-icon :icon="['fas', 'search']" class="icon" />
+            </button>
+            <router-link to="/favorites" class="header__icon" aria-label="Favorites">
+              <font-awesome-icon :icon="['fas', 'heart']" class="icon" />
+              <span v-if="favoriteCount > 0" class="header__notification">{{ favoriteCount }}</span>
+            </router-link>
+
+            <!-- User dropdown para desktop -->
+            <div class="header__user-dropdown header__user-dropdown--desktop" v-if="isAuthenticated">
+              <div class="header__avatar-container" @click="toggleDropdown">
+                <img :src="userImage" alt="User Avatar" class="header__avatar" />
+                <span class="header__avatar-name">{{ currentUser?.Nombre }}</span>
+                <font-awesome-icon :icon="['fas', 'chevron-down']" class="header__avatar-icon" />
+              </div>
+
+              <transition name="slide-fade">
+                <div class="header__dropdown-menu" v-if="isDropdownOpen">
+                  <div class="header__dropdown-header">
+                    <img :src="userImage" alt="User Avatar" class="header__dropdown-avatar" />
+                    <div class="header__dropdown-info">
+                      <p class="header__dropdown-name">{{ currentUser?.Nombre }}</p>
+                      <p class="header__dropdown-email">{{ currentUser?.Correo }}</p>
+                    </div>
+                  </div>
+                  <div class="header__dropdown-links">
+                    <router-link to="/profile" class="header__dropdown-link">
+                      <font-awesome-icon :icon="['fas', 'user']" />
+                      <span>Mi Perfil</span>
+                    </router-link>
+                    <router-link to="/orders" class="header__dropdown-link">
+                      <font-awesome-icon :icon="['fas', 'receipt']" />
+                      <span>Mis Pedidos</span>
+                    </router-link>
+                    <router-link to="/favorites" class="header__dropdown-link">
+                      <font-awesome-icon :icon="['fas', 'heart']" />
+                      <span>Favoritos</span>
+                    </router-link>
+                  </div>
+                  <v-btn @click="handleLogout" elevation="2" class="header__logout-btn">
+                    <font-awesome-icon :icon="['fas', 'sign-out-alt']" class="header__logout-icon" />
+                    Cerrar Sesión
+                  </v-btn>
+                </div>
+              </transition>
+            </div>
+
+            <!-- Si NO está autenticado, icono normal que redirige a /login -->
+            <router-link v-else to="/login" class="header__icon" aria-label="User Profile">
+              <font-awesome-icon :icon="['fas', 'user']" class="icon" />
+            </router-link>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Barra de búsqueda expandible -->
+    <transition name="slide-down">
+      <div class="header__search-bar" v-if="isSearchBarOpen">
+        <div class="header__search-container">
+          <input type="text" placeholder="Buscar platos, ingredientes..." class="header__search-input"
+            ref="searchInput" />
+          <button class="header__search-close" @click="toggleSearchBar">
+            <font-awesome-icon :icon="['fas', 'times']" />
+          </button>
+        </div>
+      </div>
+    </transition>
 
     <!-- BARRA INFERIOR (ESCRITORIO) -->
     <div class="header__bottom">
       <div class="header__container">
         <nav class="header__nav-left">
-          <ul class="home-view__nav-list">
-            <li class="home-view__nav-item">
-              <router-link to="/" class="home-view__nav-link">Menu</router-link>
+          <ul class="header__desktop-nav-list">
+            <li class="header__desktop-nav-item">
+              <router-link to="/cart" class="header__desktop-nav-link">Menu</router-link>
             </li>
-            <!--Igual añadimos este mas adelante pero se queda para que se vea simetrico-->
-            <li class="home-view__nav-item">
-              <a class="home-view__nav-link">Events</a>
+            <li class="header__desktop-nav-item">
+              <a class="header__desktop-nav-link">Events</a>
             </li>
-            <li class="home-view__nav-item">
-              <router-link to="/about" class="home-view__nav-link">About us</router-link>
+            <li class="header__desktop-nav-item">
+              <router-link to="/about" class="header__desktop-nav-link">About us</router-link>
             </li>
           </ul>
         </nav>
 
-        <div class="header__logo">
+        <div class="header__logo header__logo--desktop">
           <router-link to="/" aria-label="Ir a la página de inicio">
-          <svg class="header__svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet" style="width:300px;">
-            <text x="50%" y="45%" text-anchor="middle" class="header__brand" style="font-size:70px;">
-              PARTOW FOODS
-            </text>
-            <text x="50%" y="65%" text-anchor="middle" class="header__tagline" style="font-size:35px;">
-              RESTAURANT
-            </text>
-          </svg>
-        </router-link>
+            <div class="header__logo-animation">
+              <svg class="header__logo-svg-desktop" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="goldGradientDesktop" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#f3cc74" />
+                    <stop offset="50%" stop-color="#d1a75f" />
+                    <stop offset="100%" stop-color="#9f7835" />
+                  </linearGradient>
+                </defs>
+                <text x="50%" y="50%" text-anchor="middle" class="header__logo-desktop-text-main">PARTOW FOODS</text>
+                <text x="50%" y="75%" text-anchor="middle"
+                  class="header__logo-desktop-text-restaurant">RESTAURANT</text>
+              </svg>
+            </div>
+          </router-link>
         </div>
 
         <nav class="header__nav-right">
-          <ul class="home-view__nav-list">
-            <li class="home-view__nav-item">
-              <router-link to="/reservation" class="home-view__nav-link">Reservation</router-link>
+          <ul class="header__desktop-nav-list">
+            <li class="header__desktop-nav-item">
+              <router-link to="/reservation" class="header__desktop-nav-link">Reservation</router-link>
             </li>
-            <li class="home-view__nav-item">
-              <router-link to="/cart" class="home-view__nav-link">Orders</router-link>
+            <li class="header__desktop-nav-item">
+              <router-link to="/about" class="header__desktop-nav-link">About Us</router-link>
             </li>
-            <li class="home-view__nav-item">
-              <router-link to="/contact" class="home-view__nav-link">Contact Us</router-link>
+            <li class="header__desktop-nav-item">
+              <router-link to="/contact" class="header__desktop-nav-link">Contact Us</router-link>
             </li>
           </ul>
         </nav>
@@ -144,7 +280,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { VBtn } from 'vuetify/components';
 import { useAuthStore } from '../stores/useAuthStore';
@@ -155,21 +291,51 @@ const googleAuthStore = useGoogleAuthStore();
 
 const isMenuOpen = ref(false);
 const isDropdownOpen = ref(false);
+const isSearchBarOpen = ref(false);
+const searchInput = ref(null);
+
+// Contador temporal para favoritos
+const favoriteCount = ref(3);
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
-  document.body.classList.toggle('no-scroll', isMenuOpen.value);
-  document.documentElement.classList.toggle('no-scroll', isMenuOpen.value);
+
+  // Bloquear el scroll cuando el menú está abierto
+  if (isMenuOpen.value) {
+    document.body.style.overflow = 'hidden';
+    document.body.style.height = '100vh';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+  } else {
+    document.body.style.overflow = '';
+    document.body.style.height = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+  }
 };
 
 const closeMenu = () => {
   isMenuOpen.value = false;
-  document.body.classList.remove('no-scroll');
-  document.documentElement.classList.remove('no-scroll');
+
+  // Restaurar el scroll
+  document.body.style.overflow = '';
+  document.body.style.height = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
 };
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const toggleSearchBar = async () => {
+  isSearchBarOpen.value = !isSearchBarOpen.value;
+
+  if (isSearchBarOpen.value) {
+    await nextTick();
+    // Enfocar el input después de que se muestre
+    searchInput.value?.focus();
+  }
 };
 
 const isAuthenticated = computed(() => !!authStore.user || !!googleAuthStore.user);
@@ -190,6 +356,14 @@ const userImage = computed(() => {
 
 onMounted(() => {
   authStore.fetchUserFromDB();
+
+  // Cerrar dropdown al hacer clic fuera de él
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element;
+    if (!target.closest('.header__user-dropdown') && isDropdownOpen.value) {
+      isDropdownOpen.value = false;
+    }
+  });
 });
 
 const handleLogout = () => {
@@ -200,11 +374,13 @@ const handleLogout = () => {
 </script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 .header {
   font-family: 'Poppins', sans-serif;
   color: #eaeaea;
+  position: relative;
+  z-index: 1000;
 }
 
 /* ================= MOBILE ================= */
@@ -212,27 +388,38 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #000;
+  background: #000;
   padding: 0.75rem 1rem;
-  z-index: 100;
   position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .header__burger {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.8rem;
   color: #d1a75f;
   position: relative;
   z-index: 110;
+  transition: transform 0.3s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header__burger-icon {
+  font-size: 1.8rem;
+}
+
+.header__burger:active {
+  transform: scale(0.9);
 }
 
 .header__close {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: #d1a75f;
-  position: relative;
-  z-index: 110;
 }
 
 .header__logo-mobile {
@@ -245,6 +432,47 @@ const handleLogout = () => {
   z-index: 110;
 }
 
+.header__logo-animation {
+  transition: transform 0.3s ease;
+}
+
+.header__logo-animation:hover {
+  transform: scale(1.02);
+}
+
+.header__logo-svg {
+  width: 150px;
+  height: auto;
+  overflow: visible;
+}
+
+.header__logo-text-main {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  fill: url(#goldGradient);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: fill 0.3s ease, filter 0.5s ease;
+}
+
+.header__logo-text-restaurant {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  fill: #eaeaea;
+  letter-spacing: 2px;
+  transition: fill 0.3s ease;
+}
+
+.header__logo-animation:hover .header__logo-text-main {
+  fill: #f3cc74;
+  filter: drop-shadow(0 0 5px rgba(209, 167, 95, 0.6));
+}
+
+.header__logo-animation:hover .header__logo-text-restaurant {
+  fill: #ffffff;
+}
+
 .header__icons-mobile {
   display: flex;
   gap: 1rem;
@@ -253,7 +481,7 @@ const handleLogout = () => {
 }
 
 .header__icon {
-  background: #f5f2e9;
+  background: linear-gradient(to bottom, #f5f2e9, #e8e2d0);
   width: 2.5rem;
   height: 2.5rem;
   border: none;
@@ -263,20 +491,32 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.header__icon:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.header__icon:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
 }
 
 .header__icon i,
 .header__icon .icon {
-  color: #093B35;
+  color: #073a34;
   font-size: 1rem;
 }
 
 .header__notification {
-  background: #d1a75f;
+  background: linear-gradient(to bottom right, #d1a75f, #b78a3f);
   color: white;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: bold;
-  width: 1.5rem;
+  min-width: 1.5rem;
   height: 1.5rem;
   border-radius: 50%;
   display: flex;
@@ -285,6 +525,23 @@ const handleLogout = () => {
   position: absolute;
   top: -5px;
   right: -5px;
+  border: 2px solid #000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(209, 167, 95, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px rgba(209, 167, 95, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(209, 167, 95, 0);
+  }
 }
 
 /* Avatar y dropdown */
@@ -297,6 +554,11 @@ const handleLogout = () => {
   align-items: center;
   gap: 0.3rem;
   cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.header__avatar-container:hover {
+  transform: translateY(-2px);
 }
 
 .header__avatar {
@@ -304,62 +566,142 @@ const handleLogout = () => {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #d1a75f;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .header__avatar-name {
   color: #eaeaea;
   font-weight: 500;
+  display: none;
+  /* Ocultar en móvil */
+}
+
+.header__user-dropdown--desktop .header__avatar-name {
+  display: inline;
+  /* Mostrar en desktop */
 }
 
 .header__avatar-icon {
   margin-left: 0.25rem;
-  color: #eaeaea;
+  color: #d1a75f;
 }
 
 .header__dropdown-menu {
   position: absolute;
   right: 0;
-  color: #000;
-  border-radius: 4px;
-  z-index: 10;
+  top: 50px;
+  width: 280px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.header__dropdown-header {
+  background: linear-gradient(45deg, #012422, #073a34);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header__dropdown-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #d1a75f;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.header__dropdown-info {
+  flex: 1;
 }
 
 .header__dropdown-name {
+  color: #fff;
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
 }
 
 .header__dropdown-email {
+  color: #d1a75f;
+  margin: 0;
   font-size: 0.9rem;
-  color: #555;
-  margin-bottom: 0.5rem;
+  font-weight: 300;
 }
 
-/* Botón de logout con Vuetify */
-.logout-btn {
-  /* Reemplaza color="error" por tu color dorado */
+.header__dropdown-links {
+  padding: 1rem;
+}
+
+.header__dropdown-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  color: #333;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.header__dropdown-link:hover {
+  background: #f5f5f5;
+  color: #073a34;
+}
+
+.header__dropdown-link svg {
+  color: #073a34;
+  width: 18px;
+}
+
+.header__logout-btn {
+  margin: 0.5rem 1rem 1rem !important;
   background-color: #d1a75f !important;
-  /* color principal */
   color: #000 !important;
-  /* texto negro */
-  font-weight: 600;
-  text-transform: uppercase;
-  margin-top: 0.5rem;
-  width: 100%;
-  justify-content: center;
-  /* Centra el texto en el v-btn */
-  border: solid 5px #fff;
+  font-weight: 600 !important;
+  padding: 0.5rem 1rem !important;
+  width: calc(100% - 2rem) !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  transition: background-color 0.3s ease, transform 0.2s ease !important;
 }
 
-/* Transición "fade" */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
+.header__logout-btn:hover {
+  background-color: #c09346 !important;
+  transform: translateY(-2px);
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.header__logout-btn:active {
+  transform: translateY(0);
+}
+
+.header__logout-icon {
+  font-size: 0.9rem;
+}
+
+/* Transiciones para dropdown */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-enter-from {
   opacity: 0;
+  transform: translateY(10px);
+}
+
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
 }
 
 /* ================= MENÚ MÓVIL ================= */
@@ -367,52 +709,195 @@ const handleLogout = () => {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(10px);
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
   display: flex;
   justify-content: center;
   align-items: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   z-index: 99;
-  pointer-events: none;
 }
 
-.header__mobile-menu.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: all;
+.header__nav-mobile {
+  position: relative;
+  width: 90%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 0;
+  background: #013428;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cg fill='%23d1a75f' fill-opacity='0.05'%3E%3Ccircle cx='4' cy='4' r='1'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-.header__mobile-menu .header__nav ul {
+.header__nav-list {
   list-style: none;
   padding: 0;
-  text-align: center;
-  margin: 0;
-
-  li {
-    margin-bottom: 1.5rem;
-  }
-
-  a {
-    color: #eaeaea;
-    font-size: 1.5rem;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s;
-
-    &:hover {
-      color: #d1a75f;
-    }
-  }
+  width: 80%;
+  margin: 0 0 3rem;
 }
 
-body.no-scroll,
-html.no-scroll {
-  overflow: hidden;
+.header__nav-item {
+  margin-bottom: 1.2rem;
+}
+
+.header__nav-link {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  color: #eaeaea;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 0.3rem 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.header__nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #d1a75f;
+  transition: width 0.3s ease;
+}
+
+.header__nav-link:hover {
+  color: #d1a75f;
+  transform: translateX(5px);
+}
+
+.header__nav-link:hover::after {
+  width: 100%;
+}
+
+.header__nav-icon-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.header__nav-link:hover .header__nav-icon-box {
+  background-color: rgba(209, 167, 95, 0.2);
+  transform: scale(1.1);
+}
+
+.header__nav-icon {
+  color: #d1a75f;
+  font-size: 0.8rem;
+}
+
+.header__social-links {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.header__social-link {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d1a75f;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.header__social-link:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.header__social-link--twitter {
+  opacity: 0.7;
+}
+
+/* Animaciones para el menú móvil */
+.menu-reveal-enter-active,
+.menu-reveal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.menu-reveal-enter-from,
+.menu-reveal-leave-to {
+  opacity: 0;
+}
+
+/* ================= BARRA DE BÚSQUEDA ================= */
+.header__search-bar {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to right, #073a34, #052422);
+  padding: 1rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 50;
+}
+
+.header__search-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.header__search-input {
+  width: 100%;
+  padding: 1rem 3rem 1rem 1.5rem;
+  border: none;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 1rem;
+  color: #333;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.header__search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #d1a75f, inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header__search-close {
+  position: absolute;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #073a34;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.header__search-close:hover {
+  transform: rotate(90deg);
+}
+
+/* Animación para la barra de búsqueda */
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 
 /* ================= DESKTOP ================= */
@@ -422,94 +907,188 @@ html.no-scroll {
 }
 
 .header__top {
-  background-color: #013031;
+  background: linear-gradient(to right, #012422, #073a34, #012422);
   padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(209, 167, 95, 0.3);
+}
 
-  .header__container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.header__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .header__schedule {
-    margin: 0;
-    font-size: 0.875rem;
-    font-weight: 400;
-  }
+.header__schedule-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-  .header__icons {
-    display: flex;
-    gap: 1rem;
-  }
+.header__schedule-icon {
+  color: #d1a75f;
+}
 
-  .header__icon .icon {
-    color: #093B35;
-    font-size: 1.2rem;
-    transition: color 0.3s ease-in-out;
-  }
+.header__schedule {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
 
-  .header__icon:hover .icon {
-    color: #d1a75f;
-  }
+.header__top-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.header__social-desktop {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.header__social-desktop .header__social-link {
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  color: #d1a75f;
+  background: transparent;
+  border: 1px solid rgba(209, 167, 95, 0.3);
+}
+
+.header__social-desktop .header__social-link:hover {
+  background: #d1a75f;
+  color: #012422;
+  border-color: #d1a75f;
+}
+
+.header__icons {
+  display: flex;
+  gap: 1rem;
+}
+
+.header__icon--search {
+  transition: background 0.3s ease;
+}
+
+.header__icon--search:hover {
+  background: #d1a75f;
+}
+
+.header__icon--search:hover .icon {
+  color: #fff;
 }
 
 .header__bottom {
-  background-color: #000;
-  padding: 1rem 0;
+  background: linear-gradient(to right, #000, #041817, #000);
+  padding: 1.5rem 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-  .header__container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.header__nav-left,
+.header__nav-right {
+  flex: 1;
+}
 
-  .header__nav-left,
-  .header__nav-right {
-    .home-view__nav-list {
-      list-style: none;
-      display: flex;
-      gap: 1rem;
-      margin: 0;
-      padding: 0;
+.header__desktop-nav-list {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
 
-      .home-view__nav-link {
-        color: #eaeaea;
-        text-decoration: none;
-        text-transform: uppercase;
-        font-weight: 600;
+.header__nav-left .header__desktop-nav-list {
+  justify-content: flex-end;
+  padding-right: 2rem;
+}
 
-        &:hover {
-          color: #d1a75f;
-        }
-      }
-    }
-  }
+.header__nav-right .header__desktop-nav-list {
+  justify-content: flex-start;
+  padding-left: 2rem;
+}
 
-  .header__logo .header__svg {
-    width: 300px;
-    display: block;
-    margin: 0 auto;
-  }
+.header__desktop-nav-item {
+  position: relative;
+}
 
-  .header__brand {
-    fill: #d1a75f;
-    font-size: 42px;
-    font-family: 'Times New Roman', serif;
-    font-weight: 700;
-  }
+.header__desktop-nav-link {
+  color: #eaeaea;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: color 0.3s ease;
+}
 
-  .header__tagline {
-    fill: #7a7a7a;
-    font-size: 20px;
-    letter-spacing: 0.1rem;
-    font-weight: 400;
-  }
+.header__desktop-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #d1a75f;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  transform-origin: right center;
+}
+
+.header__desktop-nav-link:hover {
+  color: #d1a75f;
+}
+
+.header__desktop-nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.header__logo--desktop {
+  position: relative;
+  width: 300px;
+}
+
+.header__logo-svg-desktop {
+  width: 305px;
+  height: auto;
+  overflow: visible;
+}
+
+.header__logo-desktop-text-main {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 700;
+  fill: url(#goldGradientDesktop);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: fill 0.3s ease, filter 0.5s ease;
+}
+
+.header__logo-desktop-text-restaurant {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  fill: #eaeaea;
+  letter-spacing: 3px;
+  transition: fill 0.3s ease;
+}
+
+.header__logo-animation:hover .header__logo-desktop-text-main {
+  fill: #f3cc74;
+  filter: drop-shadow(0 0 8px rgba(209, 167, 95, 0.7));
+}
+
+.header__logo-animation:hover .header__logo-desktop-text-restaurant {
+  fill: #ffffff;
+}
+
+/* User dropdown en desktop */
+.header__user-dropdown--desktop {
+  display: none;
 }
 
 /* MOSTRAR BARRA SUPERIOR/INFERIOR EN ESCRITORIO, OCULTAR BARRA MÓVIL */
@@ -525,97 +1104,30 @@ html.no-scroll {
     display: block;
   }
 
-  /* CARD MENU MODAL MOBILE */
-
-  .cart-dropdown {
-    position: absolute;
-    top: 50px;
-    right: 10px;
-    width: 300px;
-    max-height: 250px;
-    background: #fef3c7;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    padding: 10px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  .header__user-dropdown--desktop {
+    display: block;
   }
 
-  .cart-dropdown__title {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: left;
-    margin-bottom: 10px;
-    color: #064e3b;
+  /* Ajustes para el dropdown en desktop */
+  .header__user-dropdown--desktop .header__avatar-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(209, 167, 95, 0.3);
   }
 
-  .cart-dropdown__items {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+  .header__user-dropdown--desktop .header__avatar {
+    width: 32px;
+    height: 32px;
   }
 
-  .cart-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    border-bottom: 1px solid #d1a75f;
-    width: 100%;
-    justify-content: space-between;
+  .header__user-dropdown--desktop .header__avatar-name {
+    font-size: 0.9rem;
   }
 
-  .cart-item__image {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: 5px;
+  .header__user-dropdown--desktop .header__dropdown-menu {
+    right: 0;
+    top: 45px;
   }
-
-  .cart-item__name,
-  .cart-item__price {
-    font-size: 14px;
-    color: #2d2d2d;
-    margin: 0;
-  }
-
-  .cart-item__actions {
-    display: flex;
-    gap: 5px;
-  }
-
-  .cart-button {
-    background: #064e3b;
-    color: white;
-    border: none;
-    padding: 5px 8px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-    transition: background 0.3s;
-
-    &:hover {
-      background: #043d2a;
-    }
-
-    .cart-button--delete {
-      background: #d9534f;
-
-      &:hover {
-        background: #c9302c;
-      }
-    }
-
-    .cart-dropdown__empty {
-      text-align: center;
-      font-size: 14px;
-      color: #666;
-      padding: 10px;
-    }
-  }
-}   
+}
 </style>

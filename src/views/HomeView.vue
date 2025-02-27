@@ -164,8 +164,9 @@ $color-gold-hover: #af8c3a;
 // =======================
 .menu-section {
   text-align: center;
-  background: #000; 
+  background: #000;
   padding-top: 40px;
+
   &__title {
     color: $color-gold;
     font-size: 3.8rem;
@@ -178,10 +179,10 @@ $color-gold-hover: #af8c3a;
     align-items: center;
     justify-items: center;
     gap: 20px;
-    
+
     @media (min-width: 768px) {
       grid-template-columns: repeat(4, 1fr);
-    } 
+    }
   }
 }
 

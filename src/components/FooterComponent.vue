@@ -22,7 +22,7 @@
       <nav class="footer__nav">
         <ul class="footer__nav-list">
           <li class="footer__nav-item">
-            <router-link to="/menu" class="footer__nav-link">Menu</router-link>
+            <router-link to="/cart" class="footer__nav-link">Menu</router-link>
           </li>
           <li class="footer__nav-item">
             <a class="footer__nav-link">Events</a>
