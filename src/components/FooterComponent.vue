@@ -7,7 +7,7 @@
             style="width:200px;">
             <text x="50%" y="50%" text-anchor="middle"
               style="font-family: 'Poppins', sans-serif; font-size:60px; fill:#d1a75f; font-weight:700;">
-              PARTOW FOODS
+              ELIXIUM FOODS
             </text>
             <text x="50%" y="75%" text-anchor="middle"
               style="font-family: 'Poppins', sans-serif; font-size:40px; fill:#eaeaea;">

@@ -376,7 +376,7 @@ export default defineComponent({
 /* --- Modal --- */
 .input-guest__modal {
     position: fixed;
-    z-index: 999;
+    z-index: 999999999999999999999999999999999999;
     top: 0;
     left: 0;
     width: 100%;

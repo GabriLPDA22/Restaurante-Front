@@ -6,7 +6,7 @@
         </div>
         <div class="contact-info__item">
             <i class="contact-info__icon">📧</i>
-            <span class="contact-info__text">info@partowads.com</span>
+            <span class="contact-info__text">info@elixiumfood.com</span>
         </div>
     </div>
 </template>

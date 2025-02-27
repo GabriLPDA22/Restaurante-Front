@@ -18,7 +18,7 @@
                   <stop offset="100%" stop-color="#9f7835" />
                 </linearGradient>
               </defs>
-              <text x="50%" y="50%" text-anchor="middle" class="header__logo-text-main">PARTOW FOODS</text>
+              <text x="50%" y="50%" text-anchor="middle" class="header__logo-text-main">ELIXIUM FOODS</text>
               <text x="50%" y="75%" text-anchor="middle" class="header__logo-text-restaurant">RESTAURANT</text>
             </svg>
           </div>
@@ -225,7 +225,7 @@
                     <stop offset="100%" stop-color="#9f7835" />
                   </linearGradient>
                 </defs>
-                <text x="50%" y="50%" text-anchor="middle" class="header__logo-desktop-text-main">PARTOW FOODS</text>
+                <text x="50%" y="50%" text-anchor="middle" class="header__logo-desktop-text-main">ELIXIUM FOODS</text>
                 <text x="50%" y="75%" text-anchor="middle"
                   class="header__logo-desktop-text-restaurant">RESTAURANT</text>
               </svg>
