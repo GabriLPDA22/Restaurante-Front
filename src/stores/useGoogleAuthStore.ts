@@ -82,4 +82,6 @@ export const useGoogleAuthStore = defineStore('googleAuth', () => {
     loginWithGoogle: handleCredentialResponse,
     logout,
   };
+}, {
+  persist: true
 });
