@@ -18,8 +18,10 @@
                   <stop offset="100%" stop-color="#9f7835" />
                 </linearGradient>
               </defs>
-              <text x="50%" y="50%" text-anchor="middle" class="header__logo-text-main">ELIXIUM FOODS</text>
-              <text x="50%" y="75%" text-anchor="middle" class="header__logo-text-restaurant">RESTAURANT</text>
+              <text x="50%" y="50%" text-anchor="middle" class="header__logo-text-main"
+                fill="url(#goldGradient)">ELIXIUM FOODS</text>
+              <text x="50%" y="75%" text-anchor="middle" class="header__logo-text-restaurant"
+                fill="url(#goldGradient)">RESTAURANT</text>
             </svg>
           </div>
         </router-link>
@@ -225,9 +227,10 @@
                     <stop offset="100%" stop-color="#9f7835" />
                   </linearGradient>
                 </defs>
-                <text x="50%" y="50%" text-anchor="middle" class="header__logo-desktop-text-main">ELIXIUM FOODS</text>
-                <text x="50%" y="75%" text-anchor="middle"
-                  class="header__logo-desktop-text-restaurant">RESTAURANT</text>
+                <text x="50%" y="50%" text-anchor="middle" class="header__logo-desktop-text-main"
+                  fill="url(#goldGradientDesktop)">ELIXIUM FOODS</text>
+                <text x="50%" y="75%" text-anchor="middle" class="header__logo-desktop-text-restaurant"
+                  fill="url(#goldGradientDesktop)">RESTAURANT</text>
               </svg>
             </div>
           </router-link>
@@ -252,18 +255,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { VBtn } from 'vuetify/components';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useGoogleAuthStore } from '../stores/useGoogleAuthStore';
 
+// Importar los stores que ya tienen configurada la persistencia
 const authStore = useAuthStore();
 const googleAuthStore = useGoogleAuthStore();
 
 const isMenuOpen = ref(false);
 const isDropdownOpen = ref(false);
 const isSearchBarOpen = ref(false);
+
+// Comprobación inicial para verificar si los stores tienen datos persistentes
+onMounted(() => {
+  // No es necesario hacer nada aquí, los stores ya se cargan automáticamente
+  // gracias a pinia-plugin-persistedstate
+  console.log('Header mounted, auth status:', isAuthenticated.value);
+});
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -296,23 +307,41 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
 };
 
+// Computed para verificar si hay un usuario autenticado
 const isAuthenticated = computed(() => {
   return !!(authStore.user || googleAuthStore.user);
 });
 
+// Computed para obtener los datos del usuario actual
+interface User {
+  Nombre: string;
+  Correo?: string;
+  PictureUrl?: string;
+}
+
 const currentUser = computed<User | null>(() => {
   const user = authStore.user || googleAuthStore.user;
-  
+
   if (!user) return null;
 
   // Intentar obtener el nombre de múltiples formas posibles
-  const nombre = 
-    user.nombre || 
+  const nombre =
+    user.nombre ||
+    user.Nombre ||
+    user.name ||
+    user.displayName ||
     'Usuario';
+
+  const correo =
+    user.correo ||
+    user.Correo ||
+    user.email ||
+    '';
 
   return {
     Nombre: nombre,
-    PictureUrl:  user.PictureUrl || user.pictureUrl || "https://cdn-icons-png.flaticon.com/128/149/149071.png"
+    Correo: correo,
+    PictureUrl: user.PictureUrl || user.pictureUrl || user.photoURL || "https://cdn-icons-png.flaticon.com/128/149/149071.png"
   };
 });
 
