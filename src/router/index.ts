@@ -6,10 +6,12 @@ import ViewMenu from '@/views/ViewMenu.vue';
 import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ShoppingCart from '@/views/ShoppingCart.vue';
-import ThanksView from '@/views/ThanksView.vue';
-import ProfileView from '@/views/ProfileView.vue';
-import OrdersView from '@/views/OrdersView.vue';
+import ThanksViewReservation from '@/views/ThanksReservationView.vue';
+import ProfileView from '../views/ProfileView.vue';
+import OrdersView from '../views/OrdersView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
+import CheckoutView from '@/views/CheckoutView.vue';
+import ThanksOrderView from '@/views/ThanksOrderView.vue';
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
@@ -44,7 +46,7 @@ const routes = [
   {
     path: '/thanks',
     name: 'thanks',
-    component: ThanksView
+    component: ThanksViewReservation
   },
   {
     path: '/profile',
@@ -60,6 +62,16 @@ const routes = [
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: NotFoundView
+  },
+  {
+    path: '/checkout',
+    name: 'checkout',
+    component: CheckoutView
+  },
+  {
+    path: '/thanks-order',
+    name: 'thanks-order',
+    component: ThanksOrderView
   }
 ];
 

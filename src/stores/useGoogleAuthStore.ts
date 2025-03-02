@@ -19,7 +19,7 @@ declare const google: {
 };
 
 export const useGoogleAuthStore = defineStore('googleAuth', () => {
-  const user = ref(null);
+  const user = ref<any>(null);
   const token = ref<string | null>(null);
   const router = useRouter();
 
@@ -48,21 +48,33 @@ export const useGoogleAuthStore = defineStore('googleAuth', () => {
     console.log("Google Token recibido:", response.credential);
     if (!response.credential) {
       console.error("⚠️ Error: El token de Google es undefined");
-      return;
+      return { success: false, message: "El token de Google es undefined" };
     }
     try {
       const { data } = await axios.post("http://localhost:5021/api/auth/google-login", {
         token: response.credential,
       });
-      console.log("User authenticated:", data);
-      user.value = data;
-      token.value = response.credential;
-      localStorage.setItem("user", JSON.stringify(data));
+      console.log("User authenticated (Google):", data);
+
+      // Si el backend indica error, retornamos success = false
+      if (data.success === false) {
+        return { success: false, message: data.message || "Error en login con Google" };
+      }
+
+      // Se asume que el backend retorna { user: {...}, token: "...", success: true, message: "Login con Google exitoso" }
+      user.value = data.user || data;
+      token.value = data.token || response.credential;
+      localStorage.setItem("user", JSON.stringify(user.value));
       localStorage.setItem("token", token.value);
-      await router.push("/");
-      window.scrollTo(0, 0);
-    } catch (error) {
-      console.error("Google login failed", error);
+
+      // Redirigir automáticamente a home
+      router.push('/');
+      console.log("Redirigiendo a home después de login con Google");
+
+      return { success: true, message: data.message || "Login con Google exitoso" };
+    } catch (error: any) {
+      console.error("Google login failed:", error);
+      return { success: false, message: error.response?.data?.message || "Error al iniciar sesión con Google" };
     }
   };
 

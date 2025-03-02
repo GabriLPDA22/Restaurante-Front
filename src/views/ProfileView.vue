@@ -9,17 +9,39 @@
             </div>
 
             <div class="profile-content">
+                <!-- Notificación -->
+                <div v-if="notificacion.visible" :class="['notification', notificacion.tipo]">
+                    <i :class="getNotificationIcon(notificacion.tipo)"></i>
+                    {{ notificacion.mensaje }}
+                </div>
+
                 <!-- Información Personal -->
                 <div class="profile-section profile-info">
                     <div class="section-header">
                         <h2>Información Personal</h2>
-                        <button v-if="!estadoEdicion.info" class="btn-edit" @click="activarEdicion('info')">EDITAR</button>
+                        <button v-if="!estadoEdicion.info" class="btn-edit"
+                            @click="activarEdicion('info')">EDITAR</button>
                     </div>
                     <div class="info-grid">
-                        <div class="info-item" v-for="(valor, campo) in infoPersonal" :key="campo">
-                            <label>{{ campo.toUpperCase().replace('_', ' ') }}</label>
-                            <p v-if="!estadoEdicion.info">{{ valor }}</p>
-                            <input v-else v-model="infoPersonal[campo]" type="text" />
+                        <div class="info-item">
+                            <label>NOMBRE</label>
+                            <p v-if="!estadoEdicion.info">{{ infoPersonal.nombre || 'No especificado' }}</p>
+                            <input v-else v-model="infoPersonal.nombre" type="text" />
+                        </div>
+                        <div class="info-item">
+                            <label>CORREO ELECTRÓNICO</label>
+                            <p v-if="!estadoEdicion.info">{{ infoPersonal.email || 'No especificado' }}</p>
+                            <input v-else v-model="infoPersonal.email" type="text" disabled />
+                        </div>
+                        <div class="info-item">
+                            <label>TELÉFONO</label>
+                            <p v-if="!estadoEdicion.info">{{ infoPersonal.telefono || 'No especificado' }}</p>
+                            <input v-else v-model="infoPersonal.telefono" type="text" />
+                        </div>
+                        <div class="info-item">
+                            <label>FECHA DE NACIMIENTO</label>
+                            <p v-if="!estadoEdicion.info">{{ formatearFecha(infoPersonal.fechaNacimiento) || 'No especificado' }}</p>
+                            <input v-else v-model="infoPersonal.fechaNacimiento" type="text" placeholder="DD/MM/AAAA" />
                         </div>
                     </div>
                     <div v-if="estadoEdicion.info" class="edit-actions">
@@ -28,61 +50,183 @@
                     </div>
                 </div>
 
-                <!-- Notificación -->
-                <div v-if="notificacion.visible" :class="['notification', notificacion.tipo]">
-                    <i :class="getNotificationIcon(notificacion.tipo)"></i>
-                    {{ notificacion.mensaje }}
+                <!-- Estado de debug (solo visible en desarrollo) -->
+                <div v-if="isDevelopment" class="debug-section">
+                    <h3>Información de Debug</h3>
+                    <p><strong>Usuario en Store:</strong> {{ JSON.stringify(authStore.user) }}</p>
+                    <button @click="recargarUsuario" class="btn-debug">Recargar Datos</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
 
-// Estado de edición centralizado
+// Detectar si estamos en desarrollo
+const isDevelopment = process.env.NODE_ENV === 'development'
+
+// Obtenemos la store
+const authStore = useAuthStore()
+
+// Estado de edición
 const estadoEdicion = ref({
     info: false
 })
 
-// Datos personales
+// Datos personales locales
 const infoPersonal = ref({
-    nombre: 'Juan Pérez Martínez',
-    email: 'juan.perez@ejemplo.com',
-    telefono: '+54 11 1234 5678',
-    fechaNacimiento: '15 de Mayo, 1985'
+    nombre: '',
+    email: '',
+    telefono: '',
+    fechaNacimiento: ''
 })
 
 // Notificaciones
 const notificacion = ref({
     visible: false,
     mensaje: '',
-    tipo: 'success' // success, error, warning, info
+    tipo: 'success' 
 })
 
-// Métodos
-const activarEdicion = (tipo: string) => {
+// Formatear fecha para mostrar
+const formatearFecha = (fecha) => {
+    if (!fecha) return '';
+    
+    // Si es formato ISO o YYYY-MM-DD
+    if (fecha.includes('-') && fecha.split('-')[0].length === 4) {
+        const parts = fecha.split('-');
+        if (parts.length === 3) {
+            return `${parts[2].split('T')[0]}/${parts[1]}/${parts[0]}`;
+        }
+    }
+    
+    return fecha;
+}
+
+// Recargar datos de usuario (para debug)
+const recargarUsuario = async () => {
+    mostrarNotificacion('Recargando datos del usuario...', 'info');
+    authStore.loadUser();
+    loadUserData();
+    mostrarNotificacion('Datos recargados', 'success');
+}
+
+// Al montar el componente, cargamos datos del user de la store
+onMounted(() => {
+    authStore.loadUser();
+    loadUserData();
+    
+    // Log para debug
+    if (isDevelopment) {
+        console.log('Datos del usuario cargados en el componente:', infoPersonal.value);
+        console.log('Usuario en la store:', authStore.user);
+    }
+})
+
+// Función para cargar datos del usuario
+const loadUserData = () => {
+    if (authStore.user) {
+        // Intentar obtener el nombre (puede estar en cualquiera de las dos propiedades)
+        infoPersonal.value.nombre = authStore.user.nombre || authStore.user.Nombre || '';
+        
+        // Intentar obtener el email
+        infoPersonal.value.email = authStore.user.email || authStore.user.Email || '';
+        
+        // Intentar obtener el teléfono
+        infoPersonal.value.telefono = authStore.user.telefono || authStore.user.Telefono || '';
+        
+        // Intentar obtener la fecha de nacimiento
+        let fechaValue = authStore.user.fechaNacimiento || authStore.user.FechaNacimiento;
+        
+        // Formatear fecha si es necesario
+        if (fechaValue) {
+            if (typeof fechaValue === 'string' && fechaValue.includes('-') && fechaValue.split('-')[0].length === 4) {
+                const parts = fechaValue.split('-');
+                if (parts.length === 3) {
+                    infoPersonal.value.fechaNacimiento = `${parts[2].split('T')[0]}/${parts[1]}/${parts[0]}`;
+                } else {
+                    infoPersonal.value.fechaNacimiento = fechaValue;
+                }
+            } else {
+                infoPersonal.value.fechaNacimiento = fechaValue.toString();
+            }
+        } else {
+            infoPersonal.value.fechaNacimiento = '';
+        }
+        
+        if (isDevelopment) {
+            console.log('Datos cargados:', {
+                nombre: infoPersonal.value.nombre,
+                email: infoPersonal.value.email,
+                telefono: infoPersonal.value.telefono,
+                fechaNacimiento: infoPersonal.value.fechaNacimiento
+            });
+        }
+    }
+}
+
+/* Métodos de edición */
+const activarEdicion = (tipo) => {
     estadoEdicion.value[tipo] = true;
 }
 
-const desactivarEdicion = (tipo: string) => {
+const desactivarEdicion = (tipo) => {
     estadoEdicion.value[tipo] = false;
+    loadUserData(); // Restaurar valores originales
 }
 
-const guardarInformacion = () => {
-    estadoEdicion.value.info = false;
-    mostrarNotificacion('Información personal guardada correctamente');
+/* Guardar la info en el backend */
+const guardarInformacion = async () => {
+    try {
+        // Mostramos notificación de carga
+        mostrarNotificacion('Guardando información...', 'info');
+        
+        // Preparamos los datos a enviar
+        const datosActualizados = {
+            nombre: infoPersonal.value.nombre,
+            email: infoPersonal.value.email,
+            telefono: infoPersonal.value.telefono,
+            fechaNacimiento: infoPersonal.value.fechaNacimiento
+        };
+        
+        console.log('Enviando datos para actualizar:', datosActualizados);
+        
+        // Llamamos a la store para actualizar
+        const response = await authStore.updateUserProfile(datosActualizados);
+        
+        console.log('Respuesta de actualización:', response);
+
+        if (response.success) {
+            mostrarNotificacion('Información personal guardada correctamente', 'success');
+            estadoEdicion.value.info = false;
+            
+            // Recargar los datos actualizados
+            loadUserData();
+        } else {
+            mostrarNotificacion(response.message || 'Error al guardar la información', 'error');
+        }
+    } catch (error) {
+        console.error('Error al guardar información:', error);
+        mostrarNotificacion('Error inesperado al guardar la información', 'error');
+    }
 }
 
-const mostrarNotificacion = (mensaje: string, tipo: string = 'success', duracion: number = 3000) => {
+/* Notificaciones */
+const mostrarNotificacion = (mensaje, tipo = 'success', duracion = 3000) => {
     notificacion.value = { visible: true, mensaje, tipo };
-    setTimeout(() => {
-        notificacion.value.visible = false;
-    }, duracion);
-}
+    
+    // Solo establecemos un temporizador para mensajes que no son de error
+    if (tipo !== 'error') {
+        setTimeout(() => {
+            notificacion.value.visible = false;
+        }, duracion);
+    }
+};
 
-const getNotificationIcon = (tipo: string) => {
+const getNotificationIcon = (tipo) => {
     switch (tipo) {
         case 'success': return 'fas fa-check-circle';
         case 'error': return 'fas fa-exclamation-circle';
@@ -90,7 +234,7 @@ const getNotificationIcon = (tipo: string) => {
         case 'info': return 'fas fa-info-circle';
         default: return 'fas fa-bell';
     }
-}
+};
 </script>
 
 <style lang="scss">
@@ -119,7 +263,7 @@ $font-secondary: 'Montserrat', sans-serif;
         border: 1px solid rgba($color-gold, 0.1);
 
         .profile-header {
-            background: linear-gradient(to right, $color-gold);
+            background: linear-gradient(to right, $color-gold, darken($color-gold, 10%));
             color: $color-dark;
             padding: 2rem;
 
@@ -142,6 +286,43 @@ $font-secondary: 'Montserrat', sans-serif;
             padding: 2rem;
             display: grid;
             gap: 2rem;
+
+            // Estilos para la notificación
+            .notification {
+                padding: 1rem;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                
+                i {
+                    margin-right: 0.75rem;
+                    font-size: 1.25rem;
+                }
+                
+                &.success {
+                    background-color: rgba(39, 174, 96, 0.2);
+                    border: 1px solid #27AE60;
+                    color: #2ECC71;
+                }
+                
+                &.error {
+                    background-color: rgba(231, 76, 60, 0.2);
+                    border: 1px solid #E74C3C;
+                    color: #F85D4B;
+                }
+                
+                &.warning {
+                    background-color: rgba(241, 196, 15, 0.2);
+                    border: 1px solid #F1C40F;
+                    color: #F1C40F;
+                }
+                
+                &.info {
+                    background-color: rgba(52, 152, 219, 0.2);
+                    border: 1px solid #3498DB;
+                    color: #3498DB;
+                }
+            }
 
             .profile-section {
                 background-color: $color-light-card;
@@ -171,6 +352,7 @@ $font-secondary: 'Montserrat', sans-serif;
                         font-weight: 500;
                         cursor: pointer;
                         text-transform: uppercase;
+                        transition: all 0.3s ease;
 
                         &:hover {
                             background-color: $color-gold;
@@ -193,7 +375,8 @@ $font-secondary: 'Montserrat', sans-serif;
                             text-transform: uppercase;
                         }
 
-                        p, input {
+                        p,
+                        input {
                             color: $color-text;
                             font-size: 1rem;
                         }
@@ -201,9 +384,21 @@ $font-secondary: 'Montserrat', sans-serif;
                         input {
                             width: 100%;
                             padding: 0.5rem;
-                            background-color: transparent;
+                            background-color: rgba($color-dark, 0.5);
                             border: 1px solid rgba($color-text, 0.5);
                             border-radius: 0.25rem;
+                            color: $color-text;
+                            
+                            &:focus {
+                                outline: none;
+                                border-color: $color-gold;
+                                box-shadow: 0 0 0 2px rgba($color-gold, 0.3);
+                            }
+                            
+                            &:disabled {
+                                opacity: 0.6;
+                                cursor: not-allowed;
+                            }
                         }
                     }
                 }
@@ -214,11 +409,13 @@ $font-secondary: 'Montserrat', sans-serif;
                     gap: 1rem;
                     margin-top: 1rem;
 
-                    .btn-primary, .btn-secondary {
+                    .btn-primary,
+                    .btn-secondary {
                         padding: 0.75rem 1.5rem;
                         border-radius: 0.5rem;
                         font-weight: 600;
                         cursor: pointer;
+                        transition: all 0.3s ease;
                     }
 
                     .btn-primary {
@@ -227,7 +424,7 @@ $font-secondary: 'Montserrat', sans-serif;
                         border: none;
 
                         &:hover {
-                            background-color: $color-gold;
+                            background-color: darken($color-gold, 10%);
                         }
                     }
 
@@ -240,6 +437,39 @@ $font-secondary: 'Montserrat', sans-serif;
                             border-color: $color-text;
                             background-color: rgba($color-text, 0.1);
                         }
+                    }
+                }
+            }
+            
+            // Sección de debug
+            .debug-section {
+                background-color: rgba(red, 0.1);
+                border: 1px solid rgba(red, 0.3);
+                padding: 1rem;
+                border-radius: 0.5rem;
+                
+                h3 {
+                    color: rgba(red, 0.8);
+                    margin-bottom: 0.5rem;
+                }
+                
+                p {
+                    font-family: monospace;
+                    word-break: break-all;
+                    white-space: pre-wrap;
+                    margin-bottom: 1rem;
+                }
+                
+                .btn-debug {
+                    background-color: #444;
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 0.25rem;
+                    cursor: pointer;
+                    
+                    &:hover {
+                        background-color: #666;
                     }
                 }
             }

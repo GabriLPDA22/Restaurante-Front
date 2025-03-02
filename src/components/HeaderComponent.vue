@@ -267,8 +267,6 @@ const googleAuthStore = useGoogleAuthStore();
 
 const isMenuOpen = ref(false);
 const isDropdownOpen = ref(false);
-const isSearchBarOpen = ref(false);
-
 // Comprobación inicial para verificar si los stores tienen datos persistentes
 onMounted(() => {
   // No es necesario hacer nada aquí, los stores ya se cargan automáticamente
@@ -319,8 +317,22 @@ interface User {
   PictureUrl?: string;
 }
 
+// Define un tipo para los posibles usuarios de los diferentes stores
+interface AuthUser {
+  nombre?: string;
+  Nombre?: string;
+  name?: string;
+  displayName?: string;
+  correo?: string;
+  Correo?: string;
+  email?: string;
+  PictureUrl?: string;
+  pictureUrl?: string;
+  photoURL?: string;
+}
+
 const currentUser = computed<User | null>(() => {
-  const user = authStore.user || googleAuthStore.user;
+  const user = authStore.user || googleAuthStore.user as AuthUser | null;
 
   if (!user) return null;
 

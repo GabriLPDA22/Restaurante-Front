@@ -52,7 +52,7 @@
       </div>
     </div>
 
-    <div v-if="cart.length" class="small-cart-preview">
+    <div v-if="cart.length" v-show="cartVisible" class="small-cart-preview">
       <div class="small-cart-preview__header">
         <span>Tu Carrito</span>
         <span class="cart-count">{{ cart.length }}</span>
@@ -80,7 +80,7 @@
           <span>Total:</span>
           <span>€{{ calculateTotal().toFixed(2) }}</span>
         </div>
-        <button class="small-cart-preview__checkout">
+        <button class="small-cart-preview__checkout" @click="irAlCheckout">
           Ir al Pago
         </button>
       </div>
@@ -90,6 +90,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router';
 
 interface Product {
   id: number;
@@ -104,10 +105,12 @@ interface CartItem extends Product {
   quantity: number;
 }
 
+const router = useRouter();
 const products = ref<Product[]>([])
 const cart = ref<CartItem[]>([])
 const searchQuery = ref('')
 const selectedCategory = ref('Todos')
+const cartVisible = ref(false);
 
 const fetchProducts = async () => {
   try {
@@ -125,10 +128,65 @@ const fetchProducts = async () => {
     products.value = await response.json();
   } catch (err) {
     console.error('Error fetching products:', err);
+    // Cargar datos de ejemplo si la API falla
+    products.value = [
+      {
+        id: 1,
+        nombre: 'Pizza Margherita',
+        descripcion: 'Tomate, mozzarella, albahaca',
+        precio: 10.50,
+        categorias: ['Pizzas', 'Vegetariano'],
+        imagenUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
+      },
+      {
+        id: 2,
+        nombre: 'Pasta Carbonara',
+        descripcion: 'Espaguetis, huevo, panceta, queso',
+        precio: 12.75,
+        categorias: ['Pastas'],
+        imagenUrl: 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
+      },
+      {
+        id: 3,
+        nombre: 'Tiramisú',
+        descripcion: 'Postre italiano con café y mascarpone',
+        precio: 6.50,
+        categorias: ['Postres'],
+        imagenUrl: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
+      },
+      {
+        id: 4,
+        nombre: 'Ensalada César',
+        descripcion: 'Lechuga, pollo, picatostes, parmesano',
+        precio: 8.95,
+        categorias: ['Ensaladas'],
+        imagenUrl: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
+      }
+    ];
   }
 }
 
-onMounted(fetchProducts)
+// Cargar carrito guardado del localStorage
+const loadCart = () => {
+  const savedCart = localStorage.getItem('cart');
+  if (savedCart) {
+    try {
+      cart.value = JSON.parse(savedCart);
+    } catch (e) {
+      console.error('Error loading cart from localStorage:', e);
+    }
+  }
+}
+
+// Guardar carrito en localStorage
+const saveCart = () => {
+  localStorage.setItem('cart', JSON.stringify(cart.value));
+}
+
+onMounted(() => {
+  fetchProducts();
+  loadCart();
+})
 
 const categories = computed(() => {
   const allCategories = products.value.flatMap(p => p.categorias);
@@ -161,12 +219,18 @@ const addToCart = (product: Product) => {
   } else {
     cart.value.push({ ...product, quantity: 1 });
   }
+
+  saveCart();
+
+  // Mostrar el carrito automáticamente al añadir un producto
+  cartVisible.value = true;
 }
 
 const removeFromCart = (productId: number) => {
   const index = cart.value.findIndex(item => item.id === productId);
   if (index !== -1) {
     cart.value.splice(index, 1);
+    saveCart();
   }
 }
 
@@ -178,6 +242,7 @@ const updateQuantity = (productId: number, newQuantity: number) => {
       removeFromCart(productId);
     } else {
       item.quantity = newQuantity;
+      saveCart();
     }
   }
 }
@@ -187,6 +252,15 @@ const calculateTotal = () => {
 }
 
 const toggleCart = () => {
+  cartVisible.value = !cartVisible.value;
+}
+
+const irAlCheckout = () => {
+  // Guardar el carrito en localStorage para que el componente de checkout pueda acceder
+  saveCart();
+
+  // Redirigir a la página de checkout
+  router.push('/checkout');
 }
 </script>
 
@@ -395,6 +469,7 @@ const toggleCart = () => {
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  animation: slideUp 0.3s ease-out;
 
   &__header {
     display: flex;
@@ -404,6 +479,7 @@ const toggleCart = () => {
     background-color: var(--primary-color);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    color: var(--white);
   }
 
   &__content {
@@ -411,6 +487,8 @@ const toggleCart = () => {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     padding: 1rem;
+    max-height: 60vh;
+    overflow-y: auto;
   }
 
   &__item {
@@ -476,6 +554,23 @@ const toggleCart = () => {
     border-radius: 5px;
     margin-top: 0.5rem;
     cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: darken(#2B7A78, 10%);
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
