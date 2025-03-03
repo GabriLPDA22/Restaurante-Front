@@ -34,32 +34,41 @@
                 <p>Cargando tus pedidos...</p>
             </div>
 
+            <div v-else-if="error" class="error-container">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>{{ error }}</p>
+                <button @click="cargarPedidos" class="btn-retry">
+                    Reintentar
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+
             <div v-else class="pedidos-content">
-                <div v-for="pedido in pedidosFiltrados" :key="pedido.id || pedido.IdPedidos" class="pedido-item">
+                <div v-for="pedido in pedidosFiltrados" :key="pedido.IdPedidos" class="pedido-item">
                     <div class="pedido-header">
                         <div class="pedido-info">
-                            <span class="pedido-numero">Pedido #{{ pedido.id || pedido.IdPedidos }}</span>
-                            <span class="pedido-fecha">{{ formatearFecha(pedido.fecha || pedido.Fecha) }}</span>
+                            <span class="pedido-numero">Pedido #{{ pedido.IdPedidos }}</span>
+                            <span class="pedido-fecha">{{ formatearFecha(pedido.Fecha) }}</span>
                         </div>
-                        <span :class="`pedido-estado ${getEstadoClase(pedido.estado || 'Preparando')}`">
-                            {{ pedido.estado || 'Preparando' }}
+                        <span :class="`pedido-estado ${getEstadoClase(pedido.Estado || 'Preparando')}`">
+                            {{ pedido.Estado || 'Preparando' }}
                         </span>
                     </div>
 
                     <div class="pedido-detalle">
                         <div class="productos-lista">
                             <h3>Productos</h3>
-                            <div v-for="(producto, index) in obtenerProductos(pedido)" :key="index"
-                                class="producto-item" @click="verDetalleProducto(producto)">
-                                <span class="producto-nombre">{{ producto.nombre || producto.NombreProducto }}</span>
-                                <span class="producto-precio">{{ producto.cantidad || producto.Cantidad }} x {{
-                                    formatearPrecio(producto.precio || producto.Precio) }}</span>
+                            <div v-for="(producto, index) in pedido.Items" :key="index" class="producto-item"
+                                @click="verDetalleProducto(producto)">
+                                <span class="producto-nombre">{{ producto.Nombre }}</span>
+                                <span class="producto-precio">{{ producto.Cantidad }} x {{
+                                    formatearPrecio(producto.Precio) }}</span>
                             </div>
                         </div>
                         <div class="pedido-resumen">
                             <div class="total-container">
                                 <p class="total-label">Total</p>
-                                <p class="total-monto">{{ calcularTotal(pedido) }}</p>
+                                <p class="total-monto">{{ formatearPrecio(pedido.Total || 0) }}</p>
                             </div>
                             <button class="btn-detalles" @click="verDetallePedido(pedido)">
                                 Ver Detalles
@@ -81,224 +90,56 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { usePedidoStore } from '../stores/usePedidoStore';
-
-// 1. Define los tipos con TODAS las propiedades posibles, marcándolas como opcionales
-interface IProducto {
-    nombre?: string;
-    NombreProducto?: string;
-    cantidad?: number;
-    Cantidad?: number;
-    precio?: number | string;
-    Precio?: number | string;
-}
-
-interface IPedido {
-    id?: number | string;
-    IdPedidos?: number | string;
-    fecha?: string;
-    Fecha?: string;
-    total?: number | string;
-    Total?: number | string;
-    estado?: string;
-    productos?: IProducto[];
-    Itmes?: IProducto[];
-}
+import { usePedidoStore, Pedido } from '../stores/usePedidoStore';
 
 // Estado local
 const searchTerm = ref('');
 const filtroSeleccionado = ref('Todos');
 const mostrarDropdown = ref(false);
 const estados = ['Todos', 'Entregado', 'En proceso', 'Preparando'];
-const cargando = ref(true);
 
 // Store de pedidos
 const pedidoStore = usePedidoStore();
 
-// Pedidos locales (si falla la API)
-const pedidosLocales = ref<IPedido[]>([]);
+// Acceder a las propiedades reactivas del store
+const pedidos = computed(() => pedidoStore.pedidos);
+const cargando = computed(() => pedidoStore.cargando);
+const error = computed(() => pedidoStore.error);
 
-// Cargar pedidos al montar
-onMounted(async () => {
-    cargando.value = true;
-    try {
-        await pedidoStore.obtenerPedidosUsuario();
-        if (pedidoStore.pedidos.length === 0) {
-            cargarPedidosLocales();
-        }
-    } catch (error) {
-        console.error('Error al cargar pedidos del usuario:', error);
-        cargarPedidosLocales();
-    } finally {
-        cargando.value = false;
-    }
-});
-
-// Cargar pedidos desde localStorage
-function cargarPedidosLocales() {
-    try {
-        const lastOrder = localStorage.getItem('lastOrder');
-        const simulatedOrders = localStorage.getItem('simulatedOrders');
-
-        if (lastOrder) {
-            const order = JSON.parse(lastOrder) as {
-                orderNumber: string | number;
-                date: string;
-                total: number;
-                items: Array<{
-                    nombre: string;
-                    cantidad?: number;
-                    quantity?: number;
-                    precio?: number;
-                }>;
-            };
-
-            pedidosLocales.value.push({
-                id: order.orderNumber,
-                fecha: order.date,
-                total: `€${order.total.toFixed(2)}`,
-                estado: 'En proceso',
-                productos: order.items.map((item) => ({
-                    nombre: item.nombre,
-                    cantidad: item.cantidad || item.quantity || 1,
-                    precio: `€${item.precio}`
-                }))
-            });
-        }
-
-        if (simulatedOrders) {
-            const orders = JSON.parse(simulatedOrders) as Array<{
-                IdPedidos: string | number;
-                Fecha: string;
-                Total?: number;
-                items: Array<{
-                    nombre?: string;
-                    cantidad?: number;
-                    quantity?: number;
-                    precio?: number;
-                }>;
-            }>;
-
-            orders.forEach((order) => {
-                pedidosLocales.value.push({
-                    id: order.IdPedidos,
-                    fecha: order.Fecha,
-                    total: `€${order.Total || 0}`,
-                    estado: 'Preparando',
-                    productos: order.items.map((item) => ({
-                        nombre: item.nombre,
-                        cantidad: item.cantidad || item.quantity || 1,
-                        precio: `€${item.precio}`
-                    }))
-                });
-            });
-        }
-    } catch (error) {
-        console.error('Error al cargar pedidos locales:', error);
-    }
-}
-
-// Filtrado de pedidos
-const pedidosFiltrados = computed<IPedido[]>(() => {
-    // Combinar pedidos de la API con pedidos locales
-    const todosLosPedidos: IPedido[] = [
-        ...(pedidoStore.pedidos as IPedido[]), // <-- asume que tus pedidos de la store se adaptan a IPedido
-        ...pedidosLocales.value
-    ];
-
-    return todosLosPedidos.filter((pedido) => {
-        // Convertimos ID a string para buscar
-        const idPedido = String(pedido.id || pedido.IdPedidos || '');
-
-        // Obtener productos
-        const productos = obtenerProductos(pedido);
-
-        // Coincidencia con lo buscado (ID o nombre de producto)
+// Filtrar pedidos
+const pedidosFiltrados = computed<Pedido[]>(() => {
+    if (!pedidos.value.length) return [];
+    return pedidos.value.filter(pedido => {
+        const idPedido = String(pedido.IdPedidos || '');
+        const productos = pedido.Items || [];
         const matchSearch =
+            searchTerm.value === '' ||
             idPedido.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-            productos.some((p) => {
-                const nombreProducto = p.nombre || p.NombreProducto || '';
-                return nombreProducto
-                    .toLowerCase()
-                    .includes(searchTerm.value.toLowerCase());
-            });
-
-        // Coincidencia con el filtro de estado
-        const estadoPedido = pedido.estado || 'Preparando';
+            productos.some(p => (p.Nombre || '').toLowerCase().includes(searchTerm.value.toLowerCase()));
+        const estadoPedido = pedido.Estado || 'Preparando';
         const matchEstado =
             filtroSeleccionado.value === 'Todos' ||
             estadoPedido === filtroSeleccionado.value;
-
         return matchSearch && matchEstado;
     });
 });
 
-// 2. Función que retorna el array de productos, contemplando 'productos' o 'Itmes'
-function obtenerProductos(pedido: IPedido): IProducto[] {
-    if (pedido.productos) return pedido.productos;
-    if (pedido.Itmes) return pedido.Itmes;
-    return [];
-}
+// Cargar pedidos al montar
+onMounted(async () => {
+    console.log('Cargando pedidos en OrderView');
+    await cargarPedidos();
+});
 
-// 3. Calcular total, manejando las variantes
-function calcularTotal(pedido: IPedido): string {
-    // Si ya viene un total calculado
-    if (pedido.total) {
-        if (typeof pedido.total === 'string') return pedido.total;
-        return `€${pedido.total.toFixed(2)}`;
-    }
-
-    // Si es un pedido con "Itmes"
-    if (pedido.Itmes) {
-        const total = pedido.Itmes.reduce((sum, item) => {
-            const precioNum = parseFloat(
-                String(item.Precio ?? item.precio ?? 0).replace('€', '').replace(',', '.')
-            );
-            const cantidad = item.Cantidad ?? item.cantidad ?? 1;
-            return sum + precioNum * cantidad;
-        }, 0);
-        return `€${total.toFixed(2)}`;
-    }
-
-    // Caso general (pedido.productos)
-    const productos = obtenerProductos(pedido);
-    const total = productos.reduce((sum, p) => {
-        const precioNum = parseFloat(
-            String(p.Precio ?? p.precio ?? 0).replace('€', '').replace(',', '.')
-        );
-        const cantidad = p.Cantidad ?? p.cantidad ?? 1;
-        return sum + precioNum * cantidad;
-    }, 0);
-
-    return `€${total.toFixed(2)}`;
-}
-
-// 4. Formatear fecha (admite string opcional)
-function formatearFecha(fechaStr?: string): string {
-    if (!fechaStr) return '';
+// Función para cargar pedidos con diagnóstico
+async function cargarPedidos() {
     try {
-        const fecha = new Date(fechaStr);
-        return fecha.toLocaleDateString('es-ES', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-    } catch {
-        return fechaStr;
+        await pedidoStore.obtenerPedidosUsuario();
+    } catch (err) {
+        console.error('Error al cargar pedidos:', err);
     }
 }
 
-// 5. Formatear precio, admitiendo también undefined
-function formatearPrecio(precio: string | number | undefined): string {
-    if (!precio) return '€0.00';
-    if (typeof precio === 'string' && precio.includes('€')) {
-        return precio;
-    }
-    const precioNum = parseFloat(String(precio).replace(',', '.'));
-    return `€${precioNum.toFixed(2)}`;
-}
-
-// Acciones
+// Funciones auxiliares
 function buscarPedidos() {
     console.log(`Buscando: ${searchTerm.value}`);
 }
@@ -310,34 +151,29 @@ function toggleDropdown() {
 function seleccionarFiltro(estado: string) {
     filtroSeleccionado.value = estado;
     mostrarDropdown.value = false;
-    console.log(`Filtro seleccionado: ${estado}`);
 }
 
 function getEstadoClase(estado: string) {
     switch (estado) {
-        case 'Entregado':
-            return 'estado-entregado';
-        case 'En proceso':
-            return 'estado-proceso';
-        case 'Preparando':
-            return 'estado-preparando';
-        default:
-            return '';
+        case 'Entregado': return 'estado-entregado';
+        case 'En proceso': return 'estado-proceso';
+        case 'Preparando': return 'estado-preparando';
+        default: return '';
     }
 }
 
-function verDetallePedido(pedido: IPedido) {
-    const idPedido = pedido.id || pedido.IdPedidos;
-    alert(`Ver detalles completos del pedido #${idPedido}`);
+function verDetallePedido(pedido: Pedido) {
+    console.log(`Ver detalles completos del pedido #${pedido.IdPedidos}`);
 }
 
-function verDetalleProducto(producto: IProducto) {
-    const nombreProducto = producto.nombre || producto.NombreProducto;
-    alert(`Detalles del producto: ${nombreProducto}`);
+function verDetalleProducto(producto: any) {
+    console.log(`Detalles del producto: ${producto.Nombre}`);
 }
+
+// Usar funciones del store para formateo
+const formatearFecha = pedidoStore.formatearFecha;
+const formatearPrecio = pedidoStore.formatearPrecio;
 </script>
-
-
 
 <style lang="scss">
 // Variables - Elixium Foods color scheme
@@ -509,6 +345,43 @@ $font-secondary: 'Montserrat', sans-serif;
 
             p {
                 font-size: 1.1rem;
+            }
+        }
+
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #EF4444;
+
+            i {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            p {
+                font-size: 1.2rem;
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
+
+            .btn-retry {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background-color: rgba(#EF4444, 0.1);
+                color: #EF4444;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.25rem;
+                border: 1px solid #EF4444;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background-color: rgba(#EF4444, 0.2);
+                }
             }
         }
 

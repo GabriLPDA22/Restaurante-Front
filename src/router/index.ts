@@ -12,6 +12,8 @@ import OrdersView from '../views/OrdersView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
 import CheckoutView from '@/views/CheckoutView.vue';
 import ThanksOrderView from '@/views/ThanksOrderView.vue';
+import ApiTestView from '@/views/ApiTestView.vue';
+import ApiUserView from '../views/ApiUserTest.vue'
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
@@ -72,6 +74,16 @@ const routes = [
     path: '/thanks-order',
     name: 'thanks-order',
     component: ThanksOrderView
+  },
+  {
+    path: '/api-test',
+    name: 'api-test',
+    component: ApiTestView
+  },
+  {
+    path: '/api-user-test',
+    name: 'api-user-test',
+    component: ApiUserView
   }
 ];
 
