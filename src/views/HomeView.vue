@@ -38,9 +38,10 @@ const navigateToCategory = (category: string) => {
 
       <!-- Botones debajo -->
       <div class="home-view__hero-actions">
-        <a href="/reserve" class="home-view__hero-btn home-view__hero-btn--reserve" style="text-decoration: none;">
+        <router-link to="/reservation" class="home-view__hero-btn home-view__hero-btn--reserve"
+          style="text-decoration: none;">
           RESERVE NOW
-        </a>
+        </router-link>
         <router-link to="/contact" class="home-view__hero-btn home-view__hero-btn--contact"
           style="text-decoration: none;">
           CONTACT US

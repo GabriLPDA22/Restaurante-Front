@@ -15,7 +15,7 @@ export interface Pedido {
     IdPedidos: number;
     Fecha: string;
     UserID: number;
-    Itmes: Array<{
+    Items: Array<{
         IdDetalle: number;
         IdPedidos: number;
         IdProducto: number;
@@ -24,7 +24,7 @@ export interface Pedido {
         Nombre?: string;
     }>;
     Total?: number;
-    simulado?: boolean;
+    Estado?: string;
 }
 
 export interface ProductoCarrito {
@@ -36,16 +36,16 @@ export interface ProductoCarrito {
     imagenUrl?: string;
 }
 
-// Tipo para errores de API
+// Manejo de errores API
 interface ApiError {
     response?: {
-        data?: {
-            message?: string;
-        };
+        data?: any;
         status?: number;
+        statusText?: string;
     };
-    request?: unknown; // Cambiado de 'any' a 'unknown' para evitar el error
+    request?: any;
     message?: string;
+    config?: any;
 }
 
 export const usePedidoStore = defineStore('pedido', () => {
@@ -54,204 +54,388 @@ export const usePedidoStore = defineStore('pedido', () => {
     const pedidoActual = ref<Pedido | null>(null);
     const cargando = ref(false);
     const error = ref('');
+    const debugInfo = ref<any>(null); // Para depuración
 
-    // Obtener pedidos del usuario actual
-    const obtenerPedidosUsuario = async () => {
-        if (!authStore.user) {
-            error.value = 'Usuario no autenticado';
-            await cargarPedidosSimulados(); // Cargar pedidos simulados si no hay usuario
-            return pedidos.value;
+    // Caché de nombres de productos
+    const productosCache = ref<Map<number, string>>(new Map());
+
+    // Obtener el ID del usuario autenticado
+    const getUserId = () => {
+        const user = authStore.user;
+        if (!user) return null;
+        return user?.id || user?.userId || user?.userid || user?.UserID || user?.userID || user?.user_id || null;
+    };
+
+    // Cargar todos los productos de una vez
+    const cargarTodosLosProductos = async () => {
+        if (productosCache.value.size > 0) {
+            // Ya tenemos productos cargados
+            return;
         }
-
-        // Uso de "as any" para evitar errores de tipo
-        const user = authStore.user as any;
-        const userId = user?.id || user?.userId || user?.userid || user?.UserID || user?.userID || user?.user_id;
-
-        if (!userId) {
-            console.warn('ID de usuario no disponible, usando ID temporal para desarrollo');
-            const tempUserId = 1; // ID temporal para desarrollo
-            await cargarPedidosSimulados(); // Cargar pedidos simulados si no hay ID
-            return pedidos.value;
-        }
-
-        cargando.value = true;
-        error.value = '';
 
         try {
+            // Intenta obtener todos los productos con una sola llamada
+            const { data } = await axios.get('http://localhost:5021/api/Productos');
+
+            if (Array.isArray(data)) {
+                // Asumiendo que la respuesta es un array de productos
+                data.forEach(producto => {
+                    const id = producto.id || producto.Id || producto.ID || producto.IdProducto || producto.idProducto;
+                    const nombre = producto.nombre || producto.Nombre || `Producto ${id}`;
+
+                    if (id) {
+                        productosCache.value.set(Number(id), nombre);
+                    }
+                });
+
+                console.log(`Cargados ${productosCache.value.size} productos en caché`);
+            } else {
+                console.warn('La respuesta de API para productos no es un array:', data);
+            }
+        } catch (err) {
+            console.error('Error al cargar todos los productos:', err);
+
+            // Intentemos cargar la lista de categorías que podría tener productos anidados
+            try {
+                const { data } = await axios.get('http://localhost:5021/api/Categorias');
+
+                if (Array.isArray(data)) {
+                    // Intentar encontrar productos en las categorías
+                    data.forEach(categoria => {
+                        if (categoria.productos && Array.isArray(categoria.productos)) {
+                            categoria.productos.forEach((producto: any) => {
+                                const id = producto.id || producto.Id || producto.ID || producto.IdProducto || producto.idProducto;
+                                const nombre = producto.nombre || producto.Nombre || `Producto ${id}`;
+
+                                if (id) {
+                                    productosCache.value.set(Number(id), nombre);
+                                }
+                            });
+                        }
+                    });
+
+                    console.log(`Cargados ${productosCache.value.size} productos desde categorías`);
+                }
+            } catch (err2) {
+                console.error('También falló la carga desde categorías:', err2);
+            }
+        }
+    };
+
+    // Obtener nombre de producto (usando la caché)
+    const obtenerNombreProducto = async (productoId: number) => {
+        // Si ya tenemos el producto en caché, lo devolvemos directamente
+        if (productosCache.value.has(productoId)) {
+            return productosCache.value.get(productoId);
+        }
+
+        // Si no está en caché, intentamos cargar todos los productos primero
+        await cargarTodosLosProductos();
+
+        // Verificar nuevamente si ahora está en caché
+        if (productosCache.value.has(productoId)) {
+            return productosCache.value.get(productoId);
+        }
+
+        // Si todavía no está, usar un valor predeterminado
+        return `Producto ${productoId}`;
+    };
+
+    // Función para cargar nombres de productos de todos los pedidos
+    const cargarNombresProductos = async () => {
+        await cargarTodosLosProductos();
+
+        // Actualizar los nombres en los pedidos
+        pedidos.value.forEach(pedido => {
+            if (pedido.Items && pedido.Items.length > 0) {
+                pedido.Items.forEach(item => {
+                    if (item.IdProducto && productosCache.value.has(item.IdProducto)) {
+                        item.Nombre = productosCache.value.get(item.IdProducto);
+                    }
+                });
+            }
+        });
+    };
+
+    // Obtener pedidos del usuario
+    const obtenerPedidosUsuario = async () => {
+        const userId = getUserId();
+        if (!userId) {
+            error.value = 'Usuario no autenticado';
+            return [];
+        }
+        cargando.value = true;
+        error.value = '';
+        debugInfo.value = null;
+
+        try {
+            console.log(`Obteniendo pedidos para el usuario: ${userId}`);
             const { data } = await axios.get(`http://localhost:5021/api/Pedido/usuario/${userId}`);
-            pedidos.value = data || [];
+            console.log('Pedidos recibidos:', data);
 
-            // Calcular el total para cada pedido
-            calcularTotalesPedidos();
+            // Guardar datos completos para depuración
+            debugInfo.value = { rawData: data };
 
-            // Si no hay pedidos de la API, intentar cargar del localStorage
-            if (pedidos.value.length === 0) {
-                await cargarPedidosSimulados();
+            // Transformar los datos para ajustarlos a la estructura esperada
+            let pedidosTransformados: Pedido[] = [];
+
+            if (Array.isArray(data)) {
+                // Es un array directo de pedidos
+                pedidosTransformados = data.map(transformarPedido);
+            } else if (data && typeof data === 'object') {
+                // Tratar de encontrar el array de pedidos en alguna propiedad del objeto
+                const posibleArrayProps = Object.keys(data);
+                for (const prop of posibleArrayProps) {
+                    if (Array.isArray(data[prop])) {
+                        pedidosTransformados = data[prop].map(transformarPedido);
+                        break;
+                    }
+                }
+
+                // Si sigue siendo un objeto y tiene IdPedidos, es un pedido único
+                if (pedidosTransformados.length === 0 && data.IdPedidos) {
+                    pedidosTransformados = [transformarPedido(data)];
+                }
             }
 
-            return pedidos.value;
+            // Actualizar el estado
+            pedidos.value = pedidosTransformados;
+            calcularTotalesPedidos();
+
+            // Cargar nombres de productos
+            await cargarNombresProductos();
+
+            // Log para depuración
+            if (pedidos.value.length > 0) {
+                console.log('Primer pedido procesado con nombres:', pedidos.value[0]);
+            }
+
+            return pedidosTransformados;
         } catch (err: any) {
-            console.error('Error al obtener pedidos:', err);
-            error.value = err.response?.data?.message || 'Error al cargar los pedidos';
-
-            // En caso de error, intentar cargar del localStorage
-            await cargarPedidosSimulados();
-
-            return pedidos.value;
+            handleApiError(err, 'Error al cargar los pedidos');
+            return [];
         } finally {
             cargando.value = false;
         }
     };
 
-    // Cargar pedidos simulados desde localStorage
-    const cargarPedidosSimulados = async () => {
-        try {
-            // 1. Intentar cargar el último pedido
-            const lastOrderStr = localStorage.getItem('lastOrder');
-            if (lastOrderStr) {
-                const lastOrder = JSON.parse(lastOrderStr);
+    // Función auxiliar para transformar el formato de cada pedido
+    function transformarPedido(pedidoData: any): Pedido {
+        console.log('Transformando pedido:', pedidoData);
 
-                // Convertir al formato de pedido
-                const pedidoLastOrder: Pedido = {
-                    IdPedidos: lastOrder.orderNumber || Date.now(),
-                    Fecha: lastOrder.date || new Date().toISOString(),
-                    UserID: 1, // ID temporal
-                    simulado: true,
-                    Itmes: (lastOrder.items || []).map((item: any, index: number) => ({
-                        IdDetalle: index + 1,
-                        IdPedidos: lastOrder.orderNumber || Date.now(),
-                        IdProducto: item.id || item.IdProducto || 0,
-                        Cantidad: item.cantidad || item.quantity || 1,
-                        Precio: parseFloat(typeof item.precio === 'string' ?
-                            item.precio.replace('€', '').replace(',', '.') : String(item.precio)) || 0,
-                        Nombre: item.nombre || ''
-                    }))
-                };
+        // Verificar que los Items sean un array
+        let items = [];
 
-                // Calcular total
-                if (pedidoLastOrder.Itmes && pedidoLastOrder.Itmes.length > 0) {
-                    pedidoLastOrder.Total = pedidoLastOrder.Itmes.reduce(
-                        (sum, item) => sum + (item.Precio * item.Cantidad), 0
+        // Opción 1: Buscar por propiedad Items/items
+        if (pedidoData.Items && Array.isArray(pedidoData.Items)) {
+            items = pedidoData.Items;
+        } else if (pedidoData.items && Array.isArray(pedidoData.items)) {
+            items = pedidoData.items;
+        } else {
+            // Opción 2: Extraer items del JSON plano basado en patrones de nombres
+            console.log('Buscando items en formato plano');
+
+            // 2.1 Si hay items en un formato aplanado (como mostró tu consola)
+            const itemsPlanos = [];
+
+            // Buscar patrones de IdDetalle, idDetalle, etc.
+            const detalleKeys = Object.keys(pedidoData).filter(key =>
+                key.startsWith('IdDetalle') ||
+                key.startsWith('idDetalle') ||
+                key.includes('detalle')
+            );
+
+            if (detalleKeys.length > 0) {
+                console.log('Encontrados posibles detalles:', detalleKeys);
+                // Extraer datos de este formato aplanado
+                for (const key of detalleKeys) {
+                    // Extraer el índice o número del detalle
+                    const match = key.match(/\d+/);
+                    if (!match) continue;
+
+                    const index = match[0];
+                    const idProductoKey = Object.keys(pedidoData).find(k =>
+                        (k.includes('IdProducto') || k.includes('idProducto')) && k.includes(index)
                     );
-                } else {
-                    pedidoLastOrder.Total = 0;
-                }
+                    const cantidadKey = Object.keys(pedidoData).find(k =>
+                        (k.includes('Cantidad') || k.includes('cantidad')) && k.includes(index)
+                    );
+                    const precioKey = Object.keys(pedidoData).find(k =>
+                        (k.includes('Precio') || k.includes('precio')) && k.includes(index)
+                    );
+                    const nombreKey = Object.keys(pedidoData).find(k =>
+                        (k.includes('Nombre') || k.includes('nombre')) && k.includes(index)
+                    );
 
-                // Añadir a la lista de pedidos si no existe ya
-                if (!pedidos.value.some(p => p.IdPedidos === pedidoLastOrder.IdPedidos)) {
-                    pedidos.value.push(pedidoLastOrder);
+                    const item = {
+                        IdDetalle: pedidoData[key],
+                        IdPedidos: pedidoData.IdPedidos || pedidoData.idPedidos || 0,
+                        IdProducto: idProductoKey ? pedidoData[idProductoKey] : 0,
+                        Cantidad: cantidadKey ? pedidoData[cantidadKey] : 1,
+                        Precio: precioKey ? pedidoData[precioKey] : 0,
+                        Nombre: nombreKey ? pedidoData[nombreKey] : `Producto ${index}`
+                    };
+                    itemsPlanos.push(item);
                 }
             }
 
-            // 2. Intentar cargar pedidos simulados
-            const simulatedOrdersStr = localStorage.getItem('simulatedOrders');
-            if (simulatedOrdersStr) {
-                const simulatedOrders = JSON.parse(simulatedOrdersStr);
+            // 2.2: Si encontramos un único "items" que parece una cadena JSON
+            if (itemsPlanos.length === 0 && typeof pedidoData.items === 'string') {
+                try {
+                    const parsedItems = JSON.parse(pedidoData.items);
+                    if (Array.isArray(parsedItems)) {
+                        itemsPlanos.push(...parsedItems);
+                    }
+                } catch (e) {
+                    console.log('Error al parsear items como JSON:', e);
+                }
+            }
 
-                // Añadir cada pedido simulado a la lista
-                simulatedOrders.forEach((order: any) => {
-                    // Evitar duplicados
-                    if (!pedidos.value.some(p => p.IdPedidos === order.IdPedidos)) {
-                        pedidos.value.push({
-                            ...order,
-                            simulado: true
-                        });
+            // 2.3: Buscar en toda la estructura a ver si encontramos arrays con apariencia de items
+            if (itemsPlanos.length === 0) {
+                Object.keys(pedidoData).forEach(key => {
+                    if (Array.isArray(pedidoData[key])) {
+                        const arr = pedidoData[key];
+                        if (arr.length > 0 && (
+                            arr[0].IdProducto !== undefined ||
+                            arr[0].idProducto !== undefined ||
+                            arr[0].Cantidad !== undefined ||
+                            arr[0].cantidad !== undefined
+                        )) {
+                            // Parece ser una colección de items
+                            itemsPlanos.push(...arr);
+                        }
                     }
                 });
             }
-        } catch (error) {
-            console.error('Error al cargar pedidos simulados:', error);
+
+            items = itemsPlanos;
         }
-    };
+
+        // Opción 3: Si todavía no hay items, crear uno por defecto basado en lo que encontremos
+        if (items.length === 0) {
+            console.log('Creando item por defecto');
+            // Buscar cualquier propiedad que contenga IdProducto o Producto
+            const idProductoKey = Object.keys(pedidoData).find(k =>
+                k.includes('IdProducto') || k.includes('idProducto')
+            );
+
+            // Si encontramos un ID de producto, crear un item
+            if (idProductoKey) {
+                const cantidadKey = Object.keys(pedidoData).find(k =>
+                    k.includes('Cantidad') || k.includes('cantidad')
+                );
+                const precioKey = Object.keys(pedidoData).find(k =>
+                    k.includes('Precio') || k.includes('precio')
+                );
+                const nombreKey = Object.keys(pedidoData).find(k =>
+                    k.includes('Nombre') || k.includes('nombre')
+                );
+
+                items.push({
+                    IdDetalle: 1,
+                    IdPedidos: pedidoData.IdPedidos || pedidoData.idPedidos || 0,
+                    IdProducto: pedidoData[idProductoKey] || 0,
+                    Cantidad: cantidadKey ? pedidoData[cantidadKey] : 1,
+                    Precio: precioKey ? pedidoData[precioKey] : 0,
+                    Nombre: nombreKey ? pedidoData[nombreKey] : `Producto ${pedidoData[idProductoKey] || 0}`
+                });
+            }
+        }
+
+        console.log('Items identificados:', items);
+
+        // Normalizar la estructura de los items
+        const itemsNormalizados = items.map(item => {
+            // Asegurar que los nombres de propiedad estén correctos (primera letra mayúscula)
+            const itemNormalizado: any = {};
+
+            // ID del detalle
+            itemNormalizado.IdDetalle = item.IdDetalle || item.idDetalle || 0;
+
+            // ID del pedido
+            itemNormalizado.IdPedidos = item.IdPedidos || item.idPedidos ||
+                pedidoData.IdPedidos || pedidoData.idPedidos || 0;
+
+            // ID del producto
+            itemNormalizado.IdProducto = item.IdProducto || item.idProducto || 0;
+
+            // Cantidad
+            itemNormalizado.Cantidad = typeof item.Cantidad !== 'undefined' ? item.Cantidad :
+                (typeof item.cantidad !== 'undefined' ? item.cantidad : 1);
+
+            // Precio
+            itemNormalizado.Precio = typeof item.Precio !== 'undefined' ? Number(item.Precio) :
+                (typeof item.precio !== 'undefined' ? Number(item.precio) : 0);
+
+            // Nombre
+            itemNormalizado.Nombre = item.Nombre || item.nombre ||
+                item.nombreProducto || item.NombreProducto ||
+                `Producto ${itemNormalizado.IdProducto}`;
+
+            return itemNormalizado;
+        });
+
+        // Calcular el total del pedido
+        const total = itemsNormalizados.reduce((sum, item) => {
+            return sum + (Number(item.Cantidad) * Number(item.Precio));
+        }, 0);
+
+        console.log('Total calculado para el pedido:', total);
+
+        // Armar el pedido con la estructura esperada
+        return {
+            IdPedidos: pedidoData.IdPedidos || pedidoData.idPedidos || 0,
+            Fecha: pedidoData.Fecha || pedidoData.fecha || new Date().toISOString(),
+            UserID: pedidoData.UserID || pedidoData.userID || pedidoData.userId || 0,
+            Items: itemsNormalizados,
+            Total: total,
+            Estado: pedidoData.Estado || pedidoData.estado || 'Preparando'
+        };
+    }
 
     // Obtener un pedido específico por ID
     const obtenerPedidoPorId = async (pedidoId: number) => {
         cargando.value = true;
         error.value = '';
-
+        debugInfo.value = null;
         try {
+            console.log(`Obteniendo pedido con ID: ${pedidoId}`);
             const { data } = await axios.get(`http://localhost:5021/api/Pedido/${pedidoId}`);
-            pedidoActual.value = data;
+            console.log('Pedido recibido:', data);
 
-            // Calcular el total del pedido
-            if (pedidoActual.value && pedidoActual.value.Itmes) {
-                pedidoActual.value.Total = pedidoActual.value.Itmes.reduce(
-                    (sum, item) => sum + (item.Precio * item.Cantidad),
-                    0
-                );
+            // Transformar el pedido para normalizar su estructura
+            const pedidoTransformado = transformarPedido(data);
+            pedidoActual.value = pedidoTransformado;
+
+            // Cargar nombres de productos para este pedido
+            if (pedidoActual.value && pedidoActual.value.Items) {
+                // Asegurarnos de tener los productos cargados
+                await cargarTodosLosProductos();
+
+                // Actualizar los nombres
+                for (const item of pedidoActual.value.Items) {
+                    if (item.IdProducto && productosCache.value.has(item.IdProducto)) {
+                        item.Nombre = productosCache.value.get(item.IdProducto);
+                    }
+                }
             }
 
             return pedidoActual.value;
         } catch (err: any) {
-            console.error('Error al obtener pedido:', err);
-            error.value = err.response?.data?.message || 'Error al cargar el pedido';
-
-            // Intentar cargar del localStorage
-            const pedidoLocal = buscarPedidoEnLocalStorage(pedidoId);
-            if (pedidoLocal) {
-                pedidoActual.value = pedidoLocal;
-                return pedidoLocal;
-            }
-
+            handleApiError(err, 'Error al cargar el pedido');
             return null;
         } finally {
             cargando.value = false;
-        }
-    };
-
-    // Buscar un pedido en localStorage
-    const buscarPedidoEnLocalStorage = (pedidoId: number): Pedido | null => {
-        try {
-            // Buscar en lastOrder
-            const lastOrderStr = localStorage.getItem('lastOrder');
-            if (lastOrderStr) {
-                const lastOrder = JSON.parse(lastOrderStr);
-                if (lastOrder.orderNumber === pedidoId) {
-                    return {
-                        IdPedidos: lastOrder.orderNumber,
-                        Fecha: lastOrder.date,
-                        UserID: 1, // ID temporal
-                        simulado: true,
-                        Itmes: (lastOrder.items || []).map((item: any, index: number) => ({
-                            IdDetalle: index + 1,
-                            IdPedidos: lastOrder.orderNumber,
-                            IdProducto: item.id || item.IdProducto || 0,
-                            Cantidad: item.cantidad || item.quantity || 1,
-                            Precio: parseFloat(typeof item.precio === 'string' ?
-                                item.precio.replace('€', '').replace(',', '.') : String(item.precio)) || 0,
-                            Nombre: item.nombre || ''
-                        })),
-                        Total: lastOrder.total || 0
-                    };
-                }
-            }
-
-            // Buscar en simulatedOrders
-            const simulatedOrdersStr = localStorage.getItem('simulatedOrders');
-            if (simulatedOrdersStr) {
-                const simulatedOrders = JSON.parse(simulatedOrdersStr);
-                const order = simulatedOrders.find((o: any) => o.IdPedidos === pedidoId);
-                if (order) {
-                    return {
-                        ...order,
-                        simulado: true
-                    };
-                }
-            }
-
-            return null;
-        } catch (error) {
-            console.error('Error al buscar pedido en localStorage:', error);
-            return null;
         }
     };
 
     // Función para calcular los totales de todos los pedidos
     const calcularTotalesPedidos = () => {
         pedidos.value.forEach(pedido => {
-            if (pedido.Itmes && pedido.Itmes.length > 0) {
-                pedido.Total = pedido.Itmes.reduce(
-                    (sum, item) => sum + (item.Precio * item.Cantidad),
+            if (pedido.Items && pedido.Items.length > 0) {
+                pedido.Total = pedido.Items.reduce(
+                    (sum, item) => sum + (Number(item.Precio) * Number(item.Cantidad)),
                     0
                 );
             } else {
@@ -262,168 +446,89 @@ export const usePedidoStore = defineStore('pedido', () => {
 
     // Crear un nuevo pedido
     const crearPedido = async (productosCarrito: ProductoCarrito[]) => {
-        // 0. Verificar que hay productos en el carrito
         if (!productosCarrito || productosCarrito.length === 0) {
-            console.error('Error: Carrito vacío');
             error.value = 'No hay productos en el carrito';
             return null;
         }
-
-        // 1. Verificar autenticación
-        if (!authStore.user) {
-            console.error('Error: Usuario no autenticado');
-            error.value = 'Usuario no autenticado';
-            return crearPedidoSimulado(productosCarrito, 1);
-        }
-
-        // 2. Inspeccionar el objeto de usuario para depuración
-        console.log('Objeto de usuario completo (crearPedido):', JSON.stringify(authStore.user));
-
-        // 3. Intentar extraer el ID de usuario de diferentes propiedades comunes
-        const user = authStore.user as any;
-        const userId = user?.id || user?.userId || user?.userid || user?.UserID || user?.userID || user?.user_id;
-
-        // 4. Verificar si se encontró un ID válido
+        const userId = getUserId();
         if (!userId) {
-            console.error('Error: ID de usuario no disponible. Objeto de usuario:', user);
-            error.value = 'ID de usuario no disponible';
-
-            // SOLUCIÓN TEMPORAL PARA DESARROLLO
-            // Asignar un ID temporal para pruebas
-            const temporalUserId = 1;
-            console.warn('Usando ID temporal para desarrollo:', temporalUserId);
-
-            return crearPedidoSimulado(productosCarrito, temporalUserId);
+            error.value = 'Usuario no autenticado';
+            return null;
         }
-
         return procesarPedido(productosCarrito, userId);
     };
 
-    // Crear un pedido simulado (cuando no hay usuario o hay error en la API)
-    const crearPedidoSimulado = (productosCarrito: ProductoCarrito[], userId: number): Pedido => {
-        const pedidoId = Date.now();
-        const fecha = new Date().toISOString();
-
-        // Convertir items al formato del backend
-        const items = productosCarrito.map((p, index) => ({
-            IdDetalle: index + 1,
-            IdPedidos: pedidoId,
-            IdProducto: p.id,
-            Cantidad: p.cantidad || p.quantity || 1,
-            Precio: parseFloat(typeof p.precio === 'string' ?
-                p.precio.replace('€', '').replace(',', '.') : String(p.precio)) || 0,
-            Nombre: p.nombre || ''
-        }));
-
-        // Crear objeto de pedido
-        const pedido: Pedido = {
-            IdPedidos: pedidoId,
-            Fecha: fecha,
-            UserID: userId,
-            Itmes: items,
-            simulado: true
-        };
-
-        // Calcular total
-        pedido.Total = pedido.Itmes.reduce(
-            (sum, item) => sum + (item.Precio * item.Cantidad), 0
-        );
-
-        // Guardar en localStorage para futuras referencias
-        try {
-            // Guardar en simulatedOrders
-            const simulatedOrdersStr = localStorage.getItem('simulatedOrders');
-            const simulatedOrders = simulatedOrdersStr ? JSON.parse(simulatedOrdersStr) : [];
-            simulatedOrders.push(pedido);
-            localStorage.setItem('simulatedOrders', JSON.stringify(simulatedOrders));
-
-            // Añadir a la lista de pedidos
-            pedidos.value.push(pedido);
-        } catch (error) {
-            console.error('Error al guardar pedido simulado en localStorage:', error);
-        }
-
-        return pedido;
-    };
-
-    // Función auxiliar para procesar el pedido (extraída para mayor claridad)
+    // Procesar el pedido
     const procesarPedido = async (productosCarrito: ProductoCarrito[], userId: number) => {
         cargando.value = true;
         error.value = '';
-
+        debugInfo.value = null;
         try {
-            console.log('Productos recibidos:', productosCarrito);
-
-            // Transformar productos al formato esperado por el backend
             const items = productosCarrito.map(p => ({
                 IdProducto: p.id,
                 Cantidad: p.cantidad || p.quantity || 1,
-                Precio: parseFloat(
-                    typeof p.precio === 'string'
-                        ? p.precio.replace('€', '').replace(',', '.')
-                        : String(p.precio)
-                ) || 0
+                Precio: parseFloat(p.precio.toString().replace('€', '').replace(',', '.')) || 0
             }));
-
-            console.log('Items transformados:', items);
-
-            // Crear objeto de pedido
-            const pedidoDto = {
-                UserID: userId,
-                Items: items
-            };
-
-            console.log('Pedido a enviar:', pedidoDto);
-
-            // Intentar enviar el pedido a la API
-            try {
-                const { data } = await axios.post('http://localhost:5021/api/Pedido', pedidoDto);
-                console.log('Respuesta de la API:', data);
-
-                // Recargar los pedidos del usuario
-                await obtenerPedidosUsuario();
-
-                return data;
-            } catch (err) {
-                // Tratar como ApiError para manejar correctamente los tipos
-                const apiError = err as ApiError;
-                console.error('Error en la API:', apiError);
-
-                // Verificar el tipo de error de manera segura
-                if (apiError && apiError.response) {
-                    console.error('Respuesta de error:', apiError.response.data);
-                    console.error('Estado HTTP:', apiError.response.status);
-
-                    // Lanzar el error específico si existe
-                    error.value = apiError.response.data?.message || 'Error al comunicarse con el servidor';
-                } else if (apiError && apiError.request) {
-                    console.error('No se recibió respuesta del servidor');
-                    error.value = 'No se recibió respuesta del servidor. Verifica tu conexión.';
-                } else if (apiError && apiError.message) {
-                    console.error('Error al configurar la solicitud:', apiError.message);
-                    error.value = 'Error al configurar la solicitud';
-                } else {
-                    console.error('Error desconocido:', apiError);
-                    error.value = 'Error desconocido al procesar el pedido';
-                }
-
-                // En caso de error, crear un pedido simulado para desarrollo
-                console.log('CREANDO PEDIDO SIMULADO PARA DESARROLLO');
-                return crearPedidoSimulado(productosCarrito, userId);
-            }
+            const pedidoDto = { UserID: userId, Items: items };
+            console.log('Enviando pedido:', JSON.stringify(pedidoDto, null, 2));
+            const { data } = await axios.post(
+                'http://localhost:5021/api/Pedido',
+                pedidoDto,
+                { headers: { 'Content-Type': 'application/json' }, timeout: 15000 }
+            );
+            console.log('Pedido exitoso:', data);
+            await obtenerPedidosUsuario();
+            return data;
         } catch (err: any) {
-            console.error('Error general al crear pedido:', err);
-            error.value = err.response?.data?.message || 'Error al crear el pedido';
-            return crearPedidoSimulado(productosCarrito, userId);
+            handleApiError(err, 'Error al crear el pedido');
+            return null;
         } finally {
             cargando.value = false;
         }
     };
 
-    // Formatear fecha para mostrar
+    // Manejo de errores de API
+    const handleApiError = (err: any, defaultMessage: string) => {
+        const apiError = err as ApiError;
+        debugInfo.value = { message: apiError.message, status: apiError.response?.status, responseData: apiError.response?.data };
+        if (apiError.response) {
+            const status = apiError.response.status;
+            if (status === 401) error.value = 'No autorizado. Inicia sesión nuevamente.';
+            else if (status === 404) error.value = 'Recurso no encontrado.';
+            else error.value = apiError.response.data?.message || `Error ${status}: ${apiError.response.statusText || defaultMessage}`;
+        } else if (apiError.request) error.value = 'No se recibió respuesta del servidor. Verifica la conexión.';
+        else error.value = apiError.message || defaultMessage;
+    };
+
+    // Formatear fecha
     const formatearFecha = (fechaStr: string) => {
         try {
+            if (!fechaStr) return 'Fecha no disponible';
+
+            // Verificar si la fecha tiene formato específico de tu API
+            if (fechaStr.includes('T00:00:00')) {
+                // Formato común en APIs .NET
+                const partes = fechaStr.split('T')[0].split('-');
+                if (partes.length === 3) {
+                    const [año, mes, dia] = partes;
+                    const fecha = new Date(parseInt(año), parseInt(mes) - 1, parseInt(dia));
+                    return fecha.toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                }
+            }
+
+            // Intentar con formato ISO
             const fecha = new Date(fechaStr);
+
+            // Verificar si la fecha es válida
+            if (isNaN(fecha.getTime())) {
+                console.warn(`Fecha inválida: ${fechaStr}`);
+                return 'Fecha pendiente';
+            }
+
             return fecha.toLocaleDateString('es-ES', {
                 day: '2-digit',
                 month: 'short',
@@ -431,37 +536,33 @@ export const usePedidoStore = defineStore('pedido', () => {
             });
         } catch (error) {
             console.error('Error al formatear fecha:', error);
-            return fechaStr;
+            return 'Fecha pendiente';
         }
     };
 
-    // Formatear precio para mostrar
+    // Formatear precio
     const formatearPrecio = (precio: number) => {
         try {
-            return '€' + precio.toFixed(2);
+            return '€' + Number(precio).toFixed(2);
         } catch (error) {
             console.error('Error al formatear precio:', error);
             return '€0.00';
         }
     };
 
-    // Propiedades computadas
-    const pedidosOrdenados = computed(() => {
-        return [...pedidos.value].sort((a, b) =>
-            new Date(b.Fecha).getTime() - new Date(a.Fecha).getTime()
-        );
-    });
-
     return {
         pedidos,
-        pedidosOrdenados,
         pedidoActual,
         cargando,
         error,
+        debugInfo,
         obtenerPedidosUsuario,
         obtenerPedidoPorId,
         crearPedido,
+        calcularTotalesPedidos,
         formatearFecha,
-        formatearPrecio
+        formatearPrecio,
+        obtenerNombreProducto,
+        cargarTodosLosProductos
     };
 });

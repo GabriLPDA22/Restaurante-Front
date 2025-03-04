@@ -11,12 +11,12 @@ export const useAuthStore = defineStore('auth', () => {
   // Función para convertir fecha de DD/MM/YYYY a YYYY-MM-DD
   const formatDateForPostgres = (dateStr) => {
     if (!dateStr) return null;
-    
+
     // Si ya está en formato YYYY-MM-DD
     if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
       return dateStr;
     }
-    
+
     // Convertir de DD/MM/YYYY a YYYY-MM-DD
     try {
       const parts = dateStr.split('/');
@@ -24,13 +24,13 @@ export const useAuthStore = defineStore('auth', () => {
         const day = parts[0].padStart(2, '0');
         const month = parts[1].padStart(2, '0');
         const year = parts[2];
-        
+
         return `${year}-${month}-${day}`;
       }
     } catch (e) {
       console.error("Error al formatear fecha:", e);
     }
-    
+
     return dateStr;
   };
 
@@ -121,7 +121,7 @@ export const useAuthStore = defineStore('auth', () => {
     router.push("/login").then(() => window.scrollTo(0, 0));
   };
 
-  // ACTUALIZAR PERFIL - SOLUCIÓN SIMPLIFICADA
+  // ACTUALIZAR PERFIL - USANDO LA RUTA CORRECTA SEGÚN LA DOCUMENTACIÓN
   const updateUserProfile = async (profileData) => {
     try {
       if (!user.value) {
@@ -129,75 +129,76 @@ export const useAuthStore = defineStore('auth', () => {
         return { success: false, message: 'No hay usuario logueado.' };
       }
 
-      console.log('Datos del usuario antes de actualizar:', user.value);
-      
-      // Intentamos con update-by-email
-      try {
-        const updateDto = {
-          Email: user.value.email || user.value.Email,
-          Nombre: profileData.nombre,
-          Telefono: profileData.telefono,
-          FechaNacimiento: formatDateForPostgres(profileData.fechaNacimiento)
-        };
-        
-        console.log('Datos para actualizar por email:', updateDto);
-        
-        const { data } = await axios.put(
-          `http://localhost:5021/api/User/update-by-email`,
-          updateDto,
-          {
-            headers: {
-              Authorization: `Bearer ${token.value || ''}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-        
-        console.log('Respuesta exitosa del servidor:', data);
-        
-        // Actualizar en store y localStorage
-        user.value = {
-          ...user.value,
-          nombre: profileData.nombre,
-          Nombre: profileData.nombre,
-          telefono: profileData.telefono,
-          Telefono: profileData.telefono,
-          fechaNacimiento: profileData.fechaNacimiento,
-          FechaNacimiento: profileData.fechaNacimiento
-        };
-        
-        localStorage.setItem("user", JSON.stringify(user.value));
-        
-        return { success: true, message: "Perfil actualizado correctamente" };
-      } 
-      catch (error) {
-        console.error("Error en update-by-email:", error);
-        
-        // Actualizar localmente como último recurso
-        user.value = {
-          ...user.value,
-          nombre: profileData.nombre,
-          Nombre: profileData.nombre,
-          telefono: profileData.telefono,
-          Telefono: profileData.telefono,
-          fechaNacimiento: profileData.fechaNacimiento,
-          FechaNacimiento: profileData.fechaNacimiento
-        };
-        
-        localStorage.setItem("user", JSON.stringify(user.value));
-        
-        return { 
-          success: true, 
-          message: "Perfil actualizado localmente. Los cambios se guardarán la próxima vez." 
-        };
+      // Obtener el ID del usuario
+      const userId = user.value.userID || user.value.userId || user.value.id || user.value.ID;
+
+      if (!userId) {
+        console.error('Error: No se pudo determinar el ID del usuario', user.value);
+        return { success: false, message: 'No se pudo determinar el ID del usuario.' };
       }
-    } 
-    catch (error) {
-      console.error("Error general al actualizar el perfil:", error);
-      
+
+      console.log('Datos del usuario actual:', user.value);
+      console.log('ID del usuario:', userId);
+
+      // Formatear la fecha de nacimiento
+      const formattedBirthdate = formatDateForPostgres(profileData.fechaNacimiento);
+
+      // Crear el objeto de datos para la actualización según el schema de la API
+      const updateData = {
+        userID: userId,         // Usar el userID existente
+        nombre: profileData.nombre,
+        email: user.value.email || user.value.Email, // Mantener el email actual
+        password: "",          // Campo obligatorio pero no lo actualizamos
+        googleID: user.value.googleID || "",
+        pictureUrl: user.value.pictureUrl || "",
+        roles: user.value.roles || ["string"],
+        telefono: profileData.telefono,
+        fechaNacimiento: formattedBirthdate
+      };
+
+      console.log('Datos para actualizar en la API:', updateData);
+
+      // Llamar al endpoint según la documentación
+      const response = await axios.put(
+        `http://localhost:5021/api/User/${userId}`,
+        updateData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token.value || ''}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Respuesta del servidor:', response.data);
+
+      // Actualizar en store y localStorage
+      user.value = {
+        ...user.value,
+        nombre: profileData.nombre,
+        telefono: profileData.telefono,
+        fechaNacimiento: profileData.fechaNacimiento,
+        FechaNacimiento: formattedBirthdate
+      };
+
+      localStorage.setItem("user", JSON.stringify(user.value));
+
+      return {
+        success: true,
+        message: "Perfil actualizado correctamente en la base de datos",
+        data: response.data
+      };
+    } catch (error) {
+      console.error("Error al actualizar el perfil:", error);
+
+      // Proporcionar mensaje de error detallado
+      const errorDetail = error.response?.data?.message || error.message || "Error desconocido";
+      const statusCode = error.response?.status || "N/A";
+
       return {
         success: false,
-        message: error.response?.data?.message || "Error al actualizar el perfil"
+        message: `Error (${statusCode}) al actualizar el perfil: ${errorDetail}`,
+        error: error
       };
     }
   };

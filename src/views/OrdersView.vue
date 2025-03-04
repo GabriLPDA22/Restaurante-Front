@@ -34,32 +34,64 @@
                 <p>Cargando tus pedidos...</p>
             </div>
 
+            <div v-else-if="error" class="error-container">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>{{ error }}</p>
+                <button @click="cargarPedidos" class="btn-retry">
+                    Reintentar
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+
+            <div v-else-if="!pedidosFiltrados || pedidosFiltrados.length === 0" class="no-pedidos">
+                <i class="fas fa-search"></i>
+                <p v-if="searchTerm">No se encontraron pedidos que coincidan con tu búsqueda</p>
+                <p v-else>Aún no has realizado ningún pedido</p>
+                <button @click="cargarPedidos" class="btn-retry margin-top">
+                    Recargar Pedidos
+                    <i class="fas fa-redo"></i>
+                </button>
+                <button @click="depurarPedidos" class="btn-debug margin-top">
+                    Diagnosticar Problema
+                    <i class="fas fa-bug"></i>
+                </button>
+            </div>
+
             <div v-else class="pedidos-content">
-                <div v-for="pedido in pedidosFiltrados" :key="pedido.id || pedido.IdPedidos" class="pedido-item">
+                <div v-for="pedido in pedidosFiltrados" :key="pedido.IdPedidos || 'temp-' + Math.random()"
+                    class="pedido-item">
                     <div class="pedido-header">
                         <div class="pedido-info">
-                            <span class="pedido-numero">Pedido #{{ pedido.id || pedido.IdPedidos }}</span>
-                            <span class="pedido-fecha">{{ formatearFecha(pedido.fecha || pedido.Fecha) }}</span>
+                            <span class="pedido-numero">Pedido #{{ pedido.IdPedidos || 'Nuevo' }}</span>
+                            <span class="pedido-fecha">{{ formatearFecha(pedido.Fecha) }}</span>
                         </div>
-                        <span :class="`pedido-estado ${getEstadoClase(pedido.estado || 'Preparando')}`">
-                            {{ pedido.estado || 'Preparando' }}
+                        <span :class="`pedido-estado ${getEstadoClase(pedido.Estado || 'Preparando')}`">
+                            {{ pedido.Estado || 'Preparando' }}
                         </span>
                     </div>
 
                     <div class="pedido-detalle">
-                        <div class="productos-lista">
+                        <div v-if="pedido.Items && pedido.Items.length > 0" class="productos-lista">
                             <h3>Productos</h3>
-                            <div v-for="(producto, index) in obtenerProductos(pedido)" :key="index"
-                                class="producto-item" @click="verDetalleProducto(producto)">
-                                <span class="producto-nombre">{{ producto.nombre || producto.NombreProducto }}</span>
-                                <span class="producto-precio">{{ producto.cantidad || producto.Cantidad }} x {{
-                                    formatearPrecio(producto.precio || producto.Precio) }}</span>
+                            <div v-for="(producto, index) in pedido.Items" :key="index" class="producto-item"
+                                @click="verDetalleProducto(producto)">
+                                <span class="producto-nombre">{{ producto.Nombre || `Producto ${producto.IdProducto}`
+                                    }}</span>
+                                <span class="producto-precio">{{ producto.Cantidad || 1 }} x {{
+                                    formatearPrecio(producto.Precio || 0) }}</span>
                             </div>
                         </div>
+                        <div v-else class="productos-lista">
+                            <h3>Productos</h3>
+                            <div class="producto-item">
+                                <span class="producto-nombre">Información de productos no disponible</span>
+                            </div>
+                        </div>
+
                         <div class="pedido-resumen">
                             <div class="total-container">
                                 <p class="total-label">Total</p>
-                                <p class="total-monto">{{ calcularTotal(pedido) }}</p>
+                                <p class="total-monto">{{ formatearPrecio(pedido.Total || 0) }}</p>
                             </div>
                             <button class="btn-detalles" @click="verDetallePedido(pedido)">
                                 Ver Detalles
@@ -68,11 +100,74 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div v-if="pedidosFiltrados.length === 0" class="no-pedidos">
-                    <i class="fas fa-search"></i>
-                    <p v-if="searchTerm">No se encontraron pedidos que coincidan con tu búsqueda</p>
-                    <p v-else>Aún no has realizado ningún pedido</p>
+        <!-- Modal de Detalles del Pedido -->
+        <div v-if="mostrarModal && pedidoSeleccionado" class="modal-overlay">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>Detalles del Pedido #{{ pedidoSeleccionado.IdPedidos }}</h2>
+                    <button @click="cerrarModal" class="btn-cerrar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="modal-content">
+                    <div class="detalles-seccion">
+                        <h3>Información General</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Fecha:</span>
+                                <span class="info-value">{{ formatearFecha(pedidoSeleccionado.Fecha) }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Estado:</span>
+                                <span
+                                    :class="`estado-badge ${getEstadoClase(pedidoSeleccionado.Estado || 'Preparando')}`">
+                                    {{ pedidoSeleccionado.Estado || 'Preparando' }}
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">ID de Pedido:</span>
+                                <span class="info-value">#{{ pedidoSeleccionado.IdPedidos }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detalles-seccion">
+                        <h3>Productos</h3>
+                        <table class="productos-tabla">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio unitario</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, index) in pedidoSeleccionado.Items" :key="index">
+                                    <td>{{ item.Nombre || `Producto ${item.IdProducto}` }}</td>
+                                    <td>{{ item.Cantidad }}</td>
+                                    <td>{{ formatearPrecio(item.Precio) }}</td>
+                                    <td>{{ formatearPrecio(item.Cantidad * item.Precio) }}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="total-label">Total</td>
+                                    <td class="total-value">{{ formatearPrecio(pedidoSeleccionado.Total || 0) }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn-secundario" @click="cerrarModal">
+                            Cerrar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -81,150 +176,43 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { usePedidoStore } from '../stores/usePedidoStore';
-
-// 1. Define los tipos con TODAS las propiedades posibles, marcándolas como opcionales
-interface IProducto {
-    nombre?: string;
-    NombreProducto?: string;
-    cantidad?: number;
-    Cantidad?: number;
-    precio?: number | string;
-    Precio?: number | string;
-}
-
-interface IPedido {
-    id?: number | string;
-    IdPedidos?: number | string;
-    fecha?: string;
-    Fecha?: string;
-    total?: number | string;
-    Total?: number | string;
-    estado?: string;
-    productos?: IProducto[];
-    Itmes?: IProducto[];
-}
+import { usePedidoStore, Pedido } from '../stores/usePedidoStore';
 
 // Estado local
 const searchTerm = ref('');
 const filtroSeleccionado = ref('Todos');
 const mostrarDropdown = ref(false);
 const estados = ['Todos', 'Entregado', 'En proceso', 'Preparando'];
-const cargando = ref(true);
+
+// Estado del modal
+const pedidoSeleccionado = ref<Pedido | null>(null);
+const mostrarModal = ref(false);
 
 // Store de pedidos
 const pedidoStore = usePedidoStore();
 
-// Pedidos locales (si falla la API)
-const pedidosLocales = ref<IPedido[]>([]);
+// Acceder a las propiedades reactivas del store
+const pedidos = computed(() => pedidoStore.pedidos);
+const cargando = computed(() => pedidoStore.cargando);
+const error = computed(() => pedidoStore.error);
 
-// Cargar pedidos al montar
-onMounted(async () => {
-    cargando.value = true;
-    try {
-        await pedidoStore.obtenerPedidosUsuario();
-        if (pedidoStore.pedidos.length === 0) {
-            cargarPedidosLocales();
-        }
-    } catch (error) {
-        console.error('Error al cargar pedidos del usuario:', error);
-        cargarPedidosLocales();
-    } finally {
-        cargando.value = false;
-    }
-});
+// Filtrar pedidos
+const pedidosFiltrados = computed<Pedido[]>(() => {
+    if (!pedidos.value || !pedidos.value.length) return [];
 
-// Cargar pedidos desde localStorage
-function cargarPedidosLocales() {
-    try {
-        const lastOrder = localStorage.getItem('lastOrder');
-        const simulatedOrders = localStorage.getItem('simulatedOrders');
+    return pedidos.value.filter(pedido => {
+        // Verificar si el pedido es válido
+        if (!pedido) return false;
 
-        if (lastOrder) {
-            const order = JSON.parse(lastOrder) as {
-                orderNumber: string | number;
-                date: string;
-                total: number;
-                items: Array<{
-                    nombre: string;
-                    cantidad?: number;
-                    quantity?: number;
-                    precio?: number;
-                }>;
-            };
+        const idPedido = String(pedido.IdPedidos || '');
+        const productos = pedido.Items || [];
 
-            pedidosLocales.value.push({
-                id: order.orderNumber,
-                fecha: order.date,
-                total: `€${order.total.toFixed(2)}`,
-                estado: 'En proceso',
-                productos: order.items.map((item) => ({
-                    nombre: item.nombre,
-                    cantidad: item.cantidad || item.quantity || 1,
-                    precio: `€${item.precio}`
-                }))
-            });
-        }
-
-        if (simulatedOrders) {
-            const orders = JSON.parse(simulatedOrders) as Array<{
-                IdPedidos: string | number;
-                Fecha: string;
-                Total?: number;
-                items: Array<{
-                    nombre?: string;
-                    cantidad?: number;
-                    quantity?: number;
-                    precio?: number;
-                }>;
-            }>;
-
-            orders.forEach((order) => {
-                pedidosLocales.value.push({
-                    id: order.IdPedidos,
-                    fecha: order.Fecha,
-                    total: `€${order.Total || 0}`,
-                    estado: 'Preparando',
-                    productos: order.items.map((item) => ({
-                        nombre: item.nombre,
-                        cantidad: item.cantidad || item.quantity || 1,
-                        precio: `€${item.precio}`
-                    }))
-                });
-            });
-        }
-    } catch (error) {
-        console.error('Error al cargar pedidos locales:', error);
-    }
-}
-
-// Filtrado de pedidos
-const pedidosFiltrados = computed<IPedido[]>(() => {
-    // Combinar pedidos de la API con pedidos locales
-    const todosLosPedidos: IPedido[] = [
-        ...(pedidoStore.pedidos as IPedido[]), // <-- asume que tus pedidos de la store se adaptan a IPedido
-        ...pedidosLocales.value
-    ];
-
-    return todosLosPedidos.filter((pedido) => {
-        // Convertimos ID a string para buscar
-        const idPedido = String(pedido.id || pedido.IdPedidos || '');
-
-        // Obtener productos
-        const productos = obtenerProductos(pedido);
-
-        // Coincidencia con lo buscado (ID o nombre de producto)
         const matchSearch =
+            searchTerm.value === '' ||
             idPedido.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-            productos.some((p) => {
-                const nombreProducto = p.nombre || p.NombreProducto || '';
-                return nombreProducto
-                    .toLowerCase()
-                    .includes(searchTerm.value.toLowerCase());
-            });
+            productos.some(p => (p.Nombre || '').toLowerCase().includes(searchTerm.value.toLowerCase()));
 
-        // Coincidencia con el filtro de estado
-        const estadoPedido = pedido.estado || 'Preparando';
+        const estadoPedido = pedido.Estado || 'Preparando';
         const matchEstado =
             filtroSeleccionado.value === 'Todos' ||
             estadoPedido === filtroSeleccionado.value;
@@ -233,72 +221,113 @@ const pedidosFiltrados = computed<IPedido[]>(() => {
     });
 });
 
-// 2. Función que retorna el array de productos, contemplando 'productos' o 'Itmes'
-function obtenerProductos(pedido: IPedido): IProducto[] {
-    if (pedido.productos) return pedido.productos;
-    if (pedido.Itmes) return pedido.Itmes;
-    return [];
-}
+// Función de depuración para diagnóstico
+function depurarPedidos() {
+    console.log('=== DIAGNÓSTICO DE PEDIDOS ===');
+    console.log('Estado del store de pedidos:');
+    console.log('Pedidos cargados:', pedidos.value ? pedidos.value.length : 0);
 
-// 3. Calcular total, manejando las variantes
-function calcularTotal(pedido: IPedido): string {
-    // Si ya viene un total calculado
-    if (pedido.total) {
-        if (typeof pedido.total === 'string') return pedido.total;
-        return `€${pedido.total.toFixed(2)}`;
-    }
+    if (pedidos.value && pedidos.value.length > 0) {
+        console.log('Primeros 2 pedidos:', JSON.stringify(pedidos.value.slice(0, 2), null, 2));
 
-    // Si es un pedido con "Itmes"
-    if (pedido.Itmes) {
-        const total = pedido.Itmes.reduce((sum, item) => {
-            const precioNum = parseFloat(
-                String(item.Precio ?? item.precio ?? 0).replace('€', '').replace(',', '.')
+        // Verificar estructura de Items
+        const primerPedido = pedidos.value[0];
+        console.log('Estructura del primer pedido:', Object.keys(primerPedido));
+
+        if (primerPedido.Items) {
+            console.log('¿Items es un array?', Array.isArray(primerPedido.Items));
+            console.log('Cantidad de Items:', primerPedido.Items.length);
+
+            if (primerPedido.Items.length > 0) {
+                console.log('Estructura del primer Item:', Object.keys(primerPedido.Items[0]));
+            }
+        } else {
+            console.log('No se encontraron Items en el pedido');
+
+            // Buscar propiedades que puedan contener los items
+            const posiblesItems = Object.keys(primerPedido).filter(k =>
+                k.toLowerCase().includes('item') ||
+                k.toLowerCase().includes('detalle') ||
+                k.toLowerCase().includes('producto')
             );
-            const cantidad = item.Cantidad ?? item.cantidad ?? 1;
-            return sum + precioNum * cantidad;
-        }, 0);
-        return `€${total.toFixed(2)}`;
+
+            if (posiblesItems.length > 0) {
+                console.log('Posibles propiedades que contienen items:', posiblesItems);
+            }
+        }
+    } else {
+        console.log('No hay pedidos cargados en el store');
     }
 
-    // Caso general (pedido.productos)
-    const productos = obtenerProductos(pedido);
-    const total = productos.reduce((sum, p) => {
-        const precioNum = parseFloat(
-            String(p.Precio ?? p.precio ?? 0).replace('€', '').replace(',', '.')
-        );
-        const cantidad = p.Cantidad ?? p.cantidad ?? 1;
-        return sum + precioNum * cantidad;
-    }, 0);
+    console.log('Pedidos filtrados:', pedidosFiltrados.value ? pedidosFiltrados.value.length : 0);
+    console.log('Estado de carga:', cargando.value);
+    console.log('Error:', error.value);
+    console.log('Debug info:', pedidoStore.debugInfo);
 
-    return `€${total.toFixed(2)}`;
+    // Intenta recargar los pedidos
+    console.log('Intentando recargar pedidos...');
+    cargarPedidos();
 }
 
-// 4. Formatear fecha (admite string opcional)
-function formatearFecha(fechaStr?: string): string {
-    if (!fechaStr) return '';
-    try {
-        const fecha = new Date(fechaStr);
-        return fecha.toLocaleDateString('es-ES', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-    } catch {
-        return fechaStr;
+// Cargar pedidos al montar
+onMounted(async () => {
+    console.log('Cargando pedidos en OrderView');
+    await cargarPedidos();
+
+    // Si no hay pedidos después de cargar, hacer diagnóstico automático
+    if (!pedidos.value || pedidos.value.length === 0) {
+        console.log('No se encontraron pedidos después de la carga inicial. Ejecutando diagnóstico...');
+        depurarPedidos();
+    }
+});
+
+// Función para cargar pedidos con diagnóstico
+async function cargarPedidos() {
+    let intentos = 0;
+    const maxIntentos = 2;
+
+    while (intentos < maxIntentos) {
+        try {
+            const resultado = await pedidoStore.obtenerPedidosUsuario();
+            console.log(`Se cargaron ${resultado.length} pedidos en el intento ${intentos + 1}`);
+
+            if (resultado.length > 0) {
+                // Si tenemos pedidos, salir del bucle
+                break;
+            } else {
+                console.log(`No se encontraron pedidos en la respuesta (intento ${intentos + 1}/${maxIntentos})`);
+                intentos++;
+
+                if (intentos < maxIntentos) {
+                    // Esperar brevemente antes de reintentar
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+        } catch (err) {
+            console.error(`Error al cargar pedidos (intento ${intentos + 1}/${maxIntentos}):`, err);
+            intentos++;
+
+            if (intentos < maxIntentos) {
+                // Esperar antes de reintentar
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
     }
 }
 
-// 5. Formatear precio, admitiendo también undefined
-function formatearPrecio(precio: string | number | undefined): string {
-    if (!precio) return '€0.00';
-    if (typeof precio === 'string' && precio.includes('€')) {
-        return precio;
-    }
-    const precioNum = parseFloat(String(precio).replace(',', '.'));
-    return `€${precioNum.toFixed(2)}`;
+// Funciones para el modal
+function verDetallePedido(pedido: Pedido) {
+    console.log(`Ver detalles completos del pedido #${pedido.IdPedidos}`);
+    pedidoSeleccionado.value = pedido;
+    mostrarModal.value = true;
 }
 
-// Acciones
+function cerrarModal() {
+    mostrarModal.value = false;
+    pedidoSeleccionado.value = null;
+}
+
+// Funciones auxiliares
 function buscarPedidos() {
     console.log(`Buscando: ${searchTerm.value}`);
 }
@@ -310,34 +339,26 @@ function toggleDropdown() {
 function seleccionarFiltro(estado: string) {
     filtroSeleccionado.value = estado;
     mostrarDropdown.value = false;
-    console.log(`Filtro seleccionado: ${estado}`);
 }
 
 function getEstadoClase(estado: string) {
     switch (estado) {
-        case 'Entregado':
-            return 'estado-entregado';
-        case 'En proceso':
-            return 'estado-proceso';
-        case 'Preparando':
-            return 'estado-preparando';
-        default:
-            return '';
+        case 'Entregado': return 'estado-entregado';
+        case 'En proceso': return 'estado-proceso';
+        case 'Preparando': return 'estado-preparando';
+        default: return '';
     }
 }
 
-function verDetallePedido(pedido: IPedido) {
-    const idPedido = pedido.id || pedido.IdPedidos;
-    alert(`Ver detalles completos del pedido #${idPedido}`);
+function verDetalleProducto(producto: any) {
+    console.log(`Detalles del producto: ${producto.Nombre || producto.IdProducto}`);
+    // Aquí podrías navegar a la vista de detalle del producto
 }
 
-function verDetalleProducto(producto: IProducto) {
-    const nombreProducto = producto.nombre || producto.NombreProducto;
-    alert(`Detalles del producto: ${nombreProducto}`);
-}
+// Usar funciones del store para formateo
+const formatearFecha = pedidoStore.formatearFecha;
+const formatearPrecio = pedidoStore.formatearPrecio;
 </script>
-
-
 
 <style lang="scss">
 // Variables - Elixium Foods color scheme
@@ -509,6 +530,100 @@ $font-secondary: 'Montserrat', sans-serif;
 
             p {
                 font-size: 1.1rem;
+            }
+        }
+
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #EF4444;
+
+            i {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            p {
+                font-size: 1.2rem;
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
+
+            .btn-retry {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background-color: rgba(#EF4444, 0.1);
+                color: #EF4444;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.25rem;
+                border: 1px solid #EF4444;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background-color: rgba(#EF4444, 0.2);
+                }
+            }
+        }
+
+        .no-pedidos {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: rgba($color-text, 0.6);
+
+            i {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            p {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+
+            .margin-top {
+                margin-top: 1rem;
+            }
+
+            .btn-retry {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background-color: rgba($color-gold, 0.1);
+                color: $color-gold;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.25rem;
+                border: 1px solid $color-gold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background-color: rgba($color-gold, 0.2);
+                }
+            }
+
+            .btn-debug {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background-color: rgba(#3B82F6, 0.1);
+                color: #3B82F6;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.25rem;
+                border: 1px solid #3B82F6;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background-color: rgba(#3B82F6, 0.2);
+                }
             }
         }
 
@@ -684,23 +799,206 @@ $font-secondary: 'Montserrat', sans-serif;
                     }
                 }
             }
+        }
+    }
+}
 
-            .no-pedidos {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 3rem;
-                color: rgba($color-text, 0.6);
+// Estilos para el modal
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($color-dark, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999999999999999;
+    padding: 1rem;
+}
 
-                i {
-                    font-size: 3rem;
-                    margin-bottom: 1rem;
+// Continuación de los estilos del modal
+.modal-container {
+    background-color: $color-card;
+    border-radius: 0.5rem;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba($color-gold, 0.2);
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba($color-gold, 0.1);
+        background-color: $color-dark;
+
+        h2 {
+            font-family: $font-primary;
+            color: $color-gold;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn-cerrar {
+            background: none;
+            border: none;
+            color: rgba($color-text, 0.7);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: color 0.2s;
+
+            &:hover {
+                color: $color-text;
+            }
+        }
+    }
+
+    .modal-content {
+        padding: 1.5rem;
+
+        .detalles-seccion {
+            margin-bottom: 2rem;
+
+            h3 {
+                font-family: $font-primary;
+                color: $color-gold;
+                margin-bottom: 1rem;
+                font-size: 1.25rem;
+                font-weight: 500;
+                letter-spacing: 0.5px;
+            }
+
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1rem;
+
+                .info-item {
+                    display: flex;
+                    flex-direction: column;
+                    background-color: rgba($color-dark, 0.3);
+                    padding: 0.75rem 1rem;
+                    border-radius: 0.25rem;
+                    border: 1px solid rgba($color-gold, 0.05);
+
+                    .info-label {
+                        color: rgba($color-text, 0.7);
+                        font-size: 0.875rem;
+                        margin-bottom: 0.25rem;
+                    }
+
+                    .info-value {
+                        color: $color-text;
+                        font-weight: 500;
+                    }
+
+                    .estado-badge {
+                        display: inline-block;
+                        padding: 0.35rem 0.75rem;
+                        border-radius: 0.25rem;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+
+                        &.estado-entregado {
+                            background-color: rgba(16, 185, 129, 0.1);
+                            color: #10B981;
+                            border: 1px solid rgba(16, 185, 129, 0.3);
+                        }
+
+                        &.estado-proceso {
+                            background-color: rgba(245, 158, 11, 0.1);
+                            color: #F59E0B;
+                            border: 1px solid rgba(245, 158, 11, 0.3);
+                        }
+
+                        &.estado-preparando {
+                            background-color: rgba(59, 130, 246, 0.1);
+                            color: #3B82F6;
+                            border: 1px solid rgba(59, 130, 246, 0.3);
+                        }
+                    }
+                }
+            }
+
+            .productos-tabla {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid rgba($color-gold, 0.1);
+                border-radius: 0.25rem;
+                overflow: hidden;
+
+                th,
+                td {
+                    padding: 0.75rem 1rem;
+                    text-align: left;
+                    color: $color-text;
                 }
 
-                p {
-                    font-size: 1.2rem;
+                th {
+                    background-color: rgba($color-dark, 0.6);
+                    color: $color-gold;
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
                 }
+
+                tbody tr {
+                    border-bottom: 1px solid rgba($color-gold, 0.05);
+
+                    &:nth-child(even) {
+                        background-color: rgba($color-dark, 0.2);
+                    }
+
+                    &:hover {
+                        background-color: rgba($color-dark, 0.4);
+                    }
+                }
+
+                tfoot {
+                    background-color: rgba($color-dark, 0.6);
+
+                    .total-label {
+                        text-align: right;
+                        font-weight: 600;
+                        color: $color-gold;
+                    }
+
+                    .total-value {
+                        font-family: $font-primary;
+                        font-weight: 700;
+                        font-size: 1.1rem;
+                        color: $color-gold;
+                    }
+                }
+            }
+        }
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 1.5rem 1.5rem;
+
+        .btn-secundario {
+            background-color: rgba($color-dark, 0.7);
+            color: $color-text;
+            border: 1px solid rgba($color-text, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+                background-color: rgba($color-dark, 0.9);
+                border-color: rgba($color-text, 0.4);
             }
         }
     }

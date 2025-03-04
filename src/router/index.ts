@@ -12,6 +12,8 @@ import OrdersView from '../views/OrdersView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
 import CheckoutView from '@/views/CheckoutView.vue';
 import ThanksOrderView from '@/views/ThanksOrderView.vue';
+import ApiTestView from '@/views/ApiTestView.vue';
+import ApiUserView from '../views/ApiUserTest.vue'
 import LoginAdminView from '@/views/LoginAdminView.vue';
 
 const routes = [
@@ -73,11 +75,6 @@ const routes = [
     path: '/thanks-order',
     name: 'thanks-order',
     component: ThanksOrderView
-  },
-  {
-    path: '/admin',
-    name: 'admin-login',
-    component: LoginAdminView
   }
 ];
 
