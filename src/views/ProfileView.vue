@@ -54,11 +54,11 @@
                 </div>
 
                 <!-- Estado de debug (solo visible en desarrollo) -->
-                <!-- <div v-if="isDevelopment" class="debug-section">
+                <div v-if="isDevelopment" class="debug-section">
                     <h3>Información de Debug</h3>
                     <p><strong>Usuario en Store:</strong> {{ JSON.stringify(authStore.user) }}</p>
                     <button @click="recargarUsuario" class="btn-debug">Recargar Datos</button>
-                </div> -->
+                </div>
             </div>
         </div>
     </div>
