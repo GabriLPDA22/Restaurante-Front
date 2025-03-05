@@ -386,7 +386,7 @@ $font-secondary: 'Montserrat', sans-serif;
         border: 1px solid rgba($color-gold, 0.1);
 
         .pedidos-header {
-            background: linear-gradient(to right, darken($color-gold, 15%), $color-gold);
+            background:  $color-gold;
             color: $color-dark;
 
             .header-content {
@@ -462,7 +462,7 @@ $font-secondary: 'Montserrat', sans-serif;
                             font-size: 0.9rem;
 
                             &:hover {
-                                background-color: lighten($color-dark, 5%);
+                                background-color: $color-dark;
                             }
 
                             i {
@@ -633,7 +633,7 @@ $font-secondary: 'Montserrat', sans-serif;
             gap: 1.5rem;
 
             .pedido-item {
-                background-color: darken($color-card, 3%);
+                background-color: $color-card;
                 border-radius: 0.5rem;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
@@ -789,7 +789,7 @@ $font-secondary: 'Montserrat', sans-serif;
                             letter-spacing: 0.5px;
 
                             &:hover {
-                                background-color: darken($color-gold, 10%);
+                                background-color: $color-gold;
                             }
 
                             i {

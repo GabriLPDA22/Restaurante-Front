@@ -557,7 +557,7 @@ const irAlCheckout = () => {
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: darken(#2B7A78, 10%);
+      background-color: #2B7A78;
     }
   }
 }

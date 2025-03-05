@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
+// Definimos tipos para TypeScript
 interface Admin {
   id: number | string;
   nombre: string;
@@ -11,11 +12,10 @@ interface Admin {
 interface LoginResponse {
   success: boolean;
   message: string;
-  id?: number;
-  nombre?: string;
-  token?: string;
+  error?: any;
 }
 
+// Definimos la URL base - ajusta esto según tu backend
 const API_URL = 'http://localhost:5021/api';
 
 export const adminAuthStore = defineStore('adminAuth', () => {
@@ -24,60 +24,79 @@ export const adminAuthStore = defineStore('adminAuth', () => {
   const router = useRouter();
 
   // LOGIN
-  const login = async (nombre: string, contraseña: string): Promise<LoginResponse> => {
+  const login = async (nombre: string, password: string): Promise<LoginResponse> => {
     try {
-      console.log("Intentando login con nombre:", nombre);
-      
-      const { data } = await axios.post(`${API_URL}/admins/login`, {
-        nombre: nombre,
-        contraseña: contraseña
-      });
-      
-      console.log("Respuesta del backend:", data);
-
-      if (!data.success) {
+      // Validación simple de campos vacíos
+      if (!nombre || !password) {
         return {
           success: false,
-          message: data.message || "Credenciales incorrectas"
+          message: "Los campos usuario y contraseña son obligatorios"
         };
       }
 
+      // Obtenemos todos los administradores
+      const { data: adminList } = await axios.get(`${API_URL}/admins`);
+      
+      // Buscamos un administrador que coincida con el nombre
+      const foundAdmin = adminList.find((adm: any) => adm.nombre === nombre);
+      
+      // Si no encontramos al administrador, retornamos error
+      if (!foundAdmin) {
+        return {
+          success: false,
+          message: "Usuario no encontrado"
+        };
+      }
+      
+      // Verificamos la contraseña
+      // Nota: En una aplicación real, NUNCA se debería manejar la autenticación de esta forma
+      // La contraseña debería verificarse en el backend y nunca exponer contraseñas en el frontend
+      if (foundAdmin.contraseña !== password) {
+        return {
+          success: false,
+          message: "Contraseña incorrecta"
+        };
+      }
+      
+      // Login exitoso
       admin.value = {
-        id: data.id!,
-        nombre: data.nombre!
+        id: foundAdmin.id,
+        nombre: foundAdmin.nombre
       };
-      token.value = data.token || "";
+      
+      // Generamos un token simple (esto es solo para demo, no seguro para producción)
+      token.value = `demo-token-${Date.now()}`;
 
+      // Guardamos en localStorage
       localStorage.setItem("admin", JSON.stringify(admin.value));
       localStorage.setItem("adminToken", token.value);
 
       return {
         success: true,
-        message: data.message || "Login exitoso"
+        message: "Login exitoso"
       };
     } catch (error: any) {
       console.error("Error en login:", error);
       
-      let errorMessage = "Error al conectar con el servidor";
+      let errorMessage = "Error al iniciar sesión";
       
       if (error.response) {
         if (error.response.status === 404) {
-          errorMessage = "URL del servicio no encontrada. Verifica la dirección.";
+          errorMessage = "Servicio no disponible";
         } else {
-          errorMessage = error.response.data?.message || 
-                         `Error ${error.response.status}: ${error.response.statusText}`;
+          errorMessage = error.response.data?.message || "Error del servidor";
         }
-      } else if (error.request) {
-        errorMessage = "No se recibió respuesta del servidor";
       }
       
       return {
         success: false,
-        message: errorMessage
+        message: errorMessage,
+        error: error
       };
     }
   };
 
+  // Cargar admin y token desde localStorage
   const loadAdmin = (): boolean => {
     const storedAdmin = localStorage.getItem("admin");
     const storedToken = localStorage.getItem("adminToken");

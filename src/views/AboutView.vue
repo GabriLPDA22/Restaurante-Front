@@ -639,7 +639,7 @@ $body-font: 'Montserrat', sans-serif;
       transition: background-color 0.3s, transform 0.2s;
 
       &:hover {
-        background-color: lighten($primary-color, 10%);
+        background-color: $primary-color;
         transform: translateY(-2px);
       }
     }

@@ -269,7 +269,7 @@ $font-secondary: 'Montserrat', sans-serif;
         border: 1px solid rgba($color-gold, 0.1);
 
         .profile-header {
-            background: linear-gradient(to right, $color-gold, darken($color-gold, 10%));
+            background: $color-gold;
             color: $color-dark;
             padding: 2rem;
 
@@ -431,7 +431,7 @@ $font-secondary: 'Montserrat', sans-serif;
                     border: none;
 
                     &:hover {
-                        background-color: darken($color-gold, 10%);
+                        background-color: $color-gold;
                     }
                 }
 

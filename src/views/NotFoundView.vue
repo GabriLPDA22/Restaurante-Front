@@ -108,7 +108,7 @@ p {
     color: $color-dark;
 
     &:hover {
-        background-color: darken($color-gold, 10%);
+        background-color: $color-gold;
         transform: translateY(-2px);
     }
 }

@@ -613,7 +613,7 @@
             color: var(--text-light);
             
             &:hover {
-              background-color: darken(#2B7A78, 10%);
+              background-color: #2B7A78;
             }
           }
         }

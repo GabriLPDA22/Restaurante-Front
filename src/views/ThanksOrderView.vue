@@ -292,15 +292,15 @@ export default defineComponent({
             color: white;
 
             &:hover {
-                background-color: darken(#2B7A78, 10%);
+                background-color: #2B7A78;
             }
         }
     }
 
-    &__redirect-message {
-        font-size: 0.9rem;
-        color: #6c757d;
-        text-align: center;
-    }
+        &__redirect-message {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-align: center;
+        }
 }
 </style>
