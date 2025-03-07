@@ -83,7 +83,7 @@
             <li class="header__nav-item">
               <router-link to="/cart" class="header__nav-link" @click="closeMenu">
                 <div class="header__nav-icon-box">
-                  <font-awesome-icon :icon="['fas', 'utensils']" class="header__nav-icon" />
+                  <i class="fas fa-utensils header__nav-icon"></i>
                 </div>
                 <span class="header__nav-text">Menu</span>
               </router-link>
@@ -91,7 +91,7 @@
             <li class="header__nav-item">
               <a class="header__nav-link">
                 <div class="header__nav-icon-box">
-                  <font-awesome-icon :icon="['fas', 'glass-cheers']" class="header__nav-icon" />
+                  <i class="fas fa-glass-cheers header__nav-icon"></i>
                 </div>
                 <span class="header__nav-text">Events</span>
               </a>
@@ -99,7 +99,7 @@
             <li class="header__nav-item">
               <router-link to="/about" class="header__nav-link" @click="closeMenu">
                 <div class="header__nav-icon-box">
-                  <font-awesome-icon :icon="['fas', 'info-circle']" class="header__nav-icon" />
+                  <i class="fas fa-info-circle header__nav-icon"></i>
                 </div>
                 <span class="header__nav-text">About Us</span>
               </router-link>
@@ -107,7 +107,7 @@
             <li class="header__nav-item">
               <router-link to="/reservation" class="header__nav-link" @click="closeMenu">
                 <div class="header__nav-icon-box">
-                  <font-awesome-icon :icon="['far', 'calendar-alt']" class="header__nav-icon" />
+                  <i class="far fa-calendar-alt header__nav-icon"></i>
                 </div>
                 <span class="header__nav-text">Reservation</span>
               </router-link>
@@ -115,23 +115,12 @@
             <li class="header__nav-item">
               <router-link to="/contact" class="header__nav-link" @click="closeMenu">
                 <div class="header__nav-icon-box">
-                  <font-awesome-icon :icon="['fas', 'phone-alt']" class="header__nav-icon" />
+                  <i class="fas fa-phone-alt header__nav-icon"></i>
                 </div>
                 <span class="header__nav-text">Contact Us</span>
               </router-link>
             </li>
           </ul>
-          <div class="header__social-links">
-            <a href="#" class="header__social-link" aria-label="Facebook">
-              <font-awesome-icon :icon="['fab', 'facebook']" />
-            </a>
-            <a href="#" class="header__social-link" aria-label="Instagram">
-              <font-awesome-icon :icon="['fab', 'instagram']" />
-            </a>
-            <a href="#" class="header__social-link header__social-link--twitter" aria-label="Twitter">
-              <font-awesome-icon :icon="['fab', 'twitter']" />
-            </a>
-          </div>
         </nav>
       </div>
     </transition>
@@ -700,18 +689,19 @@ const handleLogout = () => {
   transform: translateY(10px);
 }
 
-/* ================= MENÚ MÓVIL ================= */
+/* ================= MENÚ MÓVIL MEJORADO ================= */
 .header__mobile-menu {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.9);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 99;
+  backdrop-filter: blur(5px);
 }
 
 .header__nav-mobile {
@@ -721,63 +711,66 @@ const handleLogout = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 3rem 0;
-  background: #013428;
-  border-radius: 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #004d40 0%, #00332b 100%);
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
   overflow: hidden;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cg fill='%23d1a75f' fill-opacity='0.05'%3E%3Ccircle cx='4' cy='4' r='1'/%3E%3C/g%3E%3C/svg%3E");
+  border: 1px solid rgba(209, 167, 95, 0.2);
+}
+
+/* Añadir un título al menú */
+.header__nav-mobile::before {
+  content: 'MENÚ';
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  color: #d1a75f;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  letter-spacing: 3px;
 }
 
 .header__nav-list {
   list-style: none;
   padding: 0;
-  width: 80%;
-  margin: 0 0 3rem;
+  width: 85%;
+  margin: 0 0 2rem;
 }
 
 .header__nav-item {
-  margin-bottom: 1.2rem;
+  margin-bottom: 0.8rem;
+  width: 100%;
 }
 
 .header__nav-link {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
-  color: #eaeaea;
+  gap: 1rem;
+  color: #fff;
   text-decoration: none;
   font-size: 1.1rem;
   font-weight: 500;
-  padding: 0.3rem 0;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
   transition: all 0.3s ease;
-  position: relative;
-}
-
-.header__nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: #d1a75f;
-  transition: width 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  width: 100%;
 }
 
 .header__nav-link:hover {
+  background: rgba(209, 167, 95, 0.15);
   color: #d1a75f;
   transform: translateX(5px);
 }
 
-.header__nav-link:hover::after {
-  width: 100%;
-}
-
 .header__nav-icon-box {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.2);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(209, 167, 95, 0.15);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -785,51 +778,58 @@ const handleLogout = () => {
 }
 
 .header__nav-link:hover .header__nav-icon-box {
-  background-color: rgba(209, 167, 95, 0.2);
+  background: rgba(209, 167, 95, 0.3);
   transform: scale(1.1);
 }
 
 .header__nav-icon {
   color: #d1a75f;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .header__social-links {
   display: flex;
   gap: 1.5rem;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 85%;
+  justify-content: center;
 }
 
 .header__social-link {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(209, 167, 95, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #d1a75f;
-  font-size: 1rem;
+  font-size: 1.1rem;
   transition: all 0.3s ease;
 }
 
 .header__social-link:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(209, 167, 95, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .header__social-link--twitter {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 /* Animaciones para el menú móvil */
 .menu-reveal-enter-active,
 .menu-reveal-leave-active {
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .menu-reveal-enter-from,
 .menu-reveal-leave-to {
   opacity: 0;
+  transform: scale(0.95);
 }
 
 /* ================= BARRA DE BÚSQUEDA ================= */

@@ -89,8 +89,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router';
 
 interface Product {
   id: number;
@@ -106,11 +106,145 @@ interface CartItem extends Product {
 }
 
 const router = useRouter();
+const route = useRoute();
 const products = ref<Product[]>([])
 const cart = ref<CartItem[]>([])
 const searchQuery = ref('')
 const selectedCategory = ref('Todos')
 const cartVisible = ref(false);
+
+// Mapeo de categorías del home a las categorías exactas de la BBDD
+const categoryMapping = {
+  'Appetizers': 'Aperitivos',
+  'Main Courses': 'Plato Principal',
+  'Pasta': 'Pasta',
+  'Dessert': 'Postre',
+};
+
+// Computado para obtener todas las categorías disponibles
+const categories = computed(() => {
+  const allCategories = products.value.flatMap(p => p.categorias);
+  return ['Todos', ...new Set(allCategories)];
+});
+
+// Función para registrar información de depuración sobre las categorías
+const logCategoryInfo = () => {
+  console.log("--- Category Debug Info ---");
+  console.log("Available categories:", categories.value);
+  console.log("Current selected category:", selectedCategory.value);
+  console.log("URL query params:", route.query);
+  console.log("---------------------------");
+};
+
+// Observar cambios en la ruta para actualizar la categoría seleccionada (viejo método)
+watch(() => route.query.category, (newCategory) => {
+  if (!products.value.length || !newCategory) return;
+
+  if (typeof newCategory === 'string') {
+    console.log("Category from URL:", newCategory);
+
+    // Intentar mapear la categoría desde el Home a las categorías disponibles en el carrito
+    const mappedCategory = categoryMapping[newCategory] || newCategory;
+    console.log("Mapped category:", mappedCategory);
+
+    // Comprobar si esta categoría exacta existe en nuestras categorías disponibles
+    if (categories.value.includes(mappedCategory)) {
+      console.log("Category exists, setting to:", mappedCategory);
+      selectedCategory.value = mappedCategory;
+      return;
+    }
+
+    // Si no existe una coincidencia exacta, buscar la mejor aproximación
+    // 1. Primero buscamos una categoría que incluya el término parcialmente
+    const partialMatch = categories.value.find(cat =>
+      cat.toLowerCase().includes(mappedCategory.toLowerCase())
+    );
+
+    if (partialMatch) {
+      console.log("Partial match found, setting to:", partialMatch);
+      selectedCategory.value = partialMatch;
+      return;
+    }
+
+    // 2. Si no hay coincidencias parciales en las categorías, buscar en los productos
+    const productsWithCategory = products.value.filter(product =>
+      product.categorias.some(cat =>
+        cat.toLowerCase().includes(mappedCategory.toLowerCase())
+      )
+    );
+
+    if (productsWithCategory.length > 0) {
+      // Tomar la primera categoría del primer producto que coincida
+      const firstMatchCategory = productsWithCategory[0].categorias[0];
+      console.log("Found category from products, setting to:", firstMatchCategory);
+      selectedCategory.value = firstMatchCategory;
+    }
+  }
+}, { immediate: true });
+
+// Nuevo método: Watch para selectedCategory directamente en URL
+watch(() => route.query.selectedCategory, (newCategory) => {
+  if (newCategory && typeof newCategory === 'string') {
+    console.log("Direct category from URL:", newCategory);
+    logCategoryInfo();
+
+    // Primero, verificar si la categoría existe exactamente como está
+    if (categories.value.includes(newCategory)) {
+      console.log("Setting category directly to:", newCategory);
+      selectedCategory.value = newCategory;
+      return;
+    }
+
+    // Si no existe, buscar coincidencias parciales (insensible a mayúsculas/minúsculas)
+    const partialMatches = categories.value.filter(category =>
+      category.toLowerCase() === newCategory.toLowerCase() ||
+      category.toLowerCase().includes(newCategory.toLowerCase()) ||
+      newCategory.toLowerCase().includes(category.toLowerCase())
+    );
+
+    if (partialMatches.length > 0) {
+      console.log("Setting category to partial match:", partialMatches[0]);
+      selectedCategory.value = partialMatches[0];
+    }
+  }
+}, { immediate: true });
+
+// Asegurarse de verificar la categoría después de cargar los productos
+watch(() => products.value.length, (newLength) => {
+  if (newLength > 0) {
+    console.log("Products loaded, checking categories...");
+    logCategoryInfo();
+
+    // Verificar selectedCategory primero (nuevo método)
+    if (route.query.selectedCategory) {
+      const categoryParam = route.query.selectedCategory;
+      if (typeof categoryParam === 'string') {
+        // Comprobar si coincide exactamente con alguna categoría
+        if (categories.value.includes(categoryParam)) {
+          console.log("Setting category after products loaded:", categoryParam);
+          selectedCategory.value = categoryParam;
+          return;
+        }
+
+        // Buscar coincidencias parciales
+        const partialMatches = categories.value.filter(category =>
+          category.toLowerCase() === categoryParam.toLowerCase() ||
+          category.toLowerCase().includes(categoryParam.toLowerCase()) ||
+          categoryParam.toLowerCase().includes(category.toLowerCase())
+        );
+
+        if (partialMatches.length > 0) {
+          console.log("Setting category to partial match after products loaded:", partialMatches[0]);
+          selectedCategory.value = partialMatches[0];
+          return;
+        }
+      }
+    }
+
+    // Si no hay selectedCategory, verificar category (viejo método)
+    checkCategoryFromQuery();
+  }
+});
 
 const fetchProducts = async () => {
   try {
@@ -126,6 +260,9 @@ const fetchProducts = async () => {
     }
 
     products.value = await response.json();
+    console.log("Products loaded:", products.value.length);
+
+    // No es necesario llamar a checkCategoryFromQuery aquí porque la observación de products.value.length lo hará
   } catch (err) {
     console.error('Error fetching products:', err);
     // Cargar datos de ejemplo si la API falla
@@ -143,7 +280,7 @@ const fetchProducts = async () => {
         nombre: 'Pasta Carbonara',
         descripcion: 'Espaguetis, huevo, panceta, queso',
         precio: 12.75,
-        categorias: ['Pastas'],
+        categorias: ['Pasta'],
         imagenUrl: 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
       },
       {
@@ -151,7 +288,7 @@ const fetchProducts = async () => {
         nombre: 'Tiramisú',
         descripcion: 'Postre italiano con café y mascarpone',
         precio: 6.50,
-        categorias: ['Postres'],
+        categorias: ['Postre'],
         imagenUrl: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
       },
       {
@@ -159,10 +296,68 @@ const fetchProducts = async () => {
         nombre: 'Ensalada César',
         descripcion: 'Lechuga, pollo, picatostes, parmesano',
         precio: 8.95,
-        categorias: ['Ensaladas'],
+        categorias: ['Plato Principal'],
         imagenUrl: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
+      },
+      {
+        id: 5,
+        nombre: 'Antipasto Mixto',
+        descripcion: 'Selección de embutidos, quesos y encurtidos',
+        precio: 14.50,
+        categorias: ['Aperitivos'],
+        imagenUrl: 'https://images.unsplash.com/photo-1625944525533-473f1a3d51e0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
       }
     ];
+    console.log("Loaded fallback products:", products.value.length);
+
+    // No es necesario llamar a checkCategoryFromQuery aquí porque la observación de products.value.length lo hará
+  }
+}
+
+// Función para verificar y aplicar la categoría desde la URL después de cargar productos
+const checkCategoryFromQuery = () => {
+  const categoryParam = route.query.category;
+  console.log("Checking category from query:", categoryParam);
+
+  if (!categoryParam || !categories.value.length) return;
+
+  if (typeof categoryParam === 'string') {
+    // Intentar mapear la categoría primero
+    const mappedCategory = categoryMapping[categoryParam] || categoryParam;
+    console.log("Mapped category:", mappedCategory);
+
+    // Comprobar si esta categoría exacta existe en nuestras categorías
+    if (categories.value.includes(mappedCategory)) {
+      console.log("Category exists, setting to:", mappedCategory);
+      selectedCategory.value = mappedCategory;
+      return;
+    }
+
+    // Si no existe una coincidencia exacta, buscar la mejor aproximación
+    // 1. Primero buscamos una categoría que incluya el término parcialmente
+    const partialMatch = categories.value.find(cat =>
+      cat.toLowerCase().includes(mappedCategory.toLowerCase())
+    );
+
+    if (partialMatch) {
+      console.log("Partial match found, setting to:", partialMatch);
+      selectedCategory.value = partialMatch;
+      return;
+    }
+
+    // 2. Si no hay coincidencias parciales en las categorías, buscar en los productos
+    const productsWithCategory = products.value.filter(product =>
+      product.categorias.some(cat =>
+        cat.toLowerCase().includes(mappedCategory.toLowerCase())
+      )
+    );
+
+    if (productsWithCategory.length > 0) {
+      // Tomar la primera categoría del primer producto que coincida
+      const firstMatchCategory = productsWithCategory[0].categorias[0];
+      console.log("Found category from products, setting to:", firstMatchCategory);
+      selectedCategory.value = firstMatchCategory;
+    }
   }
 }
 
@@ -184,13 +379,9 @@ const saveCart = () => {
 }
 
 onMounted(() => {
+  console.log("Component mounted, fetching products");
   fetchProducts();
   loadCart();
-})
-
-const categories = computed(() => {
-  const allCategories = products.value.flatMap(p => p.categorias);
-  return ['Todos', ...new Set(allCategories)];
 })
 
 const filteredProducts = computed(() => {
@@ -256,10 +447,7 @@ const toggleCart = () => {
 }
 
 const irAlCheckout = () => {
-  // Guardar el carrito en localStorage para que el componente de checkout pueda acceder
   saveCart();
-
-  // Redirigir a la página de checkout
   router.push('/checkout');
 }
 </script>
