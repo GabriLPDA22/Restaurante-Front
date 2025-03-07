@@ -16,7 +16,7 @@ interface LoginResponse {
 }
 
 // Definimos la URL base - ajusta esto según tu backend
-const API_URL = 'http://localhost:5021/api';
+const API_URL = 'http://34.196.144.197:8080/api';
 
 export const adminAuthStore = defineStore('adminAuth', () => {
   const admin = ref<Admin | null>(null);

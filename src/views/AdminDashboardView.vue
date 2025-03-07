@@ -249,7 +249,7 @@ export default defineComponent({
     setup() {
         // Configuración de axios
         const api = axios.create({
-            baseURL: 'http://localhost:5021/api',
+            baseURL: 'http://34.196.144.197:8080/api',
             headers: {
                 'accept': '*/*',
                 'Content-Type': 'application/json'

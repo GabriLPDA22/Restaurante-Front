@@ -75,7 +75,7 @@ export const usePedidoStore = defineStore('pedido', () => {
 
         try {
             // Intenta obtener todos los productos con una sola llamada
-            const { data } = await axios.get('http://localhost:5021/api/Productos');
+            const { data } = await axios.get('http://34.196.144.197:8080/api/Productos');
 
             if (Array.isArray(data)) {
                 // Asumiendo que la respuesta es un array de productos
@@ -97,7 +97,7 @@ export const usePedidoStore = defineStore('pedido', () => {
 
             // Intentemos cargar la lista de categorías que podría tener productos anidados
             try {
-                const { data } = await axios.get('http://localhost:5021/api/Categorias');
+                const { data } = await axios.get('http://34.196.144.197:8080/api/Categorias');
 
                 if (Array.isArray(data)) {
                     // Intentar encontrar productos en las categorías
@@ -170,7 +170,7 @@ export const usePedidoStore = defineStore('pedido', () => {
 
         try {
             console.log(`Obteniendo pedidos para el usuario: ${userId}`);
-            const { data } = await axios.get(`http://localhost:5021/api/Pedido/usuario/${userId}`);
+            const { data } = await axios.get(`http://34.196.144.197:8080/api/Pedido/usuario/${userId}`);
             console.log('Pedidos recibidos:', data);
 
             // Guardar datos completos para depuración
@@ -401,7 +401,7 @@ export const usePedidoStore = defineStore('pedido', () => {
         debugInfo.value = null;
         try {
             console.log(`Obteniendo pedido con ID: ${pedidoId}`);
-            const { data } = await axios.get(`http://localhost:5021/api/Pedido/${pedidoId}`);
+            const { data } = await axios.get(`http://34.196.144.197:8080/api/Pedido/${pedidoId}`);
             console.log('Pedido recibido:', data);
 
             // Transformar el pedido para normalizar su estructura
@@ -472,7 +472,7 @@ export const usePedidoStore = defineStore('pedido', () => {
             const pedidoDto = { UserID: userId, Items: items };
             console.log('Enviando pedido:', JSON.stringify(pedidoDto, null, 2));
             const { data } = await axios.post(
-                'http://localhost:5021/api/Pedido',
+                'http://34.196.144.197:8080/api/Pedido',
                 pedidoDto,
                 { headers: { 'Content-Type': 'application/json' }, timeout: 15000 }
             );

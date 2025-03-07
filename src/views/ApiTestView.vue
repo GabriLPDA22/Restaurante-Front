@@ -94,7 +94,7 @@ const probarGetPedidos = async () => {
     debugInfo.value = null;
 
     try {
-        const response = await axios.get('http://localhost:5021/api/Pedido/usuario/1', {
+        const response = await axios.get('http://34.196.144.197:8080/api/Pedido/usuario/1', {
             headers: {
                 'Accept': 'application/json'
             }
@@ -124,7 +124,7 @@ const probarPostPedido = async () => {
 
         console.log('Enviando datos:', JSON.stringify(pedidoData, null, 2));
 
-        const response = await axios.post('http://localhost:5021/api/Pedido', pedidoData, {
+        const response = await axios.post('http://34.196.144.197:8080/api/Pedido', pedidoData, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -170,7 +170,7 @@ const handleError = (error: any) => {
         }
     } else if (error.request) {
         // La solicitud fue hecha pero no se recibió respuesta
-        resultado.value = `No se recibió respuesta del servidor.\nVerifica que el servidor esté funcionando en http://localhost:5021`;
+        resultado.value = `No se recibió respuesta del servidor.\nVerifica que el servidor esté funcionando en http://34.196.144.197:8080`;
     } else {
         // Error al configurar la solicitud
         resultado.value = `Error: ${error.message}`;

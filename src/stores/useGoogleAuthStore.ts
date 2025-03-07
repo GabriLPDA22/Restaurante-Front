@@ -51,7 +51,7 @@ export const useGoogleAuthStore = defineStore('googleAuth', () => {
       return { success: false, message: "El token de Google es undefined" };
     }
     try {
-      const { data } = await axios.post("http://localhost:5021/api/auth/google-login", {
+      const { data } = await axios.post("http://34.196.144.197:8080/api/auth/google-login", {
         token: response.credential,
       });
       console.log("User authenticated (Google):", data);
