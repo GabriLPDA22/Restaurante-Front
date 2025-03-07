@@ -30,13 +30,17 @@ const routes = [
   { path: '/thanks', name: 'thanks', component: ThanksViewReservation },
   { path: '/profile', name: 'profile', component: ProfileView },
   { path: '/orders', name: 'orders', component: OrdersView },
-  { path: '/not-found', name: 'not-found', component: NotFoundView },
   { path: '/checkout', name: 'checkout', component: CheckoutView },
   { path: '/thanks-order', name: 'thanks-order', component: ThanksOrderView },
   { path: '/api-test', name: 'api-test', component: ApiTestView },
   { path: '/api-user', name: 'api-user', component: ApiUserView },
   { path: '/admin', name: 'login-admin', component: LoginAdminView },
   { path: '/admin/dashboard', name: 'admin-dashboard', component: AdminDashboardView },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: NotFoundView
+  }
 ];
 
 const router = createRouter({
