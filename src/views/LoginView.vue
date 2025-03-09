@@ -28,8 +28,8 @@
                     </div>
                 </div>
                 <div class="auth__hours">
-                    <p>DOMINGO – JUEVES: 11:30AM – 11PM</p>
-                    <p>VIERNES & SÁBADO: 11:30AM – 12AM</p>
+                    <p>MONDAY – SUNDAY: 9:00AM – 12PM</p>
+                    <p></p>
                 </div>
             </div>
 
@@ -177,6 +177,9 @@ const passwordError = ref('');
 const emailFocus = ref(false);
 const passwordFocus = ref(false);
 
+// Verificar si hay una redirección desde checkout
+const fromCheckout = ref(localStorage.getItem('checkout_redirect') === 'true');
+
 // VALIDAR EMAIL
 function validateEmail() {
     if (!email.value) {
@@ -232,9 +235,17 @@ async function handleLogin() {
         // 5. Si es true, mostramos éxito
         loginSuccess.value = true;
 
-        // 6. Redirigimos tras 2s
+        // 6. Determinar a dónde redirigir
+        const redirectToCheckout = localStorage.getItem('checkout_redirect') === 'true';
+        localStorage.removeItem('checkout_redirect'); 
+        
+        // 7. Redirigimos tras 2s
         setTimeout(() => {
-            router.push('/');
+            if (redirectToCheckout) {
+                router.push('/checkout');
+            } else {
+                router.push('/');
+            }
         }, 2000);
 
     } catch (error) {
@@ -247,12 +258,26 @@ async function handleLogin() {
 
 // LOGIN CON GOOGLE
 function onGoogleLoginClick() {
+    // Guardar el estado de redirección antes de iniciar el flujo de Google
+    if (fromCheckout.value) {
+        localStorage.setItem('checkout_redirect_google', 'true');
+    }
     googleAuthStore.triggerGooglePrompt();
 }
 
 // Inicializamos GoogleAuth en onMounted
 onMounted(() => {
     googleAuthStore.initializeGoogleAuth();
+    
+    // Si hay un login exitoso con Google y viene de checkout, redirigir
+    const googleAuthComplete = localStorage.getItem('google_auth_complete') === 'true';
+    const redirectToCheckoutGoogle = localStorage.getItem('checkout_redirect_google') === 'true';
+    
+    if (googleAuthComplete && redirectToCheckoutGoogle) {
+        localStorage.removeItem('google_auth_complete');
+        localStorage.removeItem('checkout_redirect_google');
+        router.push('/checkout');
+    }
 });
 </script>
 

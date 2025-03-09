@@ -1,5 +1,22 @@
 <template>
     <div class="admin-dashboard">
+        <!-- Header con información del usuario y botón de logout -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Panel de Administración</h1>
+            <div class="dashboard-user">
+                <span>{{ adminInfo ? `Bienvenido, ${adminInfo.nombre}` : 'Admin' }}</span>
+                <button @click="handleLogout" class="logout-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+
         <nav class="dashboard-nav">
             <button v-for="section in sections" :key="section" @click="activeSection = section"
                 :class="{ active: activeSection === section }">
@@ -241,12 +258,29 @@
         </div>
     </div>
 </template>
+
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted } from 'vue';
+import { defineComponent, ref, reactive, onMounted, computed } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
+import { adminAuthStore } from '@/stores/adminAuthStore';
 
 export default defineComponent({
     setup() {
+        // Obtener instancias del store y router
+        const store = adminAuthStore();
+        const router = useRouter();
+
+        // Información del administrador
+        const adminInfo = computed(() => store.getAdminInfo());
+
+        // Verificar autenticación al entrar al componente (capa adicional de seguridad)
+        if (!store.isAuthenticated()) {
+            console.log("Acceso no autorizado al dashboard de administración");
+            router.push('/admin');
+            return {}; // Salir del setup si no está autenticado
+        }
+
         // Configuración de axios
         const api = axios.create({
             baseURL: 'http://localhost:5021/api',
@@ -277,6 +311,13 @@ export default defineComponent({
         const showConfirmDelete = ref(false);
         const deleteItemId = ref(null);
         const deleteItemSection = ref('');
+
+        // Función para manejar el cierre de sesión
+        const handleLogout = () => {
+            console.log("Cerrando sesión de administrador");
+            store.logout();
+            router.push('/admin');
+        };
 
         // Función para obtener el ID efectivo según el tipo de objeto
         const getEffectiveId = (item, section) => {
@@ -652,7 +693,6 @@ export default defineComponent({
                     case 'Pedido':
                         pedidos.value = response.data;
                         break;
-                    case 'Productos':
                         productos.value = response.data;
                         break;
                     case 'Reservations':
@@ -735,11 +775,14 @@ export default defineComponent({
             saveItem,
             checkAndConfirmDelete,
             deleteItem,
-            logReservations
+            logReservations,
+            adminInfo,
+            handleLogout
         };
     }
 });
 </script>
+
 <style lang="scss">
 $primary-color: #3a57e8;
 $primary-gradient: linear-gradient(135deg, #3a57e8 0%, #2b48d1 100%);
@@ -1678,6 +1721,88 @@ $transition-pop: all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     &:hover::before {
         opacity: 1;
+    }
+}
+
+// Dashboard header styles
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.25rem 1.75rem;
+    background: $card-bg;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-md;
+}
+
+.dashboard-title {
+    font-size: 1.75rem;
+    color: $dark-color;
+    margin: 0;
+    position: relative;
+    padding-left: 1rem;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 70%;
+        width: 5px;
+        background: $primary-gradient;
+        border-radius: 3px;
+    }
+}
+
+.dashboard-user {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    span {
+        font-weight: $font-weight-medium;
+        color: $secondary-color;
+    }
+
+    .logout-button {
+        @include button-base;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: $danger-color;
+        background-color: rgba($danger-color, 0.08);
+        padding: 0.5rem 1rem;
+        border-radius: $radius-md;
+        font-weight: 500;
+        font-size: 0.875rem;
+
+        &:hover {
+            background-color: rgba($danger-color, 0.15);
+            box-shadow: 0 3px 5px rgba($danger-color, 0.2);
+        }
+
+        svg {
+            stroke: $danger-color;
+        }
+    }
+}
+
+// Añadir estos estilos dentro de la sección de media queries
+@media (max-width: 768px) {
+    .admin-dashboard {
+        .dashboard-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+            padding: 1rem;
+        }
+
+        .dashboard-user {
+            width: 100%;
+            justify-content: space-between;
+        }
     }
 }
 </style>

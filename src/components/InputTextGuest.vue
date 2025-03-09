@@ -4,7 +4,6 @@
 
         <div class="input-guest__wrapper">
             <div class="input-guest__selector" :class="{ 'disabled': !hasValidDateAndTime }">
-                <img :src="tableIcon" alt="mesa" class="input-guest__icon" />
                 <button type="button" @click="openModal" class="input-guest__button"
                     :class="{ 'disabled': !hasValidDateAndTime }" :disabled="!hasValidDateAndTime">
                     <span class="button-text">Seleccionar Mesa</span>

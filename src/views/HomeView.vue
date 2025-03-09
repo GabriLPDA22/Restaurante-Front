@@ -65,8 +65,10 @@ const navigateToCategory = (title: string, mappedCategory: string) => {
     </section>
 
     <!-- Recomendación del Chef -->
+    <div id="chef-special">
     <ChefRecommendation :title="chefSpecial.title" :description="chefSpecial.description" :price="chefSpecial.price"
       :image="chefSpecial.image" />
+    </div>
   </main>
 </template>
 

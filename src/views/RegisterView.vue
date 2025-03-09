@@ -28,8 +28,8 @@
                     </div>
                 </div>
                 <div class="auth__hours">
-                    <p>DOMINGO – JUEVES: 11:30AM – 11PM</p>
-                    <p>VIERNES & SÁBADO: 11:30AM – 12AM</p>
+                    <p>MONDAY – SUNDAY: 9:00AM – 12PM</p>
+                    <p></p>
                 </div>
             </div>
 
