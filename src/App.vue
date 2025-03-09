@@ -33,9 +33,10 @@ const startLoading = () => {
 };
 
 const stopLoading = () => {
+  // Aumentado el tiempo para asegurar que el texto se vea claramente
   setTimeout(() => {
     isLoading.value = false;
-  }, 600); // Tiempo suficiente para asegurar una transición suave
+  }, 1500); // Tiempo más largo para ver el contenido del loader
 };
 
 // Inicializar la aplicación
@@ -44,25 +45,37 @@ onMounted(async () => {
   await loadGoogleScript();
   authStore.initializeGoogleAuth();
   
-  // Simular un tiempo mínimo de carga para la primera carga
+  // Verificar si estamos en una ruta que requiere loader
+  const currentPath = window.location.pathname;
+  const dataLoadingRoutes = [
+    '/cart',
+    '/reservation',
+    '/about'
+  ];
+  
+  isLoading.value = true;
+  
+  // Tiempo adicional si estamos en páginas con datos pesados
+  const loadTime = dataLoadingRoutes.some(route => currentPath.includes(route)) ? 2500 : 1800;
+  
   setTimeout(() => {
     stopLoading();
-  }, 1200);
+  }, loadTime);
 });
 
 // Configurar hooks de navegación para mostrar el loader solo en rutas que cargan datos pesados
 router.beforeEach((to, from, next) => {
-  // Solo mostrar el loader en ciertas rutas que cargan datos de la BBDD
+  // Primero asumimos que no queremos mostrar el loader
+  isLoading.value = false;
+  
+  // Solo mostrar el loader en las rutas que tienen contenido pesado (imágenes)
   const dataLoadingRoutes = [
-    '/menu', 
-    '/orders', 
-    '/reservas', 
-    '/checkout', 
-    '/admin/dashboard', 
-    '/profile',
-    '/gallery'
+    '/cart',
+    '/reservation',
+    '/about'
   ];
   
+  // Activamos el loader SOLAMENTE si la ruta está en la lista
   if (dataLoadingRoutes.some(route => to.path.includes(route))) {
     startLoading();
   }
@@ -71,10 +84,10 @@ router.beforeEach((to, from, next) => {
 });
 
 router.afterEach(() => {
-  // Dejar un pequeño retraso para que los componentes tengan tiempo de cargar datos
+  // Dejar un retraso mayor para asegurar que el loader se vea completamente
   setTimeout(() => {
     stopLoading();
-  }, 500);
+  }, 1000);
 });
 </script>
 
@@ -173,7 +186,8 @@ router.afterEach(() => {
   letter-spacing: 8px;
   margin-bottom: 10px;
   text-transform: uppercase;
-  animation: scaleIn 1s ease-out;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+  animation: scaleIn 1s ease-out, glow 2s infinite alternate;
 }
 
 .logo-tagline {
@@ -262,6 +276,15 @@ router.afterEach(() => {
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  }
+  to {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
   }
 }
 
