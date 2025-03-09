@@ -33,10 +33,10 @@ const startLoading = () => {
 };
 
 const stopLoading = () => {
-  // Aumentado el tiempo para asegurar que el texto se vea claramente
+  // Pequeño retraso para una transición suave
   setTimeout(() => {
     isLoading.value = false;
-  }, 1500); // Tiempo más largo para ver el contenido del loader
+  }, 1500); // Tiempo suficiente para ver el contenido del loader
 };
 
 // Inicializar la aplicación
@@ -53,41 +53,51 @@ onMounted(async () => {
     '/about'
   ];
   
-  isLoading.value = true;
-  
-  // Tiempo adicional si estamos en páginas con datos pesados
-  const loadTime = dataLoadingRoutes.some(route => currentPath.includes(route)) ? 2500 : 1800;
-  
-  setTimeout(() => {
-    stopLoading();
-  }, loadTime);
+  // SOLO mostrar el loader inicial si estamos en una página que carga datos
+  if (dataLoadingRoutes.some(route => currentPath.includes(route))) {
+    isLoading.value = true;
+    setTimeout(() => {
+      stopLoading();
+    }, 2500);
+  } else {
+    // Si no estamos en una página con datos pesados, asegurarnos de que el loader está oculto
+    isLoading.value = false;
+  }
 });
 
 // Configurar hooks de navegación para mostrar el loader solo en rutas que cargan datos pesados
 router.beforeEach((to, from, next) => {
-  // Primero asumimos que no queremos mostrar el loader
-  isLoading.value = false;
-  
-  // Solo mostrar el loader en las rutas que tienen contenido pesado (imágenes)
+  // IMPORTANTE: Solo activar el loader para las rutas específicas
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
     '/about'
   ];
   
-  // Activamos el loader SOLAMENTE si la ruta está en la lista
+  // Activamos el loader SOLAMENTE si vamos a una ruta que está en la lista
   if (dataLoadingRoutes.some(route => to.path.includes(route))) {
     startLoading();
+  } else {
+    // Para todas las demás rutas, asegurarnos de que el loader está oculto
+    isLoading.value = false;
   }
   
   next();
 });
 
-router.afterEach(() => {
-  // Dejar un retraso mayor para asegurar que el loader se vea completamente
-  setTimeout(() => {
-    stopLoading();
-  }, 1000);
+router.afterEach((to) => {
+  // Solo detener el loader si estamos en una ruta que lo activó
+  const dataLoadingRoutes = [
+    '/cart',
+    '/reservation',
+    '/about'
+  ];
+  
+  if (dataLoadingRoutes.some(route => to.path.includes(route))) {
+    setTimeout(() => {
+      stopLoading();
+    }, 1000);
+  }
 });
 </script>
 
