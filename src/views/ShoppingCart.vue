@@ -54,7 +54,7 @@
 
     <div v-if="cart.length" v-show="cartVisible" class="small-cart-preview">
       <div class="small-cart-preview__header">
-        <span>Tu Carrito</span>
+        <span style="color: white;">Tu Carrito</span>
         <span class="cart-count">{{ cart.length }}</span>
       </div>
       <div class="small-cart-preview__content">
@@ -76,14 +76,14 @@
             </button>
           </div>
         </div>
-        <div class="small-cart-preview__total">
-          <span>Total:</span>
-          <span>€{{ calculateTotal().toFixed(2) }}</span>
-        </div>
-        <button class="small-cart-preview__checkout" @click="irAlCheckout">
-          Ir al Pago
-        </button>
       </div>
+      <div class="small-cart-preview__total">
+        <span>Total:</span>
+        <span>€{{ calculateTotal().toFixed(2) }}</span>
+      </div>
+      <button class="small-cart-preview__checkout" @click="irAlCheckout">
+        Ir al Pago
+      </button>
     </div>
   </div>
 </template>
@@ -452,7 +452,7 @@ const irAlCheckout = () => {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 :root {
   --primary-color: #2B7A78;
   --secondary-color: #DEF2F1;
@@ -496,10 +496,12 @@ const irAlCheckout = () => {
   &__title {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
+    color: white;
   }
 
   &__subtitle {
     font-size: 1.2rem;
+    color: white;
   }
 }
 
@@ -522,6 +524,7 @@ const irAlCheckout = () => {
   justify-content: center;
   gap: 0.5rem;
   margin-top: 1rem;
+  color: white;
 
   &__button {
     background-color: rgba(255, 255, 255, 0.2);
@@ -534,7 +537,6 @@ const irAlCheckout = () => {
 
     &--active {
       background-color: var(--white);
-      color: var(--primary-color);
       opacity: 1;
     }
   }
@@ -653,11 +655,15 @@ const irAlCheckout = () => {
   bottom: 20px;
   right: 20px;
   width: 300px;
-  background-color: var(--primary-color);
+  z-index: 8888;
+  background-color: white;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   animation: slideUp 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
 
   &__header {
     display: flex;
@@ -668,15 +674,32 @@ const irAlCheckout = () => {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     color: var(--white);
+    position: sticky;
+    top: 0;
   }
 
   &__content {
-    background-color: var(--white);
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
     padding: 1rem;
-    max-height: 60vh;
     overflow-y: auto;
+    background-color: white;
+    max-height: 20vh;
+    flex-grow: 1;
+    z-index: 9999;
+
+    // Improved scrollbar styling
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--secondary-color);
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 10px;
+    }
   }
 
   &__item {
@@ -685,7 +708,14 @@ const irAlCheckout = () => {
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #eee;
+
+      &:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+      }
     }
 
     .cart-item-quantity {
@@ -704,6 +734,11 @@ const irAlCheckout = () => {
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: color #2B7A78;
+        }
       }
     }
 
@@ -712,40 +747,67 @@ const irAlCheckout = () => {
       border: none;
       cursor: pointer;
       font-size: 1.2rem;
+      transition: transform 0.2s;
+
+      &:hover {
+        transform: scale(1.1);
+      }
     }
   }
 
   &__name {
     color: var(--text-dark);
     font-weight: bold;
+    flex-grow: 1;
+    padding-right: 0.5rem;
   }
 
   &__price {
     color: var(--primary-color);
+    font-weight: bold;
+  }
+
+  &__footer {
+    background-color: var(--secondary-color);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 1rem;
+    position: sticky;
+    bottom: 0;
   }
 
   &__total {
     display: flex;
     justify-content: space-between;
     font-weight: bold;
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid #eee;
+    padding: 0.75rem 0;
+    font-size: 1.1rem;
+    color: var(--text-dark);
   }
 
   &__checkout {
     width: 100%;
-    background-color: var(--primary-color);
-    color: var(--white);
     border: none;
-    padding: 0.75rem;
-    border-radius: 5px;
+    background: var(--primary-color);
+    padding: 0.85rem;
+    border-radius: 8px;
     margin-top: 0.5rem;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
 
     &:hover {
-      background-color: #2B7A78;
+      background-color: color #2B7A78;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
   }
 }
@@ -786,6 +848,10 @@ const irAlCheckout = () => {
   .small-cart-preview {
     width: calc(100% - 2rem);
     margin: 0 1rem;
+
+    &__content {
+      max-height: 40vh;
+    }
   }
 
   .header-content {

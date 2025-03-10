@@ -2,12 +2,18 @@
 import HeaderComponent from "./components/HeaderComponent.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 import { useGoogleAuthStore } from "@/stores/useGoogleAuthStore";
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 const authStore = useGoogleAuthStore();
 const isLoading = ref(true);
 const router = useRouter();
+const route = useRoute();
+
+// Función para comprobar si estamos en una ruta admin
+const isAdminRoute = computed(() => {
+  return route.path.startsWith('/admin');
+});
 
 // Función para cargar el script de Google dinámicamente
 const loadGoogleScript = () => {
@@ -44,7 +50,7 @@ onMounted(async () => {
   // Cargar script de Google
   await loadGoogleScript();
   authStore.initializeGoogleAuth();
-  
+
   // Verificar si estamos en una ruta que requiere loader
   const currentPath = window.location.pathname;
   const dataLoadingRoutes = [
@@ -52,7 +58,7 @@ onMounted(async () => {
     '/reservation',
     '/about'
   ];
-  
+
   // SOLO mostrar el loader inicial si estamos en una página que carga datos
   if (dataLoadingRoutes.some(route => currentPath.includes(route))) {
     isLoading.value = true;
@@ -73,7 +79,7 @@ router.beforeEach((to, from, next) => {
     '/reservation',
     '/about'
   ];
-  
+
   // Activamos el loader SOLAMENTE si vamos a una ruta que está en la lista
   if (dataLoadingRoutes.some(route => to.path.includes(route))) {
     startLoading();
@@ -81,7 +87,7 @@ router.beforeEach((to, from, next) => {
     // Para todas las demás rutas, asegurarnos de que el loader está oculto
     isLoading.value = false;
   }
-  
+
   next();
 });
 
@@ -92,7 +98,7 @@ router.afterEach((to) => {
     '/reservation',
     '/about'
   ];
-  
+
   if (dataLoadingRoutes.some(route => to.path.includes(route))) {
     setTimeout(() => {
       stopLoading();
@@ -114,15 +120,15 @@ router.afterEach((to) => {
   </div>
 
   <!-- Contenido de la aplicación -->
-  <HeaderComponent />
-  <main class="main-content">
+  <HeaderComponent v-if="!isAdminRoute" />
+  <main class="main-content" :class="{ 'admin-content': isAdminRoute }">
     <router-view v-slot="{ Component }">
       <transition name="fade" mode="out-in">
         <component :is="Component" />
       </transition>
     </router-view>
   </main>
-  <FooterComponent />
+  <FooterComponent v-if="!isAdminRoute" />
 </template>
 
 <style>
@@ -143,8 +149,15 @@ router.afterEach((to) => {
 
 /* Estilos para el contenedor principal */
 .main-content {
-  min-height: calc(100vh - 200px); /* Ajusta según el tamaño de tu header y footer */
+  min-height: calc(100vh - 200px);
+  /* Ajusta según el tamaño de tu header y footer */
   background-color: var(--cream-white);
+}
+
+/* Estilo específico para contenido admin (sin header/footer) */
+.admin-content {
+  min-height: 100vh;
+  /* Ocupa toda la altura de la ventana */
 }
 
 /* Animación de transición entre páginas */
@@ -246,10 +259,12 @@ router.afterEach((to) => {
     width: 0;
     opacity: 0.3;
   }
+
   50% {
     width: 100px;
     opacity: 1;
   }
+
   100% {
     width: 0;
     opacity: 0.3;
@@ -257,10 +272,13 @@ router.afterEach((to) => {
 }
 
 @keyframes dotPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(0.8);
     opacity: 0.6;
   }
+
   50% {
     transform: scale(1.2);
     opacity: 1;
@@ -272,6 +290,7 @@ router.afterEach((to) => {
     transform: scale(0.8);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -283,6 +302,7 @@ router.afterEach((to) => {
     opacity: 0;
     transform: translateY(10px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -293,6 +313,7 @@ router.afterEach((to) => {
   from {
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
   }
+
   to {
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
   }
@@ -304,7 +325,7 @@ router.afterEach((to) => {
     font-size: 2.5rem;
     letter-spacing: 5px;
   }
-  
+
   .logo-tagline {
     font-size: 0.8rem;
     letter-spacing: 2px;

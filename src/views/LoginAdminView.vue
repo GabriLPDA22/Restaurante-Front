@@ -175,43 +175,43 @@ function validatePassword(): boolean {
 
 // Login
 async function handleLogin(): Promise<void> {
-  try {
-    // Validar
-    const validNombre = validateNombre();
-    const validPassword = validatePassword();
-    if (!validNombre || !validPassword) return;
+    try {
+        // Validar
+        const validNombre = validateNombre();
+        const validPassword = validatePassword();
+        if (!validNombre || !validPassword) return;
 
-    isSubmitting.value = true;
-    errorMessage.value = '';
+        isSubmitting.value = true;
+        errorMessage.value = '';
 
-    // Simulamos carga
-    await new Promise(resolve => setTimeout(resolve, 500));
+        // Simulamos carga
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-    console.log("Intentando login con:", nombre.value);
-    
-    // Llamamos al store
-    const result = await store.login(nombre.value, password.value);
-    console.log("Respuesta de login:", result);
+        console.log("Intentando login con:", nombre.value);
 
-    if (!result.success) {
-      errorMessage.value = result.message;
-      return;
+        // Llamamos al store
+        const result = await store.login(nombre.value, password.value);
+        console.log("Respuesta de login:", result);
+
+        if (!result.success) {
+            errorMessage.value = result.message;
+            return;
+        }
+
+        // Login exitoso
+        loginSuccess.value = true;
+
+        // Redirigir al dashboard con un pequeño retraso para mostrar el mensaje de éxito
+        setTimeout(() => {
+            router.push('/admin/dashboard');
+        }, 1500);
+
+    } catch (error: any) {
+        console.error("Error en handleLogin:", error);
+        errorMessage.value = error?.message || "Error inesperado. Inténtelo de nuevo.";
+    } finally {
+        isSubmitting.value = false;
     }
-
-    // Login exitoso
-    loginSuccess.value = true;
-    
-    // Redirigir al dashboard con un pequeño retraso para mostrar el mensaje de éxito
-    setTimeout(() => {
-      router.push('/admin/dashboard');
-    }, 1500);
-
-  } catch (error: any) {
-    console.error("Error en handleLogin:", error);
-    errorMessage.value = error?.message || "Error inesperado. Inténtelo de nuevo.";
-  } finally {
-    isSubmitting.value = false;
-  }
 }
 </script>
 
@@ -353,7 +353,7 @@ async function handleLogin(): Promise<void> {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 80vh;
+    min-height: 100vh;
     padding: 1rem;
     background: #0d1b1e;
     background: radial-gradient(circle at center, #182830 0%, #0d1b1e 70%);
