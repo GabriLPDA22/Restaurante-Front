@@ -16,6 +16,8 @@ import ProfileView from '@/views/ProfileView.vue';
 import ApiUserView from '@/views/ApiUserTest.vue'
 import LoginAdminView from '@/views/LoginAdminView.vue';
 import AdminDashboardView from '@/views/AdminDashboardView.vue';
+import Unauthorized401View from '@/views/Unauthorized401View.vue';
+import { adminAuthStore } from '@/stores/adminAuthStore';
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
@@ -35,7 +37,28 @@ const routes = [
   { path: '/api-test', name: 'api-test', component: ApiTestView },
   { path: '/api-user', name: 'api-user', component: ApiUserView },
   { path: '/admin', name: 'login-admin', component: LoginAdminView },
-  { path: '/admin/dashboard', name: 'admin-dashboard', component: AdminDashboardView },
+  { 
+    path: '/admin/dashboard', 
+    name: 'admin-dashboard', 
+    component: AdminDashboardView,
+    beforeEnter: (to, from, next) => {
+      // Guardia de navegación a nivel de ruta
+      const store = adminAuthStore();
+      store.loadAdmin();
+      
+      if (store.isAuthenticated()) {
+        next(); // Permitir acceso si está autenticado
+      } else {
+        next({ name: 'unauthorized' }); // Redirigir a la página 401 en lugar de al login
+      }
+    }
+  },
+  // Ruta para el error 401 - No autorizado
+  {
+    path: '/unauthorized',
+    name: 'unauthorized',
+    component: Unauthorized401View
+  },
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',

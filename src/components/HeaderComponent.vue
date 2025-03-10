@@ -130,7 +130,7 @@
       <div class="header__container">
         <div class="header__schedule-wrapper">
           <p class="header__schedule">
-            SUNDAY – THURSDAY: 11:30AM – 11PM | FRIDAY & SATURDAY: 11:30AM – 12AM
+            MONDAY – SUNDAY: 9:00AM – 12PM 
           </p>
         </div>
         <div class="header__top-right">
@@ -229,9 +229,6 @@
           <ul class="header__desktop-nav-list">
             <li class="header__desktop-nav-item">
               <router-link to="/reservation" class="header__desktop-nav-link">Reservation</router-link>
-            </li>
-            <li class="header__desktop-nav-item">
-              <router-link to="/about" class="header__desktop-nav-link">About Us</router-link>
             </li>
             <li class="header__desktop-nav-item">
               <router-link to="/contact" class="header__desktop-nav-link">Contact Us</router-link>
@@ -355,6 +352,21 @@ const handleLogout = () => {
   authStore.logout();
   googleAuthStore.logout();
 };
+
+// const scrollToChef = () => {
+//   const element = document.getElementById('chef-special');
+//   if (element) {
+//     const headerOffset = 80; 
+//     const elementPosition = element.getBoundingClientRect().top;
+//     const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    
+//     window.scrollTo({
+//       top: offsetPosition,
+//       behavior: 'smooth'
+//     });
+//   }
+// };
+
 </script>
 
 <style lang="scss" scoped>

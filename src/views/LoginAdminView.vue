@@ -10,25 +10,26 @@
                 </div>
                 <div class="auth__info">
                     <h2 class="slide-in-left">BIENVENIDO, ADMIN</h2>
-                    <p class="slide-in-left-delay">Tu acceso es clave para la gestión del sistema. Recuerda mantener la seguridad de tu cuenta.</p>
+                    <p class="slide-in-left-delay">Tu acceso es clave para la gestión del sistema. Recuerda mantener la
+                        seguridad de tu cuenta.</p>
                     <div class="auth__feature-list">
-                        <div class="auth__feature slide-in-bottom">
+                        <div class="auth__feature slide-in-bottom" style="color: white;">
                             <span class="auth__feature-icon">✓</span>
                             <span>🔒 No compartas tu contraseña</span>
                         </div>
-                        <div class="auth__feature slide-in-bottom-delay-1">
+                        <div class="auth__feature slide-in-bottom-delay-1" style="color: white;">
                             <span class="auth__feature-icon">✓</span>
                             <span>🔒 Usa una conexión segura</span>
                         </div>
-                        <div class="auth__feature slide-in-bottom-delay-2">
+                        <div class="auth__feature slide-in-bottom-delay-2" style="color: white;">
                             <span class="auth__feature-icon">✓</span>
                             <span>🔒 Cierra sesión al finalizar</span>
                         </div>
                     </div>
                 </div>
                 <div class="auth__hours">
-                    <p>DOMINGO – JUEVES: 11:30AM – 11PM</p>
-                    <p>VIERNES & SÁBADO: 11:30AM – 12AM</p>
+                    <p>MONDAY – SUNDAY: 9:00AM – 12PM</p>
+                    <p></p>
                 </div>
             </div>
 
@@ -84,8 +85,8 @@
                                 </svg>
                             </label>
                             <input id="password" v-model="password" :type="showPassword ? 'text' : 'password'"
-                                class="input-group__field" placeholder="Password"
-                                @focus="passwordError = ''" @blur="validatePassword" required />
+                                class="input-group__field" placeholder="Password" @focus="passwordError = ''"
+                                @blur="validatePassword" required />
                             <button type="button" class="input-group__toggle" @click="showPassword = !showPassword"
                                 :title="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
                                 <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -128,8 +129,8 @@ import { adminAuthStore } from '@/stores/adminAuthStore';
 // Router para redirigir después del login
 const router = useRouter();
 
-// IMPORTANTE: Con Pinia necesitamos llamar al store para obtener una instancia
-const store = adminAuthStore(); // Asegúrate de llamar a la función para obtener la instancia
+// Obtener instancia del store de autenticación
+const store = adminAuthStore();
 
 // Campos de formulario
 const nombre = ref<string>('');
@@ -145,72 +146,75 @@ const passwordError = ref<string>('');
 
 // Validaciones
 function validateNombre(): boolean {
-  if (!nombre.value) {
-    nombreError.value = 'El nombre es requerido';
-    return false;
-  }
-  
-  if (nombre.value.length < 3) {
-    nombreError.value = 'El nombre debe tener al menos 3 caracteres';
-    return false;
-  }
-  
-  nombreError.value = '';
-  return true;
+    if (!nombre.value) {
+        nombreError.value = 'El nombre es requerido';
+        return false;
+    }
+
+    if (nombre.value.length < 3) {
+        nombreError.value = 'El nombre debe tener al menos 3 caracteres';
+        return false;
+    }
+
+    nombreError.value = '';
+    return true;
 }
 
 function validatePassword(): boolean {
-  if (!password.value) {
-    passwordError.value = 'Contraseña es requerida';
-    return false;
-  }
-  if (password.value.length < 6) {
-    passwordError.value = 'La contraseña debe tener al menos 6 caracteres';
-    return false;
-  }
-  passwordError.value = '';
-  return true;
+    if (!password.value) {
+        passwordError.value = 'Contraseña es requerida';
+        return false;
+    }
+    if (password.value.length < 6) {
+        passwordError.value = 'La contraseña debe tener al menos 6 caracteres';
+        return false;
+    }
+    passwordError.value = '';
+    return true;
 }
 
 // Login
 async function handleLogin(): Promise<void> {
-  try {
-    // Validar
-    const validNombre = validateNombre();
-    const validPassword = validatePassword();
-    if (!validNombre || !validPassword) return;
+    try {
+        // Validar
+        const validNombre = validateNombre();
+        const validPassword = validatePassword();
+        if (!validNombre || !validPassword) return;
 
-    isSubmitting.value = true;
-    errorMessage.value = '';
+        isSubmitting.value = true;
+        errorMessage.value = '';
 
-    // Simulamos carga
-    await new Promise(resolve => setTimeout(resolve, 500));
+        // Simulamos carga
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-    console.log("Intentando login con:", nombre.value);
-    
-    // Llamamos al store
-    const result = await store.login(nombre.value, password.value);
-    console.log("Respuesta de login:", result);
+        console.log("Intentando login con:", nombre.value);
 
-    if (!result.success) {
-      errorMessage.value = result.message;
-      return;
+        // Llamamos al store
+        const result = await store.login(nombre.value, password.value);
+        console.log("Respuesta de login:", result);
+
+        if (!result.success) {
+            errorMessage.value = result.message;
+            return;
+        }
+
+        // Login exitoso
+        loginSuccess.value = true;
+
+        // Redirigir al dashboard con un pequeño retraso para mostrar el mensaje de éxito
+        setTimeout(() => {
+            router.push('/admin/dashboard');
+        }, 1500);
+
+    } catch (error: any) {
+        console.error("Error en handleLogin:", error);
+        errorMessage.value = error?.message || "Error inesperado. Inténtelo de nuevo.";
+    } finally {
+        isSubmitting.value = false;
     }
-
-    // Login exitoso
-    loginSuccess.value = true;
-    setTimeout(() => {
-      router.push('/admin/dashboard');
-    }, 2000);
-
-  } catch (error: any) {
-    console.error("Error en handleLogin:", error);
-    errorMessage.value = error?.message || "Error inesperado. Intentelo de nuevo.";
-  } finally {
-    isSubmitting.value = false;
-  }
 }
 </script>
+
 <style lang="scss" scoped>
 // Animaciones
 @keyframes fadeIn {
@@ -349,7 +353,7 @@ async function handleLogin(): Promise<void> {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 80vh;
+    min-height: 100vh;
     padding: 1rem;
     background: #0d1b1e;
     background: radial-gradient(circle at center, #182830 0%, #0d1b1e 70%);

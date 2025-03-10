@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
 
 // Definimos tipos para TypeScript
 interface Admin {
@@ -19,14 +18,11 @@ interface LoginResponse {
 const API_URL = 'http://34.196.144.197:8080/api';
 
 export const adminAuthStore = defineStore('adminAuth', () => {
-  const admin = ref<Admin | null>(null);
-  const token = ref<string | null>(null);
-  const router = useRouter();
+  const admin = ref(null);
+  const token = ref(null);
 
-  // LOGIN
-  const login = async (nombre: string, password: string): Promise<LoginResponse> => {
+  const login = async (nombre, password) => {
     try {
-      // Validación simple de campos vacíos
       if (!nombre || !password) {
         return {
           success: false,
@@ -34,52 +30,45 @@ export const adminAuthStore = defineStore('adminAuth', () => {
         };
       }
 
-      // Obtenemos todos los administradores
       const { data: adminList } = await axios.get(`${API_URL}/admins`);
-      
-      // Buscamos un administrador que coincida con el nombre
-      const foundAdmin = adminList.find((adm: any) => adm.nombre === nombre);
-      
-      // Si no encontramos al administrador, retornamos error
+
+      const foundAdmin = adminList.find((adm) => adm.nombre === nombre);
+
       if (!foundAdmin) {
         return {
           success: false,
           message: "Usuario no encontrado"
         };
       }
-      
-      // Verificamos la contraseña
-      // Nota: En una aplicación real, NUNCA se debería manejar la autenticación de esta forma
-      // La contraseña debería verificarse en el backend y nunca exponer contraseñas en el frontend
+
       if (foundAdmin.contraseña !== password) {
         return {
           success: false,
           message: "Contraseña incorrecta"
         };
       }
-      
-      // Login exitoso
+
       admin.value = {
         id: foundAdmin.id,
         nombre: foundAdmin.nombre
       };
-      
-      // Generamos un token simple (esto es solo para demo, no seguro para producción)
+
       token.value = `demo-token-${Date.now()}`;
 
-      // Guardamos en localStorage
       localStorage.setItem("admin", JSON.stringify(admin.value));
       localStorage.setItem("adminToken", token.value);
+
+      console.log("Login exitoso:", admin.value);
 
       return {
         success: true,
         message: "Login exitoso"
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error en login:", error);
-      
+
       let errorMessage = "Error al iniciar sesión";
-      
+
       if (error.response) {
         if (error.response.status === 404) {
           errorMessage = "Servicio no disponible";
@@ -87,7 +76,7 @@ export const adminAuthStore = defineStore('adminAuth', () => {
           errorMessage = error.response.data?.message || "Error del servidor";
         }
       }
-      
+
       return {
         success: false,
         message: errorMessage,
@@ -96,42 +85,44 @@ export const adminAuthStore = defineStore('adminAuth', () => {
     }
   };
 
-  // Cargar admin y token desde localStorage
-  const loadAdmin = (): boolean => {
-    const storedAdmin = localStorage.getItem("admin");
-    const storedToken = localStorage.getItem("adminToken");
-    if (storedAdmin && storedToken) {
-      try {
+  const loadAdmin = () => {
+    try {
+      const storedAdmin = localStorage.getItem("admin");
+      const storedToken = localStorage.getItem("adminToken");
+
+      if (storedAdmin && storedToken) {
         admin.value = JSON.parse(storedAdmin);
         token.value = storedToken;
+        console.log("Sesión de administrador cargada:", admin.value);
         return true;
-      } catch (e) {
-        console.error("Error al parsear admin:", e);
-        localStorage.removeItem("admin");
-        localStorage.removeItem("adminToken");
       }
+    } catch (e) {
+      console.error("Error al cargar datos de administrador:", e);
+      localStorage.removeItem("admin");
+      localStorage.removeItem("adminToken");
     }
     return false;
   };
 
-  // LOGOUT
-  const logout = (): void => {
+  const logout = () => {
     admin.value = null;
     token.value = null;
     localStorage.removeItem("admin");
     localStorage.removeItem("adminToken");
-    router.push("/admin/login");
+    console.log("Sesión de administrador cerrada");
   };
 
-  // Verificar si hay un admin logueado
-  const isAuthenticated = (): boolean => {
-    return !!admin.value && !!token.value;
+  const isAuthenticated = () => {
+    const authenticated = !!admin.value && !!token.value;
+    console.log("Estado de autenticación:", authenticated);
+    return authenticated;
   };
 
-  // Obtener información del admin
-  const getAdminInfo = (): Admin | null => {
+  const getAdminInfo = () => {
     return admin.value;
   };
+
+  loadAdmin();
 
   return {
     admin,

@@ -1,5 +1,22 @@
 <template>
     <div class="admin-dashboard">
+        <!-- Header con información del usuario y botón de logout -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Panel de Administración</h1>
+            <div class="dashboard-user">
+                <span>{{ adminInfo ? `Bienvenido, ${adminInfo.nombre}` : 'Admin' }}</span>
+                <button @click="handleLogout" class="logout-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+
         <nav class="dashboard-nav">
             <button v-for="section in sections" :key="section" @click="activeSection = section"
                 :class="{ active: activeSection === section }">
@@ -241,12 +258,29 @@
         </div>
     </div>
 </template>
+
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted } from 'vue';
+import { defineComponent, ref, reactive, onMounted, computed } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
+import { adminAuthStore } from '@/stores/adminAuthStore';
 
 export default defineComponent({
     setup() {
+        // Obtener instancias del store y router
+        const store = adminAuthStore();
+        const router = useRouter();
+
+        // Información del administrador
+        const adminInfo = computed(() => store.getAdminInfo());
+
+        // Verificar autenticación al entrar al componente (capa adicional de seguridad)
+        if (!store.isAuthenticated()) {
+            console.log("Acceso no autorizado al dashboard de administración");
+            router.push('/admin');
+            return {};
+        }
+
         // Configuración de axios
         const api = axios.create({
             baseURL: 'http://34.196.144.197:8080/api',
@@ -277,6 +311,106 @@ export default defineComponent({
         const showConfirmDelete = ref(false);
         const deleteItemId = ref(null);
         const deleteItemSection = ref('');
+
+        // Función para formatear items de manera limpia
+        const formatItemsMinimal = (items) => {
+            try {
+                // Convertir a objeto si es string
+                let itemsArray = items;
+                if (typeof items === 'string') {
+                    itemsArray = JSON.parse(items);
+                }
+
+                // Si no es un array o está vacío
+                if (!Array.isArray(itemsArray) || itemsArray.length === 0) {
+                    return "Sin items";
+                }
+
+                // Crear texto muy limpio
+                return itemsArray.map(item => {
+                    // Si hay un nombre de producto, usarlo; si no, mostrar solo "Producto" y el ID
+                    const nombre = item.nombreProducto ? item.nombreProducto : `Producto ${item.idProducto}`;
+                    return `${nombre} (${item.cantidad}x) $${item.precio}`;
+                }).join(" | ");
+
+            } catch (e) {
+                return "Error en formato";
+            }
+        };
+
+        // Función para parsear los items para edición
+        const parseItemsForEdit = (itemsString) => {
+            try {
+                if (!itemsString) return [];
+
+                const items = typeof itemsString === 'string'
+                    ? JSON.parse(itemsString)
+                    : itemsString;
+
+                return Array.isArray(items) ? items : [];
+            } catch (e) {
+                console.error("Error parseando items:", e);
+                return [];
+            }
+        };
+
+        // Función para añadir un nuevo item
+        const addNewItem = () => {
+            try {
+                // Parsear los items actuales
+                let items = parseItemsForEdit(formData.items);
+
+                // Añadir un nuevo item con valores por defecto
+                items.push({
+                    idProducto: "",
+                    cantidad: 1,
+                    precio: 0
+                });
+
+                // Actualizar formData.items con el nuevo array
+                formData.items = JSON.stringify(items);
+            } catch (e) {
+                console.error("Error añadiendo item:", e);
+            }
+        };
+
+        // Función para eliminar un item
+        const removeItem = (index) => {
+            try {
+                // Parsear los items actuales
+                let items = parseItemsForEdit(formData.items);
+
+                // Eliminar el item en el índice especificado
+                items.splice(index, 1);
+
+                // Actualizar formData.items con el array modificado
+                formData.items = JSON.stringify(items);
+            } catch (e) {
+                console.error("Error eliminando item:", e);
+            }
+        };
+
+        // Función para formatear JSON para edición
+        const formatItems = (items) => {
+            try {
+                if (typeof items === 'string') {
+                    return JSON.stringify(JSON.parse(items), null, 2);
+                }
+                if (typeof items === 'object') {
+                    return JSON.stringify(items, null, 2);
+                }
+                return String(items);
+            } catch (e) {
+                return String(items);
+            }
+        };
+
+        // Función para manejar el cierre de sesión
+        const handleLogout = () => {
+            console.log("Cerrando sesión de administrador");
+            store.logout();
+            router.push('/admin');
+        };
 
         // Función para obtener el ID efectivo según el tipo de objeto
         const getEffectiveId = (item, section) => {
@@ -318,48 +452,61 @@ export default defineComponent({
             alert(`Reservations tiene ${reservations.value.length} elementos.`);
         };
 
-        // Función para abrir el modal para crear
         const openModal = (type, section) => {
             modalType.value = type;
             modalSection.value = section;
 
-            // Limpiar formData
-            Object.keys(formData).forEach(key => delete formData[key]);
+            // Reiniciar formData completamente
+            Object.keys(formData).forEach(key => {
+                delete formData[key];
+            });
 
-            // Campos por defecto para creación según sección
-            if (section === 'Reservations') {
-                formData.datetime = new Date().toISOString().slice(0, 16);
-                formData.customername = '';
-                formData.tableid = '';
-            } else if (section === 'User') {
-                formData.Nombre = '';
-                formData.Email = '';
-                formData.Telefono = ''; // Usar exactamente el mismo nombre que en la BD
-                formData.FechaNacimiento = ''; // Dejar vacío el campo de fecha
-                formData.Password = '';
-            } else if (section === 'Items') {
-                formData.iddetalle = '';
-                formData.idpedidos = '';
-                formData.idproducto = '';
-                formData.cantidad = 1;
-                formData.precio = 0;
-            } else if (section === 'Pedido') {
-                formData.idPedidos = '';
-                formData.fecha = new Date().toISOString().slice(0, 16);
-                formData.userID = '';
-                formData.items = [];
-            } else if (section === 'Productos') {
-                formData.idProducto = '';
-                formData.nombre = '';
-                formData.precio = 0;
-                formData.descripcion = '';
+            // Configuraciones por sección
+            switch (section) {
+                case 'Reservations':
+                    formData.datetime = new Date().toISOString().slice(0, 16);
+                    formData.customername = '';
+                    formData.tableid = '';
+                    break;
+
+                case 'User':
+                    formData.Nombre = '';
+                    formData.Email = '';
+                    formData.Telefono = '';
+                    formData.FechaNacimiento = '';
+                    formData.Password = '';
+                    break;
+
+                case 'Items':
+                    formData.iddetalle = '';
+                    formData.idpedidos = '';
+                    formData.idproducto = '';
+                    formData.cantidad = 1;
+                    formData.precio = 0;
+                    break;
+
+                case 'Pedido':
+                    formData.idPedidos = '';
+                    formData.fecha = new Date().toISOString().slice(0, 16);
+                    formData.userID = '';
+                    formData.items = '[]';
+                    break;
+
+                case 'Productos':
+                    formData.idProducto = '';
+                    formData.nombre = '';
+                    formData.precio = 0;
+                    formData.descripcion = '';
+                    break;
+
+                default:
+                    console.warn(`Sección no reconocida: ${section}`);
             }
 
             console.log("FormData para creación:", formData);
             showModal.value = true;
         };
 
-        // Función para cerrar el modal
         const closeModal = () => {
             showModal.value = false;
         };
@@ -384,12 +531,11 @@ export default defineComponent({
             Object.keys(formData).forEach(key => delete formData[key]);
 
             if (section === 'User') {
-                // Para User, solo copiar los campos relevantes con nombres exactos de la BD
-                formData.UserID = item.UserID; // Usar UserID con U mayúscula
+                formData.UserID = item.UserID;
                 formData.Nombre = item.Nombre || '';
                 formData.Email = item.Email || '';
                 formData.Telefono = item.Telefono || ''; // Usar Telefono con T mayúscula
-                formData.Password = ''; // Campo vacío para la contraseña
+                formData.Password = '';
 
                 // Formatear FechaNacimiento si existe
                 if (item.FechaNacimiento) {
@@ -401,7 +547,6 @@ export default defineComponent({
                         formData.FechaNacimiento = item.FechaNacimiento;
                     }
                 } else {
-                    // Dejar vacío en lugar de establecer la fecha actual
                     formData.FechaNacimiento = '';
                 }
             } else if (section === 'Items') {
@@ -414,8 +559,12 @@ export default defineComponent({
             } else {
                 // Para otras secciones, mantener la lógica original
                 Object.keys(item).forEach(key => {
+                    // Si es el campo items para Pedido, formatear como JSON
+                    if (section === 'Pedido' && key === 'items') {
+                        formData[key] = formatItems(item[key]);
+                    }
                     // Formatear fechas para inputs datetime-local
-                    if (typeof item[key] === 'string' && item[key] && item[key].includes('T') && getInputType(key) === 'datetime-local') {
+                    else if (typeof item[key] === 'string' && item[key] && item[key].includes('T') && getInputType(key) === 'datetime-local') {
                         try {
                             const date = new Date(item[key]);
                             formData[key] = date.toISOString().slice(0, 16);
@@ -457,39 +606,43 @@ export default defineComponent({
         const saveItem = async () => {
             try {
                 const section = modalSection.value;
-                const data = { ...formData }; // Copia para no modificar el original
+                const data = { ...formData };
 
                 console.log(`Guardando ${modalType.value} en ${section}:`, data);
 
+                // Para Pedido, asegurarse que items sea un objeto y no un string
+                if (section === 'Pedido' && typeof data.items === 'string') {
+                    try {
+                        data.items = JSON.parse(data.items);
+                    } catch (e) {
+                        console.error("Error al parsear items:", e);
+                        alert("El formato del array de items no es válido. Debería ser un JSON array.");
+                        return;
+                    }
+                }
+
                 let response;
                 if (modalType.value === 'create') {
-                    // Para crear, manejo específico según sección
                     if (section === 'Items') {
-                        // Asegurarse que los datos numéricos son números
                         data.iddetalle = parseInt(data.iddetalle) || 0;
                         data.idpedidos = parseInt(data.idpedidos) || 0;
                         data.idproducto = parseInt(data.idproducto) || 0;
                         data.cantidad = parseInt(data.cantidad) || 1;
                         data.precio = parseFloat(data.precio) || 0;
                     } else {
-                        // Para otras secciones, eliminar IDs autogenerados
                         delete data.id;
-                        delete data.UserID; // Usar UserID con U mayúscula
+                        delete data.UserID;
                     }
 
                     response = await api.post(`/${section}`, data);
                     console.log("Respuesta de creación:", response.data);
                 } else {
-                    // Para editar, determinar el ID correcto según la sección
                     let itemId = null;
                     let endpoint = `/${section}`;
                     let itemData = { ...data };
-
-                    // Preparar datos específicos para cada sección
                     if (section === 'User' && data.UserID !== undefined) {
                         itemId = data.UserID;
 
-                        // Para User, solo incluir los campos del DTO con nombres exactos de la BD
                         itemData = {
                             Nombre: data.Nombre,
                             Email: data.Email,
@@ -497,11 +650,9 @@ export default defineComponent({
                             FechaNacimiento: data.FechaNacimiento // Usar FechaNacimiento con F mayúscula
                         };
 
-                        // Solo incluir password si no está vacío
                         if (data.Password && data.Password.trim() !== '') {
                             itemData.Password = data.Password;
                         } else if (modalType.value === 'create') {
-                            // Si es creación, asegurarse de que siempre hay una contraseña
                             const defaultPassword = 'Password123';
                             itemData.Password = defaultPassword;
                         }
@@ -527,9 +678,8 @@ export default defineComponent({
                         throw new Error(`ID no válido para editar ${section} - no se puede realizar la operación PUT`);
                     }
 
-                    console.log(`Enviando PUT a ${endpoint}/${itemId} con datos:`, itemData);
+                    console.log(`Enviando PUT a ${endpoint}/${itemId} con datos:`, itemData)
 
-                    // PUT con ID en la URL y datos específicos en el body
                     response = await api.put(`${endpoint}/${itemId}`, itemData);
                     console.log("Respuesta de actualización:", response.data);
                 }
@@ -735,11 +885,19 @@ export default defineComponent({
             saveItem,
             checkAndConfirmDelete,
             deleteItem,
-            logReservations
+            logReservations,
+            adminInfo,
+            handleLogout,
+            formatItems,
+            formatItemsMinimal,
+            parseItemsForEdit,
+            addNewItem,
+            removeItem
         };
     }
 });
 </script>
+
 <style lang="scss">
 $primary-color: #3a57e8;
 $primary-gradient: linear-gradient(135deg, #3a57e8 0%, #2b48d1 100%);
@@ -1678,6 +1836,88 @@ $transition-pop: all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     &:hover::before {
         opacity: 1;
+    }
+}
+
+// Dashboard header styles
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.25rem 1.75rem;
+    background: $card-bg;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-md;
+}
+
+.dashboard-title {
+    font-size: 1.75rem;
+    color: $dark-color;
+    margin: 0;
+    position: relative;
+    padding-left: 1rem;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 70%;
+        width: 5px;
+        background: $primary-gradient;
+        border-radius: 3px;
+    }
+}
+
+.dashboard-user {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    span {
+        font-weight: $font-weight-medium;
+        color: $secondary-color;
+    }
+
+    .logout-button {
+        @include button-base;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: $danger-color;
+        background-color: rgba($danger-color, 0.08);
+        padding: 0.5rem 1rem;
+        border-radius: $radius-md;
+        font-weight: 500;
+        font-size: 0.875rem;
+
+        &:hover {
+            background-color: rgba($danger-color, 0.15);
+            box-shadow: 0 3px 5px rgba($danger-color, 0.2);
+        }
+
+        svg {
+            stroke: $danger-color;
+        }
+    }
+}
+
+// Añadir estos estilos dentro de la sección de media queries
+@media (max-width: 768px) {
+    .admin-dashboard {
+        .dashboard-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+            padding: 1rem;
+        }
+
+        .dashboard-user {
+            width: 100%;
+            justify-content: space-between;
+        }
     }
 }
 </style>
