@@ -136,7 +136,7 @@ async function testUpdateProfileDirect() {
 
     try {
         const response = await axios.put(
-            'http://34.196.144.197:8080/api/User/update-by-email',
+            'http://elixiumapi.retocsv.es//api/User/update-by-email',
             requestData,
             {
                 headers: {
@@ -168,7 +168,7 @@ async function testUpdateProfileDirect() {
 
         try {
             const response = await axios.put(
-                'http://34.196.144.197:8080/api/User/update-by-email',
+                'http://elixiumapi.retocsv.es//api/User/update-by-email',
                 alternativeData,
                 {
                     headers: {

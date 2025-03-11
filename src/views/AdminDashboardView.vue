@@ -283,7 +283,7 @@ export default defineComponent({
 
         // Configuración de axios
         const api = axios.create({
-            baseURL: 'http://34.196.144.197:8080/api',
+            baseURL: 'http://elixiumapi.retocsv.es//api',
             headers: {
                 'accept': '*/*',
                 'Content-Type': 'application/json'

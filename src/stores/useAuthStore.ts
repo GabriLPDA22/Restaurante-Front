@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
   // LOGIN
   const login = async (email, password, rememberMe = false) => {
     try {
-      const { data } = await axios.post("http://34.196.144.197:8080/api/auth/login", {
+      const { data } = await axios.post("http://elixiumapi.retocsv.es//api/auth/login", {
         email,
         password
       });
@@ -76,7 +76,7 @@ export const useAuthStore = defineStore('auth', () => {
   // REGISTER
   const register = async (nombre, email, password) => {
     try {
-      const { data } = await axios.post("http://34.196.144.197:8080/api/auth/register", {
+      const { data } = await axios.post("http://elixiumapi.retocsv.es//api/auth/register", {
         nombre,
         email,
         password
@@ -160,7 +160,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Llamar al endpoint según la documentación
       const response = await axios.put(
-        `http://34.196.144.197:8080/api/User/${userId}`,
+        `http://elixiumapi.retocsv.es//api/User/${userId}`,
         updateData,
         {
           headers: {

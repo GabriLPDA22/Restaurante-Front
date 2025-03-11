@@ -532,7 +532,7 @@ export default defineComponent({
     border: 2px solid #e0e0e0;
     border-radius: 12px;
     overflow: hidden;
-    background: url('@/assets/restaurant.jpg') no-repeat center/cover;
+    background: url('/public/restaurant.jpg') no-repeat center/cover;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 }
 

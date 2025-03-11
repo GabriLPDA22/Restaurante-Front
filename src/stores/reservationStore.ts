@@ -59,7 +59,7 @@ export const useReservationStore = defineStore('reservation', () => {
         try {
             console.log(`Fetching reservations for date: ${date}`);
 
-            const response = await fetch(`http://34.196.144.197:8080/api/Reservations/byDate?date=${date}`);
+            const response = await fetch(`http://elixiumapi.retocsv.es//api/Reservations/byDate?date=${date}`);
 
             if (!response.ok) {
                 const errorText = await response.text();
@@ -217,7 +217,7 @@ export const useReservationStore = defineStore('reservation', () => {
             console.log('Submitting reservations:', reservations);
 
             const responses = await Promise.all(reservations.map(reservationData =>
-                fetch('http://34.196.144.197:8080/api/Reservations', {
+                fetch('http://elixiumapi.retocsv.es//api/Reservations', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',

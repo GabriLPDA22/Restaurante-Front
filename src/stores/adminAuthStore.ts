@@ -15,7 +15,7 @@ interface LoginResponse {
 }
 
 // Definimos la URL base - ajusta esto según tu backend
-const API_URL = 'http://34.196.144.197:8080/api';
+const API_URL = 'http://elixiumapi.retocsv.es//api';
 
 export const adminAuthStore = defineStore('adminAuth', () => {
   const admin = ref(null);

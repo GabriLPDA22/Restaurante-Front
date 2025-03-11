@@ -248,7 +248,7 @@ watch(() => products.value.length, (newLength) => {
 
 const fetchProducts = async () => {
   try {
-    const response = await fetch('http://34.196.144.197:8080/api/Productos', {
+    const response = await fetch('http://elixiumapi.retocsv.es//api/Productos', {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
