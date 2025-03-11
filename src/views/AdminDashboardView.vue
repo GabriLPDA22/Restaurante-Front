@@ -16,12 +16,14 @@
                 </button>
             </div>
         </div>
-
         <nav class="dashboard-nav">
             <button v-for="section in sections" :key="section" @click="activeSection = section"
                 :class="{ active: activeSection === section }">
                 {{ section }}
             </button>
+            <v-btn @click="incrementErrorCounterManually" color="warning">
+        Contador de Errores: {{ errorCounter }}
+    </v-btn>
         </nav>
 
         <div class="dashboard-content">
@@ -300,6 +302,9 @@ export default defineComponent({
         const reservations = ref([]);
         const users = ref([]);
         const items = ref([]);
+        
+        // Contador de errores
+        const errorCounter = ref(0);
 
         // Estado del modal
         const showModal = ref(false);
@@ -311,6 +316,35 @@ export default defineComponent({
         const showConfirmDelete = ref(false);
         const deleteItemId = ref(null);
         const deleteItemSection = ref('');
+
+        // Función para obtener el valor actual del contador de errores
+        const fetchErrorCounter = async () => {
+            try {
+                const response = await api.get('/ErrorCounter');
+                errorCounter.value = response.data;
+                console.log("Valor del contador de errores:", errorCounter.value);
+            } catch (error) {
+                console.error("Error obteniendo el contador de errores:", error);
+            }
+        };
+
+        // Función para incrementar el contador de errores manualmente (para el botón)
+        const incrementErrorCounterManually = async () => {
+            try {
+                // Incrementar valor local
+                errorCounter.value++;
+                console.log("Incrementando contador de errores manualmente a:", errorCounter.value);
+                
+                // Actualizar en el servidor
+                await api.put('/ErrorCounter', errorCounter.value);
+            
+            } catch (error) {
+                console.error("Error incrementando el contador de errores:", error);
+                
+                // Revertir incremento local si hay error
+                errorCounter.value--;
+            }
+        };
 
         // Función para formatear items de manera limpia
         const formatItemsMinimal = (items) => {
@@ -692,6 +726,14 @@ export default defineComponent({
             } catch (error) {
                 console.error("Error guardando datos:", error);
 
+                // Incrementar contador de errores
+                try {
+                    errorCounter.value++;
+                    await api.put('/ErrorCounter', errorCounter.value);
+                } catch (counterError) {
+                    console.error("Error incrementando contador:", counterError);
+                }
+
                 // Log detallado para depurar problemas
                 if (error.request) {
                     console.error("Request:", error.request);
@@ -764,6 +806,14 @@ export default defineComponent({
             } catch (error) {
                 console.error("Error eliminando:", error);
 
+                // Incrementar contador de errores
+                try {
+                    errorCounter.value++;
+                    await api.put('/ErrorCounter', errorCounter.value);
+                } catch (counterError) {
+                    console.error("Error incrementando contador:", counterError);
+                }
+
                 // Log detallado para depurar problemas
                 if (error.request) {
                     console.error("Request:", error.request);
@@ -824,6 +874,15 @@ export default defineComponent({
                 }
             } catch (error) {
                 console.error(`Error cargando ${section}:`, error);
+                
+                // Incrementar contador de errores
+                try {
+                    errorCounter.value++;
+                    await api.put('/ErrorCounter', errorCounter.value);
+                } catch (counterError) {
+                    console.error("Error incrementando contador:", counterError);
+                }
+                
                 if (error.response) {
                     console.error("Detalles del error:", error.response);
                 }
@@ -856,6 +915,9 @@ export default defineComponent({
             );
 
             try {
+                // Cargar el valor del contador de errores
+                await fetchErrorCounter();
+                
                 // Cargar datos de todas las secciones
                 for (const section of sections) {
                     await fetchData(section);
@@ -873,6 +935,7 @@ export default defineComponent({
             reservations,
             users,
             items,
+            errorCounter,
             showModal,
             modalType,
             modalSection,
@@ -892,9 +955,11 @@ export default defineComponent({
             formatItemsMinimal,
             parseItemsForEdit,
             addNewItem,
-            removeItem
+            removeItem,
+            incrementErrorCounterManually
         };
     }
+    
 });
 </script>
 
