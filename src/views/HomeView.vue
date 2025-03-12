@@ -4,7 +4,12 @@ import MenuCard from "@/components/MenuCard.vue";
 import ChefRecommendation from "@/components/ChefRecommendation.vue";
 
 const router = useRouter();
-
+const menuItems = [
+  { title: "Appetizers", image: "/src/assets/products/3_Aperitivo_pane-3-bastoni.jpg", mappedCategory: "Aperitivos" },
+  { title: "Main Courses", image: "/src/assets/products/2_Main_lomo-cosenza.jpg", mappedCategory: "Plato Principal" },
+  { title: "Pasta", image: "/src/assets/products/1_Pasta_Ripiena_Mezzaluna.jpg", mappedCategory: "Pasta" },
+  { title: "Dessert", image: "/src/assets/products/4_Dessert_di-carote.jpg", mappedCategory: "Postre" },
+];
 const chefSpecial = {
   title: "Risotto ai Funghi",
   description:
@@ -15,8 +20,8 @@ const chefSpecial = {
 
 const navigateToCategory = (title: string, mappedCategory: string) => {
   router.push({
-    path: '/cart', 
-    query: { selectedCategory: mappedCategory }  
+    path: '/cart',
+    query: { selectedCategory: mappedCategory }
   });
 
   window.scrollTo(0, 0);
@@ -57,8 +62,8 @@ const navigateToCategory = (title: string, mappedCategory: string) => {
 
     <!-- Recomendación del Chef -->
     <div id="chef-special">
-    <ChefRecommendation :title="chefSpecial.title" :description="chefSpecial.description" :price="chefSpecial.price"
-      :image="chefSpecial.image" />
+      <ChefRecommendation :title="chefSpecial.title" :description="chefSpecial.description" :price="chefSpecial.price"
+        :image="chefSpecial.image" />
     </div>
   </main>
 </template>
