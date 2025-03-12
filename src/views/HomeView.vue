@@ -15,7 +15,7 @@ const chefSpecial = {
   description:
     "Creamy Arborio rice infused with a medley of wild mushrooms, Parmesan cheese, and a hint of truffle oil. This exquisite dish promises a symphony of flavors, meticulously crafted to elevate your dining experience. Immerse yourself in the taste of Italy, one delightful spoonful at a time.",
   price: "$24",
-  image: "/src/assets/chef-special.png",
+  image: "/chef-special.png",
 };
 
 const navigateToCategory = (title: string, mappedCategory: string) => {
@@ -82,7 +82,7 @@ $color-gold-hover: #af8c3a;
 
   .home-view__hero {
     position: relative;
-    background: url('/src/assets/hero-background.jpg') no-repeat center center;
+    background: url('/public/hero-background.jpg') no-repeat center center;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -219,7 +219,7 @@ $color-gold-hover: #af8c3a;
 @media (min-width: 992px) {
   .home-view__hero {
     mask-image: linear-gradient(black 100%, transparent);
-    background: url('/src/assets/hero-background.jpg') no-repeat center;
+    background: url('/public/hero-background.jpg') no-repeat center;
     background-position: center top;
     background-position: center 20%;
   }

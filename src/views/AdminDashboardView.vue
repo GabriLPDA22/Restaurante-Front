@@ -278,14 +278,13 @@ export default defineComponent({
 
         // Verificar autenticación al entrar al componente (capa adicional de seguridad)
         if (!store.isAuthenticated()) {
-            console.log("Acceso no autorizado al dashboard de administración");
             router.push('/admin');
             return {};
         }
 
         // Configuración de axios
         const api = axios.create({
-            baseURL: 'http://localhost:5021/api',
+            baseURL: 'https://elixiumapi.retocsv.es/api',
             headers: {
                 'accept': '*/*',
                 'Content-Type': 'application/json'

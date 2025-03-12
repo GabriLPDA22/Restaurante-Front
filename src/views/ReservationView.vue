@@ -21,7 +21,7 @@
                     </div>
                 </div>
 
-                <InputTextGuest v-model="form.selectedTables" label="Selecciona Mesa" required />
+                <InputTextGuest v-model="form.selectedTables" label="Select Table" required />
                 <span v-if="errors.selectedTables" class="reservation__error">
                     {{ errors.selectedTables }}
                 </span>
@@ -117,7 +117,7 @@ watch(form, (newVal) => {
     padding: 2rem;
 
     @media (min-width: 768px) {
-        background: url('../assets/ordders.png') center center / cover no-repeat;
+        background: url('/public/orders.png') center center / cover no-repeat;
         padding: 0;
 
         .reservation {
