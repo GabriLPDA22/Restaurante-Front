@@ -42,7 +42,7 @@ const stopLoading = () => {
   // Pequeño retraso para una transición suave
   setTimeout(() => {
     isLoading.value = false;
-  }, 1500); // Tiempo suficiente para ver el contenido del loader
+  }, 1000); 
 };
 
 // Inicializar la aplicación
@@ -56,8 +56,7 @@ onMounted(async () => {
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
-    '/about',
-    '/'
+    '/about'
   ];
 
   // SOLO mostrar el loader inicial si estamos en una página que carga datos
@@ -65,7 +64,7 @@ onMounted(async () => {
     isLoading.value = true;
     setTimeout(() => {
       stopLoading();
-    }, 2500);
+    }, 2000);
   } else {
     // Si no estamos en una página con datos pesados, asegurarnos de que el loader está oculto
     isLoading.value = false;
@@ -78,8 +77,7 @@ router.beforeEach((to, from, next) => {
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
-    '/about',
-    '/'
+    '/about'
   ];
 
   // Activamos el loader SOLAMENTE si vamos a una ruta que está en la lista
@@ -98,14 +96,13 @@ router.afterEach((to) => {
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
-    '/about',
-    '/'
+    '/about'
   ];
 
   if (dataLoadingRoutes.some(route => to.path.includes(route))) {
     setTimeout(() => {
       stopLoading();
-    }, 1000);
+    }, 2000);
   }
 });
 </script>

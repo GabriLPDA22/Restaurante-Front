@@ -2,8 +2,8 @@
     <div class="thank-you">
         <div class="thank-you__wrapper">
             <div class="thank-you__header">
-                <h1>¡Gracias por tu pedido!</h1>
-                <p>Tu pedido ha sido confirmado correctamente</p>
+                <h1>Thank you for your order!</h1>
+                <p>Your order has been confirmed successfully</p>
             </div>
 
             <div class="thank-you__content">
@@ -17,22 +17,21 @@
 
                 <div class="thank-you__message">
                     <p v-if="orderData">
-                        <strong>{{ orderData.customerName }}</strong>, te confirmamos que hemos recibido tu pedido #{{
-                        orderData.orderNumber }}.
+                        <strong>{{ orderData.customerName }}</strong>, we confirm that we have received your order #{{ orderData.orderNumber }}.
                     </p>
-                    <p>Te enviaremos un email con los detalles a tu correo electrónico.</p>
+                    <p>We will send you an email with the details to your email address.</p>
                 </div>
 
                 <div v-if="orderData" class="thank-you__order-summary">
-                    <h2>Resumen del pedido</h2>
+                    <h2>Order Summary</h2>
 
                     <div class="order-details">
                         <div class="order-detail-row">
-                            <span>Fecha:</span>
+                            <span>Date:</span>
                             <span>{{ formatDate(orderData.date) }}</span>
                         </div>
                         <div class="order-detail-row">
-                            <span>Productos:</span>
+                            <span>Products:</span>
                             <span>{{ orderData.totalItems }}</span>
                         </div>
                         <div class="order-detail-row total">
@@ -44,15 +43,15 @@
 
                 <div class="thank-you__actions">
                     <button @click="goToOrders" class="btn-secondary">
-                        Ver mis pedidos
+                        View My Orders
                     </button>
                     <button @click="goToHome" class="btn-primary">
-                        Volver al inicio
+                        Back to Home
                     </button>
                 </div>
 
                 <div class="thank-you__redirect-message">
-                    <p>Serás redirigido automáticamente a la página principal en {{ countdown }} segundos...</p>
+                    <p>You will be automatically redirected to the home page in {{ countdown }} seconds...</p>
                 </div>
             </div>
         </div>

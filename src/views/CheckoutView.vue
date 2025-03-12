@@ -2,15 +2,15 @@
   <div class="checkout">
     <div class="checkout__wrapper">
       <div class="checkout__header">
-        <h1>Finalizar Pedido</h1>
-        <p>Confirma tu pedido y completa la información de entrega</p>
+        <h1>Complete Order</h1>
+        <p>Confirm your order and complete the delivery information</p>
       </div>
 
       <div class="checkout__content">
         <div class="checkout__summary">
           <div class="summary-header">
-            <h2>Resumen del Pedido</h2>
-            <span class="items-count">{{ totalItems }} artículos</span>
+            <h2>Order Summary</h2>
+            <span class="items-count">{{ totalItems }} items</span>
           </div>
 
           <div class="summary-items">
@@ -21,7 +21,7 @@
               <div class="summary-item__details">
                 <h3 class="summary-item__name">{{ item.nombre }}</h3>
                 <div class="summary-item__quantity">
-                  Cantidad: {{ item.cantidad || item.quantity || 1 }}
+                  Quantity: {{ item.cantidad || item.quantity || 1 }}
                 </div>
               </div>
               <div class="summary-item__price">
@@ -36,7 +36,7 @@
               <span>€{{ subtotal.toFixed(2) }}</span>
             </div>
             <div class="summary-row">
-              <span>Gastos de envío</span>
+              <span>Shipping costs</span>
               <span>€{{ deliveryCost.toFixed(2) }}</span>
             </div>
             <div class="summary-row total">
@@ -46,7 +46,7 @@
           </div>
         </div>
 
-        <!-- Mensaje de autenticación si no está logueado -->
+        <!-- Authentication message if not logged in -->
         <div v-if="!isAuthenticated" class="checkout__auth-required">
           <div class="auth-message">
             <div class="auth-icon">
@@ -56,118 +56,118 @@
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
             </div>
-            <h2>Iniciar sesión requerido</h2>
-            <p>Para finalizar tu pedido, necesitas iniciar sesión o registrarte en nuestra plataforma.</p>
+            <h2>Login required</h2>
+            <p>To complete your order, you need to log in or register on our platform.</p>
             <div class="auth-benefits">
               <div class="benefit-item">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span>Seguimiento de tus pedidos</span>
+                <span>Track your orders</span>
               </div>
               <div class="benefit-item">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span>Historial de compras</span>
+                <span>Purchase history</span>
               </div>
               <div class="benefit-item">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span>Direcciones guardadas</span>
+                <span>Saved addresses</span>
               </div>
             </div>
             <div class="auth-actions">
-              <button class="btn-login" @click="navigateToLogin">Iniciar sesión</button>
-              <button class="btn-register" @click="navigateToRegister">Registrarse</button>
+              <button class="btn-login" @click="navigateToLogin">Log in</button>
+              <button class="btn-register" @click="navigateToRegister">Register</button>
             </div>
           </div>
         </div>
 
-        <!-- Formulario de checkout solo si está autenticado -->
+        <!-- Checkout form only if authenticated -->
         <div v-else class="checkout__form">
-          <h2>Información de Entrega</h2>
+          <h2>Delivery Information</h2>
 
           <form @submit.prevent="procesarPedido" class="delivery-form">
             <div class="form-group">
-              <label for="name">Nombre completo</label>
+              <label for="name">Full name</label>
               <input 
                 type="text" 
                 id="name" 
                 v-model="customerInfo.name" 
                 required 
-                placeholder="Tu nombre completo"
+                placeholder="Your full name"
               />
             </div>
 
             <div class="form-group">
-              <label for="phone">Teléfono</label>
+              <label for="phone">Phone</label>
               <input 
                 type="tel" 
                 id="phone" 
                 v-model="customerInfo.phone" 
                 required 
-                placeholder="Tu número de teléfono"
+                placeholder="Your phone number"
               />
             </div>
 
             <div class="form-group">
-              <label for="email">Correo electrónico</label>
+              <label for="email">Email</label>
               <input 
                 type="email" 
                 id="email" 
                 v-model="customerInfo.email" 
                 required 
-                placeholder="Tu correo electrónico"
+                placeholder="Your email"
               />
             </div>
 
             <div class="form-group">
-              <label for="address">Dirección de entrega</label>
+              <label for="address">Delivery address</label>
               <input 
                 type="text" 
                 id="address" 
                 v-model="customerInfo.address" 
                 required 
-                placeholder="Tu dirección completa"
+                placeholder="Your complete address"
               />
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label for="postalcode">Código postal</label>
+                <label for="postalcode">Postal code</label>
                 <input 
                   type="text" 
                   id="postalcode" 
                   v-model="customerInfo.postalCode" 
                   required 
-                  placeholder="Código postal"
+                  placeholder="Postal code"
                 />
               </div>
               <div class="form-group">
-                <label for="city">Ciudad</label>
+                <label for="city">City</label>
                 <input 
                   type="text" 
                   id="city" 
                   v-model="customerInfo.city" 
                   required 
-                  placeholder="Ciudad"
+                  placeholder="City"
                 />
               </div>
             </div>
 
             <div class="form-group">
-              <label for="notes">Notas adicionales (opcional)</label>
+              <label for="notes">Additional notes (optional)</label>
               <textarea 
                 id="notes"
                 v-model="customerInfo.notes" 
-                placeholder="Instrucciones especiales para la entrega"
+                placeholder="Special delivery instructions"
               ></textarea>
             </div>
 
             <div class="form-group payment-methods">
-              <label>Método de pago</label>
+              <label>Payment method</label>
               <div class="payment-options">
                 <div 
                   class="payment-option"
@@ -180,7 +180,7 @@
                       <line x1="1" y1="10" x2="23" y2="10"></line>
                     </svg>
                   </div>
-                  <div class="payment-label">Tarjeta de crédito</div>
+                  <div class="payment-label">Credit card</div>
                 </div>
                 <div 
                   class="payment-option"
@@ -209,21 +209,21 @@
                       <path d="M6 12h.01M18 12h.01"></path>
                     </svg>
                   </div>
-                  <div class="payment-label">Efectivo al entregar</div>
+                  <div class="payment-label">Cash on delivery</div>
                 </div>
               </div>
             </div>
 
             <div class="checkout-actions">
               <button type="button" class="btn-secondary" @click="volverAlMenu">
-                Volver al Menú
+                Back to Menu
               </button>
               <button 
                 type="submit" 
                 class="btn-primary" 
                 :disabled="submitting"
               >
-                {{ submitting ? 'Procesando...' : 'Confirmar Pedido' }}
+                {{ submitting ? 'Processing...' : 'Confirm Order' }}
               </button>
             </div>
           </form>
