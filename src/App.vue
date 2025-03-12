@@ -77,7 +77,8 @@ router.beforeEach((to, from, next) => {
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
-    '/about'
+    '/about',
+    '/'
   ];
 
   // Activamos el loader SOLAMENTE si vamos a una ruta que está en la lista
@@ -96,7 +97,8 @@ router.afterEach((to) => {
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
-    '/about'
+    '/about',
+    '/'
   ];
 
   if (dataLoadingRoutes.some(route => to.path.includes(route))) {
