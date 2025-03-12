@@ -56,7 +56,8 @@ onMounted(async () => {
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
-    '/about'
+    '/about',
+    '/'
   ];
 
   // SOLO mostrar el loader inicial si estamos en una página que carga datos
