@@ -2,7 +2,20 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5021/api';
+// Definimos tipos para TypeScript
+interface Admin {
+  id: number | string;
+  nombre: string;
+}
+
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  error?: any;
+}
+
+// Definimos la URL base - ajusta esto según tu backend
+const API_URL = 'https://elixiumapi.retocsv.es/api';
 
 export const adminAuthStore = defineStore('adminAuth', () => {
   const admin = ref(null);
