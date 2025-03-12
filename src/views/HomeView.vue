@@ -5,6 +5,13 @@ import ChefRecommendation from "@/components/ChefRecommendation.vue";
 
 const router = useRouter();
 
+const menuItems = [
+   { title: "Appetizers", image: "/3_Aperitivo_pane-3-bastoni.jpg", mappedCategory: "Aperitivos" },
+   { title: "Main Courses", image: "/2_Main_lomo-cosenza.jpg", mappedCategory: "Plato Principal" },
+   { title: "Pasta", image: "/1_Pasta_Ripiena_Mezzaluna.jpg", mappedCategory: "Pasta" },
+   { title: "Dessert", image: "/4_Dessert_di-carote.jpg", mappedCategory: "Postre" },
+ ];
+
 const chefSpecial = {
   title: "Risotto ai Funghi",
   description:

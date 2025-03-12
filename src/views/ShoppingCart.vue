@@ -253,7 +253,6 @@ watch(() => products.value.length, (newLength) => {
 });
 
 const fetchProducts = async () => {
-  try {
     const response = await fetch('https://elixiumapi.retocsv.es/api/Productos', {
       method: 'GET',
       headers: {
