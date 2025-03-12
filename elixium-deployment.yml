@@ -1,16 +1,23 @@
----
 apiVersion: v1
 kind: Service
 metadata:
   name: elixium
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:725628648316:certificate/ba72f68d-87e8-494c-8f50-1f3e6e3c13d8
+    # Only run TLS on the port named "https" below.
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
 spec:
-  type: LoadBalancer
-  ports:
-  - port: 80
-    targetPort: 80
   selector:
     app: elixium
-    tier: frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 80
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,6 +40,6 @@ spec:
     spec:
       containers:
       - name: elixium
-        image: franvilla/front:latest
+        image: franvilla/front2:latest
         ports:
         - containerPort: 80
