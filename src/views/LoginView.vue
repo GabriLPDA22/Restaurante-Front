@@ -1,7 +1,7 @@
 <template>
     <div class="auth">
         <div class="auth__container">
-            <!-- Sidebar izquierdo con animación de fondo -->
+            <!-- Left sidebar with background animation -->
             <div class="auth__sidebar">
                 <div class="auth__sidebar-bg"></div>
                 <div class="auth__brand">
@@ -9,21 +9,20 @@
                     <p class="fade-in-delay">RESTAURANT</p>
                 </div>
                 <div class="auth__info">
-                    <h2 class="slide-in-left">Bienvenido de nuevo</h2>
-                    <p class="slide-in-left-delay">Accede a tu cuenta para gestionar tus reservas y disfrutar de ofertas
-                        exclusivas</p>
+                    <h2 class="slide-in-left">Welcome back</h2>
+                    <p class="slide-in-left-delay">Access your account to manage your reservations and enjoy exclusive offers</p>
                     <div class="auth__feature-list">
                         <div class="auth__feature slide-in-bottom">
                             <span class="auth__feature-icon">✓</span>
-                            <span>Reservas prioritarias</span>
+                            <span>Priority reservations</span>
                         </div>
                         <div class="auth__feature slide-in-bottom-delay-1">
                             <span class="auth__feature-icon">✓</span>
-                            <span>Menús exclusivos</span>
+                            <span>Exclusive menus</span>
                         </div>
                         <div class="auth__feature slide-in-bottom-delay-2">
                             <span class="auth__feature-icon">✓</span>
-                            <span>Promociones especiales</span>
+                            <span>Special promotions</span>
                         </div>
                     </div>
                 </div>
@@ -33,7 +32,7 @@
                 </div>
             </div>
 
-            <!-- Formulario de login con animaciones y validaciones -->
+            <!-- Login form with animations and validations -->
             <div class="auth__form-container">
                 <div class="auth__form-wrapper fade-in-up">
                     <h2 class="auth__title">
@@ -46,7 +45,7 @@
                     <transition name="fade">
                         <div v-if="loginSuccess" class="auth__success-message">
                             <span class="auth__success-icon">✓</span>
-                            <span>¡Login exitoso! Redirigiendo...</span>
+                            <span>Login successful! Redirecting...</span>
                         </div>
                     </transition>
 
@@ -90,7 +89,7 @@
                                 class="input-group__field" placeholder="Password"
                                 @focus="passwordFocus = true; passwordError = ''" @blur="validatePassword" required />
                             <button type="button" class="input-group__toggle" @click="showPassword = !showPassword"
-                                :title="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                                :title="showPassword ? 'Hide password' : 'Show password'">
                                 <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
@@ -188,7 +187,7 @@ function validateEmail() {
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.value)) {
-        emailError.value = 'Formato de email inválido';
+        emailError.value = 'Invalid email format';
         return false;
     }
     emailError.value = '';
@@ -198,11 +197,11 @@ function validateEmail() {
 // VALIDAR PASSWORD
 function validatePassword() {
     if (!password.value) {
-        passwordError.value = 'Contraseña es requerida';
+        passwordError.value = 'Password is required';
         return false;
     }
     if (password.value.length < 6) {
-        passwordError.value = 'La contraseña debe tener al menos 6 caracteres';
+        passwordError.value = 'Password must be at least 6 characters long';
         return false;
     }
     passwordError.value = '';
@@ -228,7 +227,7 @@ async function handleLogin() {
 
         // 4. Chequeamos si success = false
         if (!response.success) {
-            errorMessage.value = response.message || 'Credenciales incorrectas.';
+            errorMessage.value = response.message || 'Incorrect credentials. Please try again.';
             return;
         }
 
@@ -250,7 +249,7 @@ async function handleLogin() {
 
     } catch (error) {
         console.error('Error en el login:', error);
-        errorMessage.value = 'Credenciales incorrectas. Por favor, inténtalo de nuevo.';
+        errorMessage.value = 'Incorrect credentials. Please try again.';
     } finally {
         isSubmitting.value = false;
     }

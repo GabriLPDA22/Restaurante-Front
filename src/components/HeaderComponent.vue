@@ -10,6 +10,7 @@
       <div class="header__logo-mobile">
         <router-link to="/" aria-label="Ir a la página de inicio">
           <div class="header__logo-animation">
+            <!-- SVG MÓVIL CON ELIXIUM FOODS EN UNA LÍNEA (SIN ANIMACIÓN EN FOODS) -->
             <svg class="header__logo-svg" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -17,11 +18,28 @@
                   <stop offset="50%" stop-color="#d1a75f" />
                   <stop offset="100%" stop-color="#9f7835" />
                 </linearGradient>
+                
+                <!-- Filtros para efectos de brillo y sombra -->
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
               </defs>
-              <text x="50%" y="50%" text-anchor="middle" class="header__logo-text-main"
-                fill="url(#goldGradient)">ELIXIUM FOODS</text>
-              <text x="50%" y="75%" text-anchor="middle" class="header__logo-text-restaurant"
-                fill="url(#goldGradient)">RESTAURANT</text>
+              
+              <!-- ELIXIUM FOODS en una línea - FOODS sin animación -->
+              <text x="50%" y="50%" text-anchor="middle" class="header__logo-text-main" 
+                fill="url(#goldGradient)" filter="url(#glow)" style="font-size: 34px;">
+                <tspan class="elixium-text">ELIXIUM FOODS</tspan>
+                <animate attributeName="fill-opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite" />
+              </text>
+              
+              <!-- RESTAURANT en línea separada -->
+              <text x="50%" y="75%" text-anchor="middle" class="header__logo-text-restaurant restaurant-text" 
+                fill="#eaeaea" style="font-size: 14px; letter-spacing: 3px;">
+                RESTAURANT
+                <animate attributeName="fill-opacity" values="0.7;1;0.7" dur="4s" repeatCount="indefinite" />
+                <animate attributeName="letter-spacing" values="2px;3px;2px" dur="3.5s" repeatCount="indefinite" />
+              </text>
             </svg>
           </div>
         </router-link>
@@ -60,7 +78,6 @@
                 </router-link>
               </div>
               <v-btn @click="handleLogout" elevation="2" class="header__logout-btn">
-                <font-awesome-icon :icon="['fas', 'sign-out-alt']" class="header__logout-icon" />
                 Cerrar Sesión
               </v-btn>
             </div>
@@ -83,7 +100,7 @@
             <li class="header__nav-item">
               <router-link to="/cart" class="header__nav-link" @click="closeMenu">
                 <div class="header__nav-icon-box">
-                  <i class="fas fa-utensils header__nav-icon"></i>
+                  🏠
                 </div>
                 <span class="header__nav-text">Menu</span>
               </router-link>
@@ -91,7 +108,7 @@
             <li class="header__nav-item">
               <a class="header__nav-link">
                 <div class="header__nav-icon-box">
-                  <i class="fas fa-glass-cheers header__nav-icon"></i>
+                  🎉
                 </div>
                 <span class="header__nav-text">Events</span>
               </a>
@@ -99,7 +116,7 @@
             <li class="header__nav-item">
               <router-link to="/about" class="header__nav-link" @click="closeMenu">
                 <div class="header__nav-icon-box">
-                  <i class="fas fa-info-circle header__nav-icon"></i>
+                  🤝
                 </div>
                 <span class="header__nav-text">About Us</span>
               </router-link>
@@ -107,7 +124,7 @@
             <li class="header__nav-item">
               <router-link to="/reservation" class="header__nav-link" @click="closeMenu">
                 <div class="header__nav-icon-box">
-                  <i class="far fa-calendar-alt header__nav-icon"></i>
+                  📋
                 </div>
                 <span class="header__nav-text">Reservation</span>
               </router-link>
@@ -115,7 +132,7 @@
             <li class="header__nav-item">
               <router-link to="/contact" class="header__nav-link" @click="closeMenu">
                 <div class="header__nav-icon-box">
-                  <i class="fas fa-phone-alt header__nav-icon"></i>
+                  📩
                 </div>
                 <span class="header__nav-text">Contact Us</span>
               </router-link>
@@ -171,7 +188,6 @@
                     </router-link>
                   </div>
                   <v-btn @click="handleLogout" elevation="2" class="header__logout-btn">
-                    <font-awesome-icon :icon="['fas', 'sign-out-alt']" class="header__logout-icon" />
                     Cerrar Sesión
                   </v-btn>
                 </div>
@@ -208,18 +224,46 @@
         <div class="header__logo header__logo--desktop">
           <router-link to="/" aria-label="Ir a la página de inicio">
             <div class="header__logo-animation">
-              <svg class="header__logo-svg-desktop" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+              <!-- SVG DESKTOP CON ELIXIUM FOODS EN UNA LÍNEA (SIN ANIMACIÓN EN FOODS) -->
+              <svg class="header__logo-svg-desktop" viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <linearGradient id="goldGradientDesktop" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#f3cc74" />
                     <stop offset="50%" stop-color="#d1a75f" />
                     <stop offset="100%" stop-color="#9f7835" />
                   </linearGradient>
+                  
+                  <!-- Filtros avanzados para versión desktop -->
+                  <filter id="glowDesktop" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                  
+                  <!-- Animación de desplazamiento de gradiente -->
+                  <linearGradient id="movingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#f3cc74" />
+                    <stop offset="45%" stop-color="#d1a75f" />
+                    <stop offset="55%" stop-color="#f3cc74" />
+                    <stop offset="100%" stop-color="#9f7835" />
+                    <animate attributeName="x1" values="0%;100%;0%" dur="4s" repeatCount="indefinite" />
+                    <animate attributeName="x2" values="100%;200%;100%" dur="4s" repeatCount="indefinite" />
+                  </linearGradient>
                 </defs>
-                <text x="50%" y="50%" text-anchor="middle" class="header__logo-desktop-text-main"
-                  fill="url(#goldGradientDesktop)">ELIXIUM FOODS</text>
-                <text x="50%" y="75%" text-anchor="middle" class="header__logo-desktop-text-restaurant"
-                  fill="url(#goldGradientDesktop)">RESTAURANT</text>
+                
+                <!-- ELIXIUM FOODS en una línea - FOODS sin animación -->
+                <text x="50%" y="60%" text-anchor="middle" class="header__logo-desktop-text-main" 
+                  fill="url(#movingGradient)" filter="url(#glowDesktop)" style="font-size: 50px;">
+                  <tspan class="elixium-text">ELIXIUM FOODS</tspan>
+                  <animate attributeName="text-shadow" values="0 0 5px #f3cc74;0 0 15px #d1a75f;0 0 5px #f3cc74" 
+                    dur="3s" repeatCount="indefinite" />
+                </text>
+                
+                <!-- RESTAURANT en línea separada -->
+                <text x="50%" y="85%" text-anchor="middle" class="header__logo-desktop-text-restaurant restaurant-text" 
+                  fill="#eaeaea" style="font-size: 18px; letter-spacing: 5px;">
+                  RESTAURANT
+                  <animate attributeName="fill" values="#eaeaea;#ffffff;#eaeaea" dur="4s" repeatCount="indefinite" />
+                </text>
               </svg>
             </div>
           </router-link>
@@ -426,6 +470,7 @@ const handleLogout = () => {
   text-align: center;
   position: relative;
   z-index: 110;
+  padding: 0.5rem 0; 
 }
 
 .header__logo-animation {
@@ -437,14 +482,88 @@ const handleLogout = () => {
 }
 
 .header__logo-svg {
-  width: 150px;
+  width: 180px; /* Aumentado de 150px */
   height: auto;
   overflow: visible;
+  margin: 0 auto;
 }
+
+/* ANIMACIONES SVG - NUEVAS CLASES */
+@keyframes shimmer {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(209, 167, 95, 0.3)); }
+  50% { filter: drop-shadow(0 0 8px rgba(209, 167, 95, 0.8)); }
+}
+
+@keyframes letter-spacing-anim {
+  0%, 100% { letter-spacing: 2px; }
+  50% { letter-spacing: 4px; }
+}
+
+@keyframes rotation {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1deg); }
+  75% { transform: rotate(-1deg); }
+}
+
+@keyframes gradient-move {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(209, 167, 95, 0.7)); }
+  50% { filter: drop-shadow(0 0 15px rgba(209, 167, 95, 1)); }
+}
+
+.elixium-text {
+  animation: shimmer 3s infinite;
+}
+
+.restaurant-text {
+  animation: letter-spacing-anim 4s infinite;
+}
+
+.letter {
+  display: inline-block;
+  opacity: 0.7;
+  animation: float 3s ease-in-out infinite;
+  
+  &:nth-child(1) { animation-delay: 0.0s; }
+  &:nth-child(2) { animation-delay: 0.1s; }
+  &:nth-child(3) { animation-delay: 0.2s; }
+  &:nth-child(4) { animation-delay: 0.3s; }
+  &:nth-child(5) { animation-delay: 0.4s; }
+  &:nth-child(6) { animation-delay: 0.5s; }
+  &:nth-child(7) { animation-delay: 0.6s; }
+  &:nth-child(8) { animation-delay: 0.7s; }
+  &:nth-child(9) { animation-delay: 0.8s; }
+  &:nth-child(10) { animation-delay: 0.9s; }
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #f3cc74, #d1a75f, #9f7835, #d1a75f);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-move 4s ease infinite;
+}
+
+/* FIN DE ANIMACIONES SVG */
 
 .header__logo-text-main {
   font-family: 'Playfair Display', serif;
-  font-size: 28px;
+  font-size: 34px; /* Aumentado de 28px */
   font-weight: 700;
   fill: url(#goldGradient);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -453,10 +572,10 @@ const handleLogout = () => {
 
 .header__logo-text-restaurant {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: 14px; /* Aumentado de 10px */
   font-weight: 400;
   fill: #eaeaea;
-  letter-spacing: 2px;
+  letter-spacing: 3px; /* Aumentado de 2px */
   transition: fill 0.3s ease;
 }
 
@@ -464,6 +583,12 @@ const handleLogout = () => {
   fill: #f3cc74;
   filter: drop-shadow(0 0 5px rgba(209, 167, 95, 0.6));
 }
+
+.header__logo-animation:hover .elixium-text {
+  animation: glowPulse 1.5s infinite;
+}
+
+/* Se eliminó el hover en foods-text */
 
 .header__logo-animation:hover .header__logo-text-restaurant {
   fill: #ffffff;
@@ -1058,18 +1183,22 @@ const handleLogout = () => {
 
 .header__logo--desktop {
   position: relative;
-  width: 300px;
+  width: 350px; /* Aumentado de 300px */
+  margin: 0 auto; /* Centrar horizontalmente */
+  display: flex;
+  justify-content: center;
 }
 
 .header__logo-svg-desktop {
-  width: 305px;
+  width: 350px; /* Aumentado de 305px */
   height: auto;
   overflow: visible;
+  margin: 0 auto;
 }
 
 .header__logo-desktop-text-main {
   font-family: 'Playfair Display', serif;
-  font-size: 42px;
+  font-size: 60px; /* Aumentado de 42px */
   font-weight: 700;
   fill: url(#goldGradientDesktop);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -1078,10 +1207,10 @@ const handleLogout = () => {
 
 .header__logo-desktop-text-restaurant {
   font-family: 'Poppins', sans-serif;
-  font-size: 14px;
+  font-size: 18px; /* Aumentado de 14px */
   font-weight: 400;
   fill: #eaeaea;
-  letter-spacing: 3px;
+  letter-spacing: 5px; /* Aumentado de 3px */
   transition: fill 0.3s ease;
 }
 
@@ -1136,6 +1265,28 @@ const handleLogout = () => {
   .header__user-dropdown--desktop .header__dropdown-menu {
     right: 0;
     top: 45px;
+  }
+}
+
+/* Ajuste para pantallas más grandes */
+@media (min-width: 1200px) {
+  .header__logo-svg-desktop {
+    width: 300px; /* Aún más grande en pantallas muy grandes */
+  }
+  
+  .header__logo-desktop-text-main {
+    font-size: 65px; /* Más grande en pantallas muy grandes */
+  }
+  
+  .header__logo-desktop-text-restaurant {
+    font-size: 20px; /* Más grande en pantallas muy grandes */
+  }
+}
+
+/* Ajuste para pantallas más pequeñas */
+@media (max-width: 400px) {
+  .header__logo-svg {
+    width: 160px; 
   }
 }
 </style>

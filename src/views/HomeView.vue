@@ -5,14 +5,6 @@ import ChefRecommendation from "@/components/ChefRecommendation.vue";
 
 const router = useRouter();
 
-// Categorías actualizadas basadas en las imágenes proporcionadas
-const menuItems = [
-  { title: "Appetizers", image: "/public/products/3_Aperitivo_pane-3-bastoni.jpg", mappedCategory: "Aperitivos" },
-  { title: "Main Courses", image: "/public/products/2_Main_lomo-cosenza.jpg", mappedCategory: "Plato Principal" },
-  { title: "Pasta", image: "/public/products/1_Pasta_Ripiena_Mezzaluna.jpg", mappedCategory: "Pasta" },
-  { title: "Dessert", image: "/public/products/4_Dessert_di-carote.jpg", mappedCategory: "Postre" },
-];
-
 const chefSpecial = {
   title: "Risotto ai Funghi",
   description:
@@ -22,10 +14,9 @@ const chefSpecial = {
 };
 
 const navigateToCategory = (title: string, mappedCategory: string) => {
-  // Navegamos directamente a la página de carrito con la categoría exacta de la base de datos
   router.push({
-    path: '/cart', // Asegúrate de que esta ruta coincida con tu configuración
-    query: { selectedCategory: mappedCategory }  // Enviamos la categoría española exacta de la BBDD
+    path: '/cart', 
+    query: { selectedCategory: mappedCategory }  
   });
 
   window.scrollTo(0, 0);

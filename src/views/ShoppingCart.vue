@@ -3,7 +3,7 @@
     <header class="restaurant-app__header">
       <div class="header-content">
         <h1 class="header-content__title">Buon Appetito!</h1>
-        <p class="header-content__subtitle">Experiencia gastronómica excepcional</p>
+        <p class="header-content__subtitle">Exceptional Gastronomic Experience</p>
 
         <div class="search-container">
           <input type="text" placeholder="Buscar platos..." v-model="searchQuery" class="search-container__input" />
@@ -43,13 +43,19 @@
       </div>
     </main>
 
+    <!-- Redesigned Cart Float Button -->
     <div class="cart-float-button" @click="toggleCart">
       <div class="cart-icon">
-        <span class="cart-icon-emoji">🛒</span>
-        <span v-if="cart.length" class="cart-count">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon__svg">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span v-if="totalCartItems > 0" class="cart-count">
           {{ totalCartItems }}
         </span>
       </div>
+      <span v-if="totalCartItems > 0" class="cart-float-total">€{{ calculateTotal().toFixed(2) }}</span>
     </div>
 
     <div v-if="cart.length" v-show="cartVisible" class="small-cart-preview">
@@ -261,59 +267,7 @@ const fetchProducts = async () => {
 
     products.value = await response.json();
     console.log("Products loaded:", products.value.length);
-
-    // No es necesario llamar a checkCategoryFromQuery aquí porque la observación de products.value.length lo hará
-  } catch (err) {
-    console.error('Error fetching products:', err);
-    // Cargar datos de ejemplo si la API falla
-    products.value = [
-      {
-        id: 1,
-        nombre: 'Pizza Margherita',
-        descripcion: 'Tomate, mozzarella, albahaca',
-        precio: 10.50,
-        categorias: ['Pizzas', 'Vegetariano'],
-        imagenUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
-      },
-      {
-        id: 2,
-        nombre: 'Pasta Carbonara',
-        descripcion: 'Espaguetis, huevo, panceta, queso',
-        precio: 12.75,
-        categorias: ['Pasta'],
-        imagenUrl: 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
-      },
-      {
-        id: 3,
-        nombre: 'Tiramisú',
-        descripcion: 'Postre italiano con café y mascarpone',
-        precio: 6.50,
-        categorias: ['Postre'],
-        imagenUrl: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
-      },
-      {
-        id: 4,
-        nombre: 'Ensalada César',
-        descripcion: 'Lechuga, pollo, picatostes, parmesano',
-        precio: 8.95,
-        categorias: ['Plato Principal'],
-        imagenUrl: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
-      },
-      {
-        id: 5,
-        nombre: 'Antipasto Mixto',
-        descripcion: 'Selección de embutidos, quesos y encurtidos',
-        precio: 14.50,
-        categorias: ['Aperitivos'],
-        imagenUrl: 'https://images.unsplash.com/photo-1625944525533-473f1a3d51e0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80'
-      }
-    ];
-    console.log("Loaded fallback products:", products.value.length);
-
-    // No es necesario llamar a checkCategoryFromQuery aquí porque la observación de products.value.length lo hará
-  }
-}
-
+  } 
 // Función para verificar y aplicar la categoría desde la URL después de cargar productos
 const checkCategoryFromQuery = () => {
   const categoryParam = route.query.category;
@@ -413,8 +367,14 @@ const addToCart = (product: Product) => {
 
   saveCart();
 
-  // Mostrar el carrito automáticamente al añadir un producto
   cartVisible.value = true;
+  const cartButton = document.querySelector('.cart-float-button');
+  if (cartButton) {
+    cartButton.classList.add('cart-float-button--pulse');
+    setTimeout(() => {
+      cartButton.classList.remove('cart-float-button--pulse');
+    }, 1000);
+  }
 }
 
 const removeFromCart = (productId: number) => {
@@ -445,6 +405,7 @@ const calculateTotal = () => {
 const toggleCart = () => {
   cartVisible.value = !cartVisible.value;
 }
+
 
 const irAlCheckout = () => {
   saveCart();
@@ -513,9 +474,13 @@ const irAlCheckout = () => {
     width: 100%;
     padding: 0.75rem 1.25rem;
     border: none;
+    color: white;
     border-radius: 50px;
-    background: var(--white);
+    background: rgb(255 , 255 , 255, 0.4);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  &__input::placeholder {
+    color: white;
   }
 }
 
@@ -527,13 +492,13 @@ const irAlCheckout = () => {
   color: white;
 
   &__button {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.4);
     color: var(--white);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 20px;
     cursor: pointer;
-    opacity: 0.7;
+    opacity: 0.9;
 
     &--active {
       background-color: var(--white);
@@ -610,28 +575,51 @@ const irAlCheckout = () => {
   }
 }
 
+/* Redesigned Cart Float Button */
 .cart-float-button {
   position: fixed;
   bottom: 20px;
   right: 20px;
   background-color: var(--primary-color);
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
   display: flex;
-  justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 12px 20px;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   z-index: 1000;
+  transition: all 0.3s ease;
+  color: white;
+  min-width: 60px;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    background-color: #2B7A78;
+  }
+  
+  &--pulse {
+    animation: pulse 1s 1;
+  }
 }
 
 .cart-icon {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &__svg {
+    color: white;
+    stroke-width: 2px;
+  }
 }
 
-.cart-icon-emoji {
-  font-size: 1.5rem;
+.cart-float-total {
+  margin-left: 15px;
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
 }
 
 .cart-count {
@@ -650,20 +638,31 @@ const irAlCheckout = () => {
   font-weight: bold;
 }
 
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .small-cart-preview {
   position: fixed;
-  bottom: 20px;
+  bottom: 90px; 
   right: 20px;
-  width: 300px;
-  z-index: 8888;
+  max-width: 500px;
+  z-index: 999; 
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
   animation: slideUp 0.3s ease-out;
   display: flex;
   flex-direction: column;
-  max-height: 80vh;
+  max-height: calc(80vh - 90px); 
 
   &__header {
     display: flex;
@@ -711,6 +710,7 @@ const irAlCheckout = () => {
       margin-bottom: 0.75rem;
       padding-bottom: 0.75rem;
       border-bottom: 1px solid #eee;
+      gap:10px;
 
       &:last-child {
         margin-bottom: 0;
@@ -737,7 +737,7 @@ const irAlCheckout = () => {
         transition: background-color 0.2s;
 
         &:hover {
-          background-color: color #2B7A78;
+          background-color: #2B7A78;
         }
       }
     }
@@ -780,18 +780,17 @@ const irAlCheckout = () => {
     display: flex;
     justify-content: space-between;
     font-weight: bold;
-    padding: 0.75rem 0;
+    padding: 0.75rem;
     font-size: 1.1rem;
     color: var(--text-dark);
   }
 
   &__checkout {
-    width: 100%;
     border: none;
     background: var(--primary-color);
     padding: 0.85rem;
     border-radius: 8px;
-    margin-top: 0.5rem;
+    margin:10px;
     cursor: pointer;
     transition: all 0.2s;
     font-weight: bold;
@@ -800,7 +799,7 @@ const irAlCheckout = () => {
     color: white;
 
     &:hover {
-      background-color: color #2B7A78;
+      background-color: #2B7A78;
       transform: translateY(-1px);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
     }
@@ -848,9 +847,19 @@ const irAlCheckout = () => {
   .small-cart-preview {
     width: calc(100% - 2rem);
     margin: 0 1rem;
+    bottom: 80px; 
 
     &__content {
-      max-height: 40vh;
+      max-height: 35vh; 
+    }
+  }
+  
+  .cart-float-button {
+    width: calc(100% - 40px);
+    justify-content: space-between;
+    
+    .cart-float-total {
+      font-size: 1.1rem;
     }
   }
 

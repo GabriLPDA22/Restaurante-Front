@@ -4,8 +4,8 @@
             Get In <span class="contact-header__highlight">Touch</span>
         </h1>
         <p class="contact-header__description">
-            Enim tempor eget pharetra facilisis sed maecenas adipiscing. Eu leo molestie vel, ornare non id blandit
-            netus.
+            Do you have any questions or need assistance? 
+            We are here to help and ensure your best experience with our authentic Italian cuisine.
         </p>
     </div>
 </template>

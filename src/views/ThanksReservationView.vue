@@ -1,7 +1,7 @@
 <template>
     <div class="thank-you">
         <div class="thank-you__container">
-            <h1 class="thank-you__title">¡Gracias por tu reserva!</h1>
+            <h1 class="thank-you__title">Thank you for your reservation!</h1>
 
             <div class="thank-you__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="none"
@@ -12,21 +12,21 @@
             </div>
 
             <div class="thank-you__message">
-                <p>Tu reserva ha sido confirmada correctamente.</p>
+                <p>Your reservation has been confirmed successfully.</p>
                 <p v-if="reservationData">
-                    <strong>{{ reservationData.customerName }}</strong>, te esperamos el día
-                    <strong>{{ formatDate(reservationData.date) }}</strong> a las
-                    <strong>{{ reservationData.time }}</strong> en
+                    <strong>{{ reservationData.customerName }}</strong>, we look forward to seeing you on
+                    <strong>{{ formatDate(reservationData.date) }}</strong> at
+                    <strong>{{ reservationData.time }}</strong> at
                     <strong>{{ getTableText(reservationData.tables) }}</strong>.
                 </p>
             </div>
 
             <div class="thank-you__actions">
-                <button @click="goToHome" class="thank-you__button">Volver al inicio</button>
+                <button @click="goToHome" class="thank-you__button">Go back to home</button>
             </div>
 
             <div class="thank-you__redirect-message">
-                <p>Serás redirigido automáticamente a la página principal en {{ countdown }} segundos...</p>
+                <p>You will be automatically redirected to the home page in {{ countdown }} seconds...</p>
             </div>
         </div>
     </div>

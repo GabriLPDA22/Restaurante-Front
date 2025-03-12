@@ -1,7 +1,7 @@
 <template>
     <div class="auth">
         <div class="auth__container">
-            <!-- Sidebar izquierdo con animación de fondo -->
+            <!-- Left sidebar with background animation -->
             <div class="auth__sidebar">
                 <div class="auth__sidebar-bg"></div>
                 <div class="auth__brand">
@@ -9,21 +9,20 @@
                     <p class="fade-in-delay">RESTAURANT</p>
                 </div>
                 <div class="auth__info">
-                    <h2 class="slide-in-left">Únete a nosotros</h2>
-                    <p class="slide-in-left-delay">Crea una cuenta para acceder a reservas prioritarias y ofertas
-                        exclusivas</p>
+                    <h2 class="slide-in-left">Join us</h2>
+                    <p class="slide-in-left-delay">Create an account to access priority reservations and exclusive offers</p>
                     <div class="auth__feature-list">
                         <div class="auth__feature slide-in-bottom">
                             <span class="auth__feature-icon">✓</span>
-                            <span>Reservas prioritarias</span>
+                            <span>Priority reservations</span>
                         </div>
                         <div class="auth__feature slide-in-bottom-delay-1">
                             <span class="auth__feature-icon">✓</span>
-                            <span>Descuentos exclusivos</span>
+                            <span>Exclusive discounts</span>
                         </div>
                         <div class="auth__feature slide-in-bottom-delay-2">
                             <span class="auth__feature-icon">✓</span>
-                            <span>Eventos especiales</span>
+                            <span>Special events</span>
                         </div>
                     </div>
                 </div>
@@ -33,7 +32,7 @@
                 </div>
             </div>
 
-            <!-- Formulario de registro con animaciones y validaciones -->
+            <!-- Registration form with animations and validations -->
             <div class="auth__form-container">
                 <div class="auth__form-wrapper fade-in-up">
                     <h2 class="auth__title">Register <span class="auth__icon">🧑‍💻</span></h2>
@@ -41,15 +40,15 @@
 
                     <h3 class="auth__heading">Enter Your Details</h3>
 
-                    <!-- Mensaje de éxito -->
+                    <!-- Success message -->
                     <transition name="fade">
                         <div v-if="registerSuccess" class="auth__success-message">
                             <span class="auth__success-icon">✓</span>
-                            <span>¡Registro exitoso! Redirigiendo al login...</span>
+                            <span>Registration successful! Redirecting to login...</span>
                         </div>
                     </transition>
 
-                    <!-- Mensaje de error (ahora con fondo rojo claro) -->
+                    <!-- Error message (now with light red background) -->
                     <transition name="fade">
                         <div v-if="errorMessage" class="auth__error-message">
                             <span class="auth__error-icon">!</span>
@@ -58,7 +57,7 @@
                     </transition>
 
                     <form @submit.prevent="handleSubmit" class="auth__form">
-                        <!-- Nombre -->
+                        <!-- Name -->
                         <div class="input-group" :class="{ 'input-group--error': nombreError }">
                             <div class="input-group__field-wrapper">
                                 <label for="nombre" class="input-group__label">
@@ -116,7 +115,7 @@
                                     @focus="passwordFocus = true; passwordError = ''" @blur="validatePassword"
                                     @input="updatePasswordStrength" required />
                                 <button type="button" class="input-group__toggle" @click="showPassword = !showPassword"
-                                    :title="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                                    :title="showPassword ? 'Hide password' : 'Show password'">
                                     <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round">
@@ -138,15 +137,15 @@
                             </transition>
                         </div>
 
-                        <!-- Barra de fortaleza de contraseña -->
+                        <!-- Password strength bar -->
                         <div class="auth__password-strength" v-if="form.password">
                             <span>Password strength:</span>
                             <span class="auth__strength-meter">
-                                <!-- La barra avanza con width: passwordStrength + '%' -->
+                                <!-- The bar advances with width: passwordStrength + '%' -->
                                 <span class="auth__strength-bar" :style="{ width: passwordStrength + '%' }"
                                     :class="passwordStrengthClass"></span>
                             </span>
-                            <!-- Texto fijo en color neutro -->
+                            <!-- Fixed text in neutral color -->
                             <span class="auth__strength-text">{{ passwordStrengthText }}</span>
                         </div>
 
@@ -168,7 +167,7 @@
                                     @blur="validateConfirmPassword" required />
                                 <button type="button" class="input-group__toggle"
                                     @click="showConfirmPassword = !showConfirmPassword"
-                                    :title="showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                                    :title="showConfirmPassword ? 'Hide password' : 'Show password'">
                                     <svg v-if="showConfirmPassword" xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round">
@@ -191,7 +190,7 @@
                             </transition>
                         </div>
 
-                        <!-- Términos -->
+                        <!-- Terms -->
                         <div class="auth__terms">
                             <label class="checkbox">
                                 <input type="checkbox" v-model="acceptTerms" @change="validateTerms">
@@ -204,7 +203,7 @@
                             </transition>
                         </div>
 
-                        <!-- Botón de registro -->
+                        <!-- Register button -->
                         <button type="submit" class="auth__button" :disabled="isSubmitting || !formValid"
                             :class="{ 'auth__button--loading': isSubmitting }">
                             <span v-if="!isSubmitting">Register</span>
@@ -220,7 +219,7 @@
             </div>
         </div>
 
-        <!-- Modal para términos y condiciones -->
+        <!-- Modal for terms and conditions -->
         <transition name="modal">
             <div v-if="showTerms" class="auth__modal">
                 <div class="auth__modal-content">
@@ -229,17 +228,17 @@
                         <button class="auth__modal-close" @click="showTerms = false">×</button>
                     </div>
                     <div class="auth__modal-body">
-                        <p>Al utilizar nuestros servicios, aceptas nuestros términos y condiciones...</p>
+                        <p>By using our services, you accept our terms and conditions...</p>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies
                             lacinia, nisl nisl aliquet nisl, eget aliquet nisl nisl eget nisl.</p>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies
                             lacinia, nisl nisl aliquet nisl, eget aliquet nisl nisl eget nisl.</p>
-                        <p>Última actualización: Marzo 2025</p>
+                        <p>Last updated: March 2025</p>
                     </div>
                     <div class="auth__modal-footer">
                         <button class="auth__button auth__button--sm"
-                            @click="acceptTerms = true; showTerms = false; validateTerms()">Aceptar</button>
-                        <button class="auth__button auth__button--outline" @click="showTerms = false">Cerrar</button>
+                            @click="acceptTerms = true; showTerms = false; validateTerms()">Accept</button>
+                        <button class="auth__button auth__button--outline" @click="showTerms = false">Close</button>
                     </div>
                 </div>
             </div>
@@ -262,7 +261,7 @@ const form = ref({
     confirmPassword: ''
 });
 
-// Estados de UI
+// UI states
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const isSubmitting = ref(false);
@@ -271,7 +270,7 @@ const showTerms = ref(false);
 const registerSuccess = ref(false);
 const errorMessage = ref('');
 
-// Estados de validación
+// Validation states
 const nombreError = ref('');
 const emailError = ref('');
 const passwordError = ref('');
@@ -283,19 +282,19 @@ const emailFocus = ref(false);
 const passwordFocus = ref(false);
 const confirmPasswordFocus = ref(false);
 
-// Fortaleza de la contraseña
+// Password strength
 const passwordStrength = ref(0);
 
 /* ========================================
-   VALIDACIONES
+   VALIDATIONS
 ======================================== */
 const validateNombre = () => {
     if (!form.value.nombre) {
-        nombreError.value = 'Nombre completo es requerido';
+        nombreError.value = 'Full name is required';
         return false;
     }
     if (form.value.nombre.length < 3) {
-        nombreError.value = 'El nombre debe tener al menos 3 caracteres';
+        nombreError.value = 'Name must be at least 3 characters';
         return false;
     }
     nombreError.value = '';
@@ -304,12 +303,12 @@ const validateNombre = () => {
 
 const validateEmail = () => {
     if (!form.value.email) {
-        emailError.value = 'Email es requerido';
+        emailError.value = 'Email is required';
         return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.value.email)) {
-        emailError.value = 'Formato de email inválido';
+        emailError.value = 'Invalid email format';
         return false;
     }
     emailError.value = '';
@@ -318,14 +317,14 @@ const validateEmail = () => {
 
 const validatePassword = () => {
     if (!form.value.password) {
-        passwordError.value = 'Contraseña es requerida';
+        passwordError.value = 'Password is required';
         return false;
     }
     if (form.value.password.length < 6) {
-        passwordError.value = 'La contraseña debe tener al menos 6 caracteres';
+        passwordError.value = 'Password must be at least 6 characters';
         return false;
     }
-    // Si ya hay confirmPassword, volvemos a validar
+    // If there's already a confirmPassword, we validate again
     if (form.value.confirmPassword) {
         validateConfirmPassword();
     }
@@ -335,11 +334,11 @@ const validatePassword = () => {
 
 const validateConfirmPassword = () => {
     if (!form.value.confirmPassword) {
-        confirmPasswordError.value = 'Confirmación de contraseña es requerida';
+        confirmPasswordError.value = 'Password confirmation is required';
         return false;
     }
     if (form.value.password !== form.value.confirmPassword) {
-        confirmPasswordError.value = 'Las contraseñas no coinciden';
+        confirmPasswordError.value = 'Passwords do not match';
         return false;
     }
     confirmPasswordError.value = '';
@@ -348,7 +347,7 @@ const validateConfirmPassword = () => {
 
 const validateTerms = () => {
     if (!acceptTerms.value) {
-        termsError.value = 'Debes aceptar los términos y condiciones';
+        termsError.value = 'You must accept the terms and conditions';
         return false;
     }
     termsError.value = '';
@@ -356,14 +355,14 @@ const validateTerms = () => {
 };
 
 /* ========================================
-   FORTALEZA DE LA CONTRASEÑA
+   PASSWORD STRENGTH
 ======================================== */
 function calculatePasswordStrength(password: string) {
     if (!password) return 0;
 
     let strength = 0;
 
-    // Longitud
+    // Length
     if (password.length >= 12) {
         strength += 30;
     } else if (password.length >= 8) {
@@ -372,19 +371,19 @@ function calculatePasswordStrength(password: string) {
         strength += 10;
     }
 
-    // Números
+    // Numbers
     if (/\d/.test(password)) {
         strength += 20;
     }
 
-    // Mayúsculas y minúsculas
+    // Upper and lowercase
     if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
         strength += 25;
     } else if (/[a-z]/.test(password) || /[A-Z]/.test(password)) {
         strength += 10;
     }
 
-    // Caracteres especiales
+    // Special characters
     if (/[^a-zA-Z0-9]/.test(password)) {
         strength += 25;
     }
@@ -405,13 +404,13 @@ const passwordStrengthClass = computed(() => {
 
 const passwordStrengthText = computed(() => {
     const val = passwordStrength.value;
-    if (val >= 80) return 'Fuerte';
-    if (val >= 50) return 'Media';
-    return 'Débil';
+    if (val >= 80) return 'Strong';
+    if (val >= 50) return 'Medium';
+    return 'Weak';
 });
 
 /* ========================================
-   COMPUTED: Form válido
+   COMPUTED: Valid form
 ======================================== */
 const formValid = computed(() => {
     return (
@@ -432,14 +431,14 @@ const formValid = computed(() => {
    SUBMIT
 ======================================== */
 const handleSubmit = async () => {
-  // 1. Validaciones de campos antes de enviar
+  // 1. Field validations before submitting
   const isNombreValid = validateNombre();
   const isEmailValid = validateEmail();
   const isPasswordValid = validatePassword();
   const isConfirmPasswordValid = validateConfirmPassword();
   const isTermsValid = validateTerms();
 
-  // Si alguna validación falla, detenemos el submit
+  // If any validation fails, we stop the submit
   if (
     !isNombreValid ||
     !isEmailValid ||
@@ -451,58 +450,58 @@ const handleSubmit = async () => {
   }
 
   try {
-    // 2. Iniciamos el proceso de envío
+    // 2. Start the submission process
     isSubmitting.value = true;
     errorMessage.value = '';
 
-    // (Opcional) Simulamos un tiempo de carga
+    // (Optional) Simulate loading time
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // 3. Llamamos a la store para registrar
+    // 3. Call the store to register
     const response = await authStore.register(
       form.value.nombre,
       form.value.email,
       form.value.password
     );
-    console.log("Respuesta en el componente:", response);
+    console.log("Response in component:", response);
 
-    // 4. Verificamos si el registro fue exitoso
+    // 4. Check if registration was successful
     if (!response || !response.success) {
-      // Chequeamos si el backend nos indica que el email ya existe
-      if (response?.message?.toLowerCase().includes("ya está registrado")) {
-        errorMessage.value = "El Email ya está registrado. Por favor, inicia sesión con tu cuenta.";
+      // Check if the backend indicates that the email already exists
+      if (response?.message?.toLowerCase().includes("already registered")) {
+        errorMessage.value = "Email is already registered. Please log in with your account.";
       } else {
         errorMessage.value =
-          response?.message || "Error al registrar. Por favor, inténtalo de nuevo.";
+          response?.message || "Error registering. Please try again.";
       }
       return;
     }
 
-    // 5. Si llegamos aquí, success = true
+    // 5. If we get here, success = true
     registerSuccess.value = true;
 
-    // 6. (Opcional) Redirigimos al login tras 2s
+    // 6. (Optional) Redirect to login after 2s
     setTimeout(() => {
       router.push("/login");
     }, 2000);
 
   } catch (error: any) {
-    // Manejo general de errores (por ejemplo, errores de red, etc.)
-    console.error("Error en el registro:", error);
-    errorMessage.value = "Error al registrar. Por favor, inténtalo de nuevo.";
+    // General error handling (e.g., network errors, etc.)
+    console.error("Error in registration:", error);
+    errorMessage.value = "Error registering. Please try again.";
   } finally {
-    // 7. Finalizamos la carga
+    // 7. End loading
     isSubmitting.value = false;
   }
 };
 
 
-/* Escuchamos cambios en la contraseña para recalcular fortaleza */
+/* Listen for changes in the password to recalculate strength */
 watch(() => form.value.password, () => {
     updatePasswordStrength();
 });
 
-/* Inicializamos la barra de fortaleza */
+/* Initialize the strength bar */
 updatePasswordStrength();
 </script>
 

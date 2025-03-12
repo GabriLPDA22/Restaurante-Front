@@ -1,7 +1,7 @@
 <template>
     <div class="auth">
         <div class="auth__container">
-            <!-- Sidebar izquierdo con animación de fondo -->
+            <!-- Left sidebar with background animation -->
             <div class="auth__sidebar">
                 <div class="auth__sidebar-bg"></div>
                 <div class="auth__brand">
@@ -9,21 +9,20 @@
                     <p class="fade-in-delay">RESTAURANT</p>
                 </div>
                 <div class="auth__info">
-                    <h2 class="slide-in-left">BIENVENIDO, ADMIN</h2>
-                    <p class="slide-in-left-delay">Tu acceso es clave para la gestión del sistema. Recuerda mantener la
-                        seguridad de tu cuenta.</p>
+                    <h2 class="slide-in-left">WELCOME, ADMIN</h2>
+                    <p class="slide-in-left-delay">Your access is key for system management. Remember to maintain the security of your account.</p>
                     <div class="auth__feature-list">
                         <div class="auth__feature slide-in-bottom" style="color: white;">
                             <span class="auth__feature-icon">✓</span>
-                            <span>🔒 No compartas tu contraseña</span>
+                            <span>🔒 Do not share your password</span>
                         </div>
                         <div class="auth__feature slide-in-bottom-delay-1" style="color: white;">
                             <span class="auth__feature-icon">✓</span>
-                            <span>🔒 Usa una conexión segura</span>
+                            <span>🔒 Use a secure connection</span>
                         </div>
                         <div class="auth__feature slide-in-bottom-delay-2" style="color: white;">
                             <span class="auth__feature-icon">✓</span>
-                            <span>🔒 Cierra sesión al finalizar</span>
+                            <span>🔒 Log out when finished</span>
                         </div>
                     </div>
                 </div>
@@ -33,7 +32,7 @@
                 </div>
             </div>
 
-            <!-- Formulario de login con animaciones y validaciones -->
+            <!-- Login form with animations and validations -->
             <div class="auth__form-container">
                 <div class="auth__form-wrapper fade-in-up">
                     <h2 class="auth__title">
@@ -46,7 +45,7 @@
                     <transition name="fade">
                         <div v-if="loginSuccess" class="auth__success-message">
                             <span class="auth__success-icon">✓</span>
-                            <span>¡Login exitoso! Redirigiendo...</span>
+                            <span>Login successful! Redirecting...</span>
                         </div>
                     </transition>
 
@@ -68,7 +67,7 @@
                                 </svg>
                             </label>
                             <input id="nombre" v-model="nombre" type="text" class="input-group__field"
-                                placeholder="Nombre de usuario" @focus="nombreError = ''" @blur="validateNombre"
+                                placeholder="Username" @focus="nombreError = ''" @blur="validateNombre"
                                 required />
                             <transition name="fade">
                                 <div v-if="nombreError" class="input-group__error">{{ nombreError }}</div>
@@ -88,7 +87,7 @@
                                 class="input-group__field" placeholder="Password" @focus="passwordError = ''"
                                 @blur="validatePassword" required />
                             <button type="button" class="input-group__toggle" @click="showPassword = !showPassword"
-                                :title="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                                :title="showPassword ? 'Hide password' : 'Show password'">
                                 <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
@@ -126,33 +125,33 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { adminAuthStore } from '@/stores/adminAuthStore';
 
-// Router para redirigir después del login
+// Router to redirect after login
 const router = useRouter();
 
-// Obtener instancia del store de autenticación
+// Get authentication store instance
 const store = adminAuthStore();
 
-// Campos de formulario
+// Form fields
 const nombre = ref<string>('');
 const password = ref<string>('');
 const showPassword = ref<boolean>(false);
 
-// Estados UI
+// UI states
 const isSubmitting = ref<boolean>(false);
 const loginSuccess = ref<boolean>(false);
 const errorMessage = ref<string>('');
 const nombreError = ref<string>('');
 const passwordError = ref<string>('');
 
-// Validaciones
+// Validations
 function validateNombre(): boolean {
     if (!nombre.value) {
-        nombreError.value = 'El nombre es requerido';
+        nombreError.value = 'Username is required';
         return false;
     }
 
     if (nombre.value.length < 3) {
-        nombreError.value = 'El nombre debe tener al menos 3 caracteres';
+        nombreError.value = 'Username must be at least 3 characters';
         return false;
     }
 
@@ -162,11 +161,11 @@ function validateNombre(): boolean {
 
 function validatePassword(): boolean {
     if (!password.value) {
-        passwordError.value = 'Contraseña es requerida';
+        passwordError.value = 'Password is required';
         return false;
     }
     if (password.value.length < 6) {
-        passwordError.value = 'La contraseña debe tener al menos 6 caracteres';
+        passwordError.value = 'Password must be at least 6 characters';
         return false;
     }
     passwordError.value = '';
@@ -176,7 +175,7 @@ function validatePassword(): boolean {
 // Login
 async function handleLogin(): Promise<void> {
     try {
-        // Validar
+        // Validate
         const validNombre = validateNombre();
         const validPassword = validatePassword();
         if (!validNombre || !validPassword) return;
@@ -184,31 +183,31 @@ async function handleLogin(): Promise<void> {
         isSubmitting.value = true;
         errorMessage.value = '';
 
-        // Simulamos carga
+        // Simulate loading
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        console.log("Intentando login con:", nombre.value);
+        console.log("Attempting login with:", nombre.value);
 
-        // Llamamos al store
+        // Call the store
         const result = await store.login(nombre.value, password.value);
-        console.log("Respuesta de login:", result);
+        console.log("Login response:", result);
 
         if (!result.success) {
             errorMessage.value = result.message;
             return;
         }
 
-        // Login exitoso
+        // Successful login
         loginSuccess.value = true;
 
-        // Redirigir al dashboard con un pequeño retraso para mostrar el mensaje de éxito
+        // Redirect to dashboard with a small delay to show success message
         setTimeout(() => {
             router.push('/admin/dashboard');
         }, 1500);
 
     } catch (error: any) {
-        console.error("Error en handleLogin:", error);
-        errorMessage.value = error?.message || "Error inesperado. Inténtelo de nuevo.";
+        console.error("Error in handleLogin:", error);
+        errorMessage.value = error?.message || "Unexpected error. Please try again.";
     } finally {
         isSubmitting.value = false;
     }

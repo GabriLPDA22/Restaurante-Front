@@ -38,12 +38,14 @@ const generateStars = (count: number = 5) => {
           </p>
 
           <div class="chef-recommendation__actions">
-            <button class="chef-recommendation__btn chef-recommendation__btn--primary">
+            <router-link to="/reservation" class="chef-recommendation__btn chef-recommendation__btn--primary"
+              style="text-decoration: none;">
               Order Now
-            </button>
-            <button class="chef-recommendation__btn chef-recommendation__btn--secondary">
+            </router-link>
+            <router-link to="/cart" class="chef-recommendation__btn chef-recommendation__btn--secondary"
+              style="text-decoration: none;">
               View Details
-            </button>
+            </router-link>
           </div>
         </div>
 

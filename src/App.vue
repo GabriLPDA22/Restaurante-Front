@@ -42,7 +42,7 @@ const stopLoading = () => {
   // Pequeño retraso para una transición suave
   setTimeout(() => {
     isLoading.value = false;
-  }, 1500); // Tiempo suficiente para ver el contenido del loader
+  }, 1000); 
 };
 
 // Inicializar la aplicación
@@ -64,7 +64,7 @@ onMounted(async () => {
     isLoading.value = true;
     setTimeout(() => {
       stopLoading();
-    }, 2500);
+    }, 2000);
   } else {
     // Si no estamos en una página con datos pesados, asegurarnos de que el loader está oculto
     isLoading.value = false;
@@ -102,7 +102,7 @@ router.afterEach((to) => {
   if (dataLoadingRoutes.some(route => to.path.includes(route))) {
     setTimeout(() => {
       stopLoading();
-    }, 1000);
+    }, 2000);
   }
 });
 </script>

@@ -10,9 +10,8 @@
                 </svg>
             </div>
             <h1 class="error-code">401</h1>
-            <h2 class="error-title">Acceso Denegado</h2>
-            <p class="error-message">No tienes permiso para acceder a esta página. Esta área está restringida solo para
-                administradores.</p>
+            <h2 class="error-title">Access Denied</h2>
+            <p class="error-message">You do not have permission to access this page. This area is restricted to administrators only.</p>
             <div class="action-buttons">
                 <button @click="goBack" class="btn-back">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -20,7 +19,7 @@
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
-                    Volver
+                    Go Back
                 </button>
                 <button @click="goToLogin" class="btn-login">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -29,7 +28,7 @@
                         <polyline points="10 17 15 12 10 7"></polyline>
                         <line x1="15" y1="12" x2="3" y2="12"></line>
                     </svg>
-                    Iniciar Sesión
+                    Log In
                 </button>
             </div>
         </div>

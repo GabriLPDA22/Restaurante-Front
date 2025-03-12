@@ -2,7 +2,7 @@
   <footer class="footer">
     <div class="footer__top">
       <div class="footer__logo">
-        <router-link to="/" aria-label="Ir a la página de inicio">
+        <router-link to="/" aria-label="Go to homepage">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet"
             style="width:200px;">
             <text x="50%" y="50%" text-anchor="middle"
@@ -18,7 +18,7 @@
       </div>
 
 
-      <!-- Navegación (solo escritorio) -->
+      <!-- Navigation (desktop only) -->
       <nav class="footer__nav">
         <ul class="footer__nav-list">
           <li class="footer__nav-item">
@@ -42,28 +42,29 @@
         </ul>
       </nav>
 
-      <!-- Descripción -->
+      <!-- Description -->
       <p class="footer__description">
         Lorem ipsum dolor sit amet consectetur. Sagittis mattis mauris at condimentum arcu eget.
         Sed posuere cursus pharetra tortor eu purus rhoncus lectus. Enim ut ligula sit nec donec.
         Hendrerit in.
       </p>
 
-      <!-- Horarios -->
+      <!-- Hours -->
       <p class="footer__hours">
-        SUNDAY - THURSDAY: 11:30AM - 11PM <br />
-        FRIDAY & SATURDAY: 11:30AM - 12AM
+        MONDAY – SUNDAY: 9:00AM – 12PM
       </p>
 
-      <!-- Botones -->
+      <!-- Buttons -->
       <div class="footer__actions">
-        <button class="footer__button footer__button--reserve">Reserve Now</button>
+        <router-link to="/reservation" class="footer__button footer__button--reserve"
+          style="text-decoration: none;">Reserve
+          Now</router-link>
         <router-link to="/contact" class="footer__button footer__button--contact" style="text-decoration: none;">
           Contact Us
         </router-link>
       </div>
 
-      <!-- Redes sociales -->
+      <!-- Social media -->
       <div class="footer__social">
         <a href="https://www.facebook.com" class="footer__social-icon">
           <font-awesome-icon :icon="['fab', 'facebook']" />
@@ -74,7 +75,7 @@
       </div>
     </div>
 
-    <!-- Parte inferior (copyright) -->
+    <!-- Bottom part (copyright) -->
     <div class="footer__bottom">
       <p class="footer__copyright">
         COPYRIGHT 2025
