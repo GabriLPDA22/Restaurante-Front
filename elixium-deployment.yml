@@ -40,6 +40,6 @@ spec:
     spec:
       containers:
       - name: elixium
-        image: franvilla/front:latest
+        image: franvilla/front2:latest
         ports:
         - containerPort: 80
