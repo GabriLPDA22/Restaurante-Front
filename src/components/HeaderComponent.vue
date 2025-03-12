@@ -254,7 +254,7 @@
                 
                 <!-- ELIXIUM FOODS en una línea - FOODS sin animación -->
                 <text x="50%" y="60%" text-anchor="middle" class="header__logo-desktop-text-main" 
-                  fill="url(#movingGradient)" filter="url(#glowDesktop)" style="font-size: 40px;">
+                  fill="url(#movingGradient)" filter="url(#glowDesktop)" style="font-size: 60px;">
                   <tspan class="elixium-text">ELIXIUM FOODS</tspan>
                   <animate attributeName="text-shadow" values="0 0 5px #f3cc74;0 0 15px #d1a75f;0 0 5px #f3cc74" 
                     dur="3s" repeatCount="indefinite" />
@@ -287,7 +287,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { VBtn } from 'vuetify/components';
 import { useAuthStore } from '../stores/useAuthStore';
@@ -477,6 +477,10 @@ const handleLogout = () => {
 
 .header__logo-animation {
   transition: transform 0.3s ease;
+}
+
+.header__logo-animation:hover {
+  transform: scale(1.02);
 }
 
 .header__logo-svg {
@@ -709,6 +713,19 @@ const handleLogout = () => {
 .header__avatar-icon {
   margin-left: 0.25rem;
   color: #d1a75f;
+}
+
+.header__dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  width: 280px;
+  background: #fff;
+  border-radius: 10px;
+  border: #158d7f solid;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 100;
 }
 
 .header__dropdown-header {
@@ -1261,7 +1278,7 @@ const handleLogout = () => {
 /* Ajuste para pantallas más grandes */
 @media (min-width: 1200px) {
   .header__logo-svg-desktop {
-    width: 380px; /* Aún más grande en pantallas muy grandes */
+    width: 300px; /* Aún más grande en pantallas muy grandes */
   }
   
   .header__logo-desktop-text-main {
