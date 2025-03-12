@@ -56,7 +56,8 @@ onMounted(async () => {
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
-    '/about'
+    '/about',
+    '/'
   ];
 
   // SOLO mostrar el loader inicial si estamos en una página que carga datos
@@ -77,7 +78,8 @@ router.beforeEach((to, from, next) => {
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
-    '/about'
+    '/about',
+    '/'
   ];
 
   // Activamos el loader SOLAMENTE si vamos a una ruta que está en la lista
@@ -96,7 +98,8 @@ router.afterEach((to) => {
   const dataLoadingRoutes = [
     '/cart',
     '/reservation',
-    '/about'
+    '/about',
+    '/'
   ];
 
   if (dataLoadingRoutes.some(route => to.path.includes(route))) {
