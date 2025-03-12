@@ -5,11 +5,11 @@
                 <div class="header-content">
                     <h1>
                         <i class="fas fa-shopping-bag"></i>
-                        Mis Pedidos
+                        My Orders
                     </h1>
                     <div class="header-actions">
                         <div class="search-container">
-                            <input type="text" placeholder="Buscar pedido" v-model="searchTerm"
+                            <input type="text" placeholder="Search order" v-model="searchTerm"
                                 @input="buscarPedidos" />
                             <i class="fas fa-search"></i>
                         </div>
@@ -31,28 +31,28 @@
 
             <div v-if="cargando" class="pedidos-loading">
                 <div class="loading-spinner"></div>
-                <p>Cargando tus pedidos...</p>
+                <p>Loading your orders...</p>
             </div>
 
             <div v-else-if="error" class="error-container">
                 <i class="fas fa-exclamation-circle"></i>
                 <p>{{ error }}</p>
                 <button @click="cargarPedidos" class="btn-retry">
-                    Reintentar
+                    Retry
                     <i class="fas fa-redo"></i>
                 </button>
             </div>
 
             <div v-else-if="!pedidosFiltrados || pedidosFiltrados.length === 0" class="no-pedidos">
                 <i class="fas fa-search"></i>
-                <p v-if="searchTerm">No se encontraron pedidos que coincidan con tu búsqueda</p>
-                <p v-else>Aún no has realizado ningún pedido</p>
+                <p v-if="searchTerm">No orders found matching your search</p>
+                <p v-else>You haven't placed any orders yet</p>
                 <button @click="cargarPedidos" class="btn-retry margin-top">
-                    Recargar Pedidos
+                    Reload Orders
                     <i class="fas fa-redo"></i>
                 </button>
                 <button @click="depurarPedidos" class="btn-debug margin-top">
-                    Diagnosticar Problema
+                    Diagnose Problem
                     <i class="fas fa-bug"></i>
                 </button>
             </div>
@@ -62,29 +62,29 @@
                     class="pedido-item">
                     <div class="pedido-header">
                         <div class="pedido-info">
-                            <span class="pedido-numero">Pedido #{{ pedido.IdPedidos || 'Nuevo' }}</span>
+                            <span class="pedido-numero">Order #{{ pedido.IdPedidos || 'New' }}</span>
                             <span class="pedido-fecha">{{ formatearFecha(pedido.Fecha) }}</span>
                         </div>
-                        <span :class="`pedido-estado ${getEstadoClase(pedido.Estado || 'Preparando')}`">
-                            {{ pedido.Estado || 'Preparando' }}
+                        <span :class="`pedido-estado ${getEstadoClase(pedido.Estado || 'Preparing')}`">
+                            {{ pedido.Estado || 'Preparing' }}
                         </span>
                     </div>
 
                     <div class="pedido-detalle">
                         <div v-if="pedido.Items && pedido.Items.length > 0" class="productos-lista">
-                            <h3>Productos</h3>
+                            <h3>Products</h3>
                             <div v-for="(producto, index) in pedido.Items" :key="index" class="producto-item"
                                 @click="verDetalleProducto(producto)">
-                                <span class="producto-nombre">{{ producto.Nombre || `Producto ${producto.IdProducto}`
+                                <span class="producto-nombre">{{ producto.Nombre || `Product ${producto.IdProducto}`
                                     }}</span>
                                 <span class="producto-precio">{{ producto.Cantidad || 1 }} x {{
                                     formatearPrecio(producto.Precio || 0) }}</span>
                             </div>
                         </div>
                         <div v-else class="productos-lista">
-                            <h3>Productos</h3>
+                            <h3>Products</h3>
                             <div class="producto-item">
-                                <span class="producto-nombre">Información de productos no disponible</span>
+                                <span class="producto-nombre">Product information not available</span>
                             </div>
                         </div>
 
@@ -94,7 +94,7 @@
                                 <p class="total-monto">{{ formatearPrecio(pedido.Total || 0) }}</p>
                             </div>
                             <button class="btn-detalles" @click="verDetallePedido(pedido)">
-                                Ver Detalles
+                                View Details
                                 <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
@@ -103,11 +103,11 @@
             </div>
         </div>
 
-        <!-- Modal de Detalles del Pedido -->
+        <!-- Order Details Modal -->
         <div v-if="mostrarModal && pedidoSeleccionado" class="modal-overlay">
             <div class="modal-container">
                 <div class="modal-header">
-                    <h2>Detalles del Pedido #{{ pedidoSeleccionado.IdPedidos }}</h2>
+                    <h2>Order Details #{{ pedidoSeleccionado.IdPedidos }}</h2>
                     <button @click="cerrarModal" class="btn-cerrar">
                         <i class="fas fa-times"></i>
                     </button>
@@ -115,40 +115,40 @@
 
                 <div class="modal-content">
                     <div class="detalles-seccion">
-                        <h3>Información General</h3>
+                        <h3>General Information</h3>
                         <div class="info-grid">
                             <div class="info-item">
-                                <span class="info-label">Fecha:</span>
+                                <span class="info-label">Date:</span>
                                 <span class="info-value">{{ formatearFecha(pedidoSeleccionado.Fecha) }}</span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Estado:</span>
+                                <span class="info-label">Status:</span>
                                 <span
-                                    :class="`estado-badge ${getEstadoClase(pedidoSeleccionado.Estado || 'Preparando')}`">
-                                    {{ pedidoSeleccionado.Estado || 'Preparando' }}
+                                    :class="`estado-badge ${getEstadoClase(pedidoSeleccionado.Estado || 'Preparing')}`">
+                                    {{ pedidoSeleccionado.Estado || 'Preparing' }}
                                 </span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">ID de Pedido:</span>
+                                <span class="info-label">Order ID:</span>
                                 <span class="info-value">#{{ pedidoSeleccionado.IdPedidos }}</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="detalles-seccion">
-                        <h3>Productos</h3>
+                        <h3>Products</h3>
                         <table class="productos-tabla">
                             <thead>
                                 <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio unitario</th>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Unit price</th>
                                     <th>Subtotal</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(item, index) in pedidoSeleccionado.Items" :key="index">
-                                    <td>{{ item.Nombre || `Producto ${item.IdProducto}` }}</td>
+                                    <td>{{ item.Nombre || `Product ${item.IdProducto}` }}</td>
                                     <td>{{ item.Cantidad }}</td>
                                     <td>{{ formatearPrecio(item.Precio) }}</td>
                                     <td>{{ formatearPrecio(item.Cantidad * item.Precio) }}</td>
@@ -165,7 +165,7 @@
 
                     <div class="modal-actions">
                         <button class="btn-secundario" @click="cerrarModal">
-                            Cerrar
+                            Close
                         </button>
                     </div>
                 </div>
@@ -178,30 +178,30 @@
 import { ref, computed, onMounted } from 'vue';
 import { usePedidoStore, Pedido } from '../stores/usePedidoStore';
 
-// Estado local
+// Local state
 const searchTerm = ref('');
-const filtroSeleccionado = ref('Todos');
+const filtroSeleccionado = ref('All');
 const mostrarDropdown = ref(false);
-const estados = ['Todos', 'Entregado', 'En proceso', 'Preparando'];
+const estados = ['All', 'Delivered', 'In process', 'Preparing'];
 
-// Estado del modal
+// Modal state
 const pedidoSeleccionado = ref<Pedido | null>(null);
 const mostrarModal = ref(false);
 
-// Store de pedidos
+// Orders store
 const pedidoStore = usePedidoStore();
 
-// Acceder a las propiedades reactivas del store
+// Access reactive properties from the store
 const pedidos = computed(() => pedidoStore.pedidos);
 const cargando = computed(() => pedidoStore.cargando);
 const error = computed(() => pedidoStore.error);
 
-// Filtrar pedidos
+// Filter orders
 const pedidosFiltrados = computed<Pedido[]>(() => {
     if (!pedidos.value || !pedidos.value.length) return [];
 
     return pedidos.value.filter(pedido => {
-        // Verificar si el pedido es válido
+        // Check if the order is valid
         if (!pedido) return false;
 
         const idPedido = String(pedido.IdPedidos || '');
@@ -212,76 +212,76 @@ const pedidosFiltrados = computed<Pedido[]>(() => {
             idPedido.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
             productos.some(p => (p.Nombre || '').toLowerCase().includes(searchTerm.value.toLowerCase()));
 
-        const estadoPedido = pedido.Estado || 'Preparando';
+        const estadoPedido = pedido.Estado || 'Preparing';
         const matchEstado =
-            filtroSeleccionado.value === 'Todos' ||
+            filtroSeleccionado.value === 'All' ||
             estadoPedido === filtroSeleccionado.value;
 
         return matchSearch && matchEstado;
     });
 });
 
-// Función de depuración para diagnóstico
+// Debug function for diagnostics
 function depurarPedidos() {
-    console.log('=== DIAGNÓSTICO DE PEDIDOS ===');
-    console.log('Estado del store de pedidos:');
-    console.log('Pedidos cargados:', pedidos.value ? pedidos.value.length : 0);
+    console.log('=== ORDERS DIAGNOSTICS ===');
+    console.log('Order store state:');
+    console.log('Orders loaded:', pedidos.value ? pedidos.value.length : 0);
 
     if (pedidos.value && pedidos.value.length > 0) {
-        console.log('Primeros 2 pedidos:', JSON.stringify(pedidos.value.slice(0, 2), null, 2));
+        console.log('First 2 orders:', JSON.stringify(pedidos.value.slice(0, 2), null, 2));
 
-        // Verificar estructura de Items
+        // Check Items structure
         const primerPedido = pedidos.value[0];
-        console.log('Estructura del primer pedido:', Object.keys(primerPedido));
+        console.log('First order structure:', Object.keys(primerPedido));
 
         if (primerPedido.Items) {
-            console.log('¿Items es un array?', Array.isArray(primerPedido.Items));
-            console.log('Cantidad de Items:', primerPedido.Items.length);
+            console.log('Is Items an array?', Array.isArray(primerPedido.Items));
+            console.log('Items count:', primerPedido.Items.length);
 
             if (primerPedido.Items.length > 0) {
-                console.log('Estructura del primer Item:', Object.keys(primerPedido.Items[0]));
+                console.log('First Item structure:', Object.keys(primerPedido.Items[0]));
             }
         } else {
-            console.log('No se encontraron Items en el pedido');
+            console.log('No Items found in the order');
 
-            // Buscar propiedades que puedan contener los items
+            // Look for properties that may contain items
             const posiblesItems = Object.keys(primerPedido).filter(k =>
                 k.toLowerCase().includes('item') ||
-                k.toLowerCase().includes('detalle') ||
-                k.toLowerCase().includes('producto')
+                k.toLowerCase().includes('detail') ||
+                k.toLowerCase().includes('product')
             );
 
             if (posiblesItems.length > 0) {
-                console.log('Posibles propiedades que contienen items:', posiblesItems);
+                console.log('Possible properties containing items:', posiblesItems);
             }
         }
     } else {
-        console.log('No hay pedidos cargados en el store');
+        console.log('No orders loaded in the store');
     }
 
-    console.log('Pedidos filtrados:', pedidosFiltrados.value ? pedidosFiltrados.value.length : 0);
-    console.log('Estado de carga:', cargando.value);
+    console.log('Filtered orders:', pedidosFiltrados.value ? pedidosFiltrados.value.length : 0);
+    console.log('Loading state:', cargando.value);
     console.log('Error:', error.value);
     console.log('Debug info:', pedidoStore.debugInfo);
 
-    // Intenta recargar los pedidos
-    console.log('Intentando recargar pedidos...');
+    // Try to reload orders
+    console.log('Trying to reload orders...');
     cargarPedidos();
 }
 
-// Cargar pedidos al montar
+// Load orders on mount
 onMounted(async () => {
-    console.log('Cargando pedidos en OrderView');
+    console.log('Loading orders in OrderView');
     await cargarPedidos();
 
-    // Si no hay pedidos después de cargar, hacer diagnóstico automático
+    // If there are no orders after loading, run automatic diagnostics
     if (!pedidos.value || pedidos.value.length === 0) {
-        console.log('No se encontraron pedidos después de la carga inicial. Ejecutando diagnóstico...');
+        console.log('No orders found after initial load. Running diagnostics...');
         depurarPedidos();
     }
 });
 
-// Función para cargar pedidos con diagnóstico
+// Function to load orders with diagnostics
 async function cargarPedidos() {
     let intentos = 0;
     const maxIntentos = 2;
@@ -289,35 +289,35 @@ async function cargarPedidos() {
     while (intentos < maxIntentos) {
         try {
             const resultado = await pedidoStore.obtenerPedidosUsuario();
-            console.log(`Se cargaron ${resultado.length} pedidos en el intento ${intentos + 1}`);
+            console.log(`${resultado.length} orders loaded in attempt ${intentos + 1}`);
 
             if (resultado.length > 0) {
-                // Si tenemos pedidos, salir del bucle
+                // If we have orders, exit the loop
                 break;
             } else {
-                console.log(`No se encontraron pedidos en la respuesta (intento ${intentos + 1}/${maxIntentos})`);
+                console.log(`No orders found in response (attempt ${intentos + 1}/${maxIntentos})`);
                 intentos++;
 
                 if (intentos < maxIntentos) {
-                    // Esperar brevemente antes de reintentar
+                    // Wait briefly before retrying
                     await new Promise(resolve => setTimeout(resolve, 1000));
                 }
             }
         } catch (err) {
-            console.error(`Error al cargar pedidos (intento ${intentos + 1}/${maxIntentos}):`, err);
+            console.error(`Error loading orders (attempt ${intentos + 1}/${maxIntentos}):`, err);
             intentos++;
 
             if (intentos < maxIntentos) {
-                // Esperar antes de reintentar
+                // Wait before retrying
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
         }
     }
 }
 
-// Funciones para el modal
+// Functions for the modal
 function verDetallePedido(pedido: Pedido) {
-    console.log(`Ver detalles completos del pedido #${pedido.IdPedidos}`);
+    console.log(`View complete details of order #${pedido.IdPedidos}`);
     pedidoSeleccionado.value = pedido;
     mostrarModal.value = true;
 }
@@ -327,9 +327,9 @@ function cerrarModal() {
     pedidoSeleccionado.value = null;
 }
 
-// Funciones auxiliares
+// Helper functions
 function buscarPedidos() {
-    console.log(`Buscando: ${searchTerm.value}`);
+    console.log(`Searching: ${searchTerm.value}`);
 }
 
 function toggleDropdown() {
@@ -343,19 +343,19 @@ function seleccionarFiltro(estado: string) {
 
 function getEstadoClase(estado: string) {
     switch (estado) {
-        case 'Entregado': return 'estado-entregado';
-        case 'En proceso': return 'estado-proceso';
-        case 'Preparando': return 'estado-preparando';
+        case 'Delivered': return 'estado-entregado';
+        case 'In process': return 'estado-proceso';
+        case 'Preparing': return 'estado-preparando';
         default: return '';
     }
 }
 
 function verDetalleProducto(producto: any) {
-    console.log(`Detalles del producto: ${producto.Nombre || producto.IdProducto}`);
-    // Aquí podrías navegar a la vista de detalle del producto
+    console.log(`Product details: ${producto.Nombre || producto.IdProducto}`);
+    // Here you could navigate to the product detail view
 }
 
-// Usar funciones del store para formateo
+// Use store functions for formatting
 const formatearFecha = pedidoStore.formatearFecha;
 const formatearPrecio = pedidoStore.formatearPrecio;
 </script>

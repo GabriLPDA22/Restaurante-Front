@@ -4,7 +4,7 @@
             <div class="profile-header">
                 <h1>
                     <i class="fas fa-user-circle"></i>
-                    Mi Perfil
+                    My Profile
                 </h1>
             </div>
 
@@ -49,8 +49,8 @@
 
                 <!-- Botones de acción de edición (estaban mal ubicados) -->
                 <div v-if="estadoEdicion.info" class="edit-actions">
-                    <button class="btn-secondary" @click="desactivarEdicion('info')">Cancelar</button>
-                    <button class="btn-primary" @click="guardarInformacion">Guardar</button>
+                    <button class="btn-secondary" @click="desactivarEdicion('info')">Cancel</button>
+                    <button class="btn-primary" @click="guardarInformacion">Save</button>
                 </div>
 
                 <!-- Estado de debug (solo visible en desarrollo) -->
@@ -112,10 +112,10 @@ const formatearFecha = (fecha: string | undefined): string => {
 
 // Recargar datos de usuario (para debug)
 const recargarUsuario = async (): Promise<void> => {
-    mostrarNotificacion('Recargando datos del usuario...', 'info');
+    mostrarNotificacion('Reload info of User...', 'info');
     await authStore.loadUser();
     loadUserData();
-    mostrarNotificacion('Datos recargados', 'success');
+    mostrarNotificacion('Data reloaded', 'success');
 };
 
 // Al montar el componente, cargamos datos del user de la store
@@ -125,8 +125,8 @@ onMounted(async () => {
 
     // Log para debug
     if (isDevelopment) {
-        console.log('Datos del usuario cargados en el componente:', infoPersonal.value);
-        console.log('Usuario en la store:', authStore.user);
+        console.log('User data loaded in the component:', infoPersonal.value);
+        console.log('User in the store:', authStore.user);
     }
 });
 
@@ -161,15 +161,6 @@ const loadUserData = (): void => {
             }
         } else {
             infoPersonal.value.fechaNacimiento = '';
-        }
-
-        if (isDevelopment) {
-            console.log('Datos cargados:', {
-                nombre: infoPersonal.value.nombre,
-                email: infoPersonal.value.email,
-                telefono: infoPersonal.value.telefono,
-                fechaNacimiento: infoPersonal.value.fechaNacimiento
-            });
         }
     }
 };

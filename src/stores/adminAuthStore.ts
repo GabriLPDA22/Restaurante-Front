@@ -13,57 +13,57 @@ export const adminAuthStore = defineStore('adminAuth', () => {
       if (!nombre || !password) {
         return {
           success: false,
-          message: "Los campos usuario y contraseña son obligatorios"
+          message: "Missing credentials"
         };
       }
 
       const { data: adminList } = await axios.get(`${API_URL}/admins`);
-      
+
       const foundAdmin = adminList.find((adm) => adm.nombre === nombre);
-      
+
       if (!foundAdmin) {
         return {
           success: false,
-          message: "Usuario no encontrado"
+          message: "User not found"
         };
       }
-      
+
       if (foundAdmin.contraseña !== password) {
         return {
           success: false,
-          message: "Contraseña incorrecta"
+          message: "Incorrect password"
         };
       }
-      
+
       admin.value = {
         id: foundAdmin.id,
         nombre: foundAdmin.nombre
       };
-      
+
       token.value = `demo-token-${Date.now()}`;
 
       localStorage.setItem("admin", JSON.stringify(admin.value));
       localStorage.setItem("adminToken", token.value);
 
-      console.log("Login exitoso:", admin.value);
+      console.log("Successful login:", admin.value);
 
       return {
         success: true,
-        message: "Login exitoso"
+        message: "Successful login"
       };
     } catch (error) {
-      console.error("Error en login:", error);
-      
-      let errorMessage = "Error al iniciar sesión";
-      
+      console.error("Login error:", error);
+
+      let errorMessage = "Error logging in";
+
       if (error.response) {
         if (error.response.status === 404) {
-          errorMessage = "Servicio no disponible";
+          errorMessage = "Service unavailable";
         } else {
-          errorMessage = error.response.data?.message || "Error del servidor";
+          errorMessage = error.response.data?.message || "Server error";
         }
       }
-      
+
       return {
         success: false,
         message: errorMessage,
@@ -76,15 +76,15 @@ export const adminAuthStore = defineStore('adminAuth', () => {
     try {
       const storedAdmin = localStorage.getItem("admin");
       const storedToken = localStorage.getItem("adminToken");
-      
+
       if (storedAdmin && storedToken) {
         admin.value = JSON.parse(storedAdmin);
         token.value = storedToken;
-        console.log("Sesión de administrador cargada:", admin.value);
+        console.log("Loaded admin session:", admin.value);
         return true;
       }
     } catch (e) {
-      console.error("Error al cargar datos de administrador:", e);
+      console.error("Error loading admin data:", e);
       localStorage.removeItem("admin");
       localStorage.removeItem("adminToken");
     }
@@ -96,12 +96,12 @@ export const adminAuthStore = defineStore('adminAuth', () => {
     token.value = null;
     localStorage.removeItem("admin");
     localStorage.removeItem("adminToken");
-    console.log("Sesión de administrador cerrada");
+    console.log("Admin session closed");
   };
 
   const isAuthenticated = () => {
     const authenticated = !!admin.value && !!token.value;
-    console.log("Estado de autenticación:", authenticated);
+    console.log("Authentication status:", authenticated);
     return authenticated;
   };
 

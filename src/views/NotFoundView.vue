@@ -2,14 +2,14 @@
     <div class="not-found-container">
         <div class="not-found-content">
             <div class="error-code">404</div>
-            <h1>Página no encontrada</h1>
-            <p>Lo sentimos, la página que estás buscando no existe.</p>
+            <h1>Page Not Found</h1>
+            <p>Sorry, the page you are looking for does not exist.</p>
             <div class="error-actions">
                 <router-link to="/" class="btn-home">
-                    Volver al Inicio
+                    Go to Home
                 </router-link>
                 <button @click="goBack" class="btn-back">
-                    Ir Atrás
+                    Go Back
                 </button>
             </div>
         </div>
