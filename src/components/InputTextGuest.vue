@@ -6,16 +6,16 @@
             <div class="input-guest__selector" :class="{ 'disabled': !hasValidDateAndTime }">
                 <button type="button" @click="openModal" class="input-guest__button"
                     :class="{ 'disabled': !hasValidDateAndTime }" :disabled="!hasValidDateAndTime">
-                    <span class="button-text">Seleccionar Mesa</span>
+                    <span class="button-text">Select Table</span>
                     <span class="button-icon">›</span>
                 </button>
             </div>
             <div v-if="selectedTables.length" class="input-guest__selected-tables">
-                <span class="selected-label">Mesas:</span>
+                <span class="selected-label">Tables:</span>
                 <span class="selected-numbers">{{ selectedTables.join(', ') }}</span>
             </div>
             <div v-if="!hasValidDateAndTime" class="input-guest__helper-text">
-                Selecciona fecha y hora para continuar
+                Select hour and date to continue
             </div>
         </div>
 
@@ -23,26 +23,26 @@
         <div v-if="isModalOpen" class="input-guest__modal" @wheel.prevent @touchmove.prevent>
             <div class="input-guest__modal-content">
                 <span class="input-guest__close" @click="closeModal">&times;</span>
-                <h2>Selecciona una Mesa</h2>
+                <h2>Select Table</h2>
 
                 <!-- Mensaje indicando que debe seleccionar fecha y hora primero -->
                 <div v-if="!hasValidDateAndTime" class="input-guest__warning">
-                    Por favor, selecciona una fecha y hora de reserva primero para ver las mesas disponibles.
+                    Please select an hour and reservation date first to see available tables.
                 </div>
 
                 <!-- Leyenda de disponibilidad -->
                 <div v-else class="input-guest__availability-legend">
                     <div class="legend-item">
                         <span class="legend-color available"></span>
-                        <span>Disponible</span>
+                        <span>Available</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color occupied"></span>
-                        <span>Ocupada</span>
+                        <span>Occupied</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color selected"></span>
-                        <span>Seleccionada</span>
+                        <span>Selected</span>
                     </div>
                 </div>
 
@@ -60,11 +60,10 @@
 
                 <!-- Mensajes de información -->
                 <div v-if="hasValidDateAndTime" class="input-guest__info">
-                    <p v-if="isLoadingReservations">Cargando información de disponibilidad...</p>
+                    <p v-if="isLoadingReservations">Loading disponibility info...</p>
                     <p v-else-if="loadingError" class="error-message">{{ loadingError }}</p>
-                    <p v-else-if="occupiedTables.length === 0" class="success-message">¡Todas las mesas están
-                        disponibles!</p>
-                    <p v-else>Las mesas marcadas en rojo no están disponibles para la hora seleccionada.</p>
+                    <p v-else-if="occupiedTables.length === 0" class="success-message">All tables are available!</p>
+                    <p v-else>The tables marked red arent available for the selected date and hour</p>
                 </div>
             </div>
         </div>

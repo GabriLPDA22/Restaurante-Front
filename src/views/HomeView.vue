@@ -13,7 +13,7 @@ const menuItems = [
  ];
 
 const chefSpecial = {
-  title: "chef",
+  title: "Risotto ai Funghi",
   description:
     "Creamy Arborio rice infused with a medley of wild mushrooms, Parmesan cheese, and a hint of truffle oil. This exquisite dish promises a symphony of flavors, meticulously crafted to elevate your dining experience. Immerse yourself in the taste of Italy, one delightful spoonful at a time.",
   price: "$24",

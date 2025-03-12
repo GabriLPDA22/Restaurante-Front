@@ -21,7 +21,7 @@
                     </div>
                 </div>
 
-                <InputTextGuest v-model="form.selectedTables" label="Selecciona Mesa" required />
+                <InputTextGuest v-model="form.selectedTables" label="Select Table" required />
                 <span v-if="errors.selectedTables" class="reservation__error">
                     {{ errors.selectedTables }}
                 </span>
