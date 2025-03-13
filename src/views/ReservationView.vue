@@ -117,7 +117,7 @@ watch(form, (newVal) => {
     padding: 2rem;
 
     @media (min-width: 768px) {
-        background: url('/public/orders.png') center center / cover no-repeat;
+        background: url('../assets/ordders.png') center center / cover no-repeat;
         padding: 0;
 
         .reservation {

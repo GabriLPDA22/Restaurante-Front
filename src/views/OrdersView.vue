@@ -673,7 +673,24 @@ $font-secondary: 'Montserrat', sans-serif;
                         font-weight: 600;
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
-                        color: #10B981; 
+
+                        &.estado-entregado {
+                            background-color: rgba(16, 185, 129, 0.1);
+                            color: #10B981;
+                            border: 1px solid rgba(16, 185, 129, 0.3);
+                        }
+
+                        &.estado-proceso {
+                            background-color: rgba(245, 158, 11, 0.1);
+                            color: #F59E0B;
+                            border: 1px solid rgba(245, 158, 11, 0.3);
+                        }
+
+                        &.estado-preparando {
+                            background-color: rgba(59, 130, 246, 0.1);
+                            color: #3B82F6;
+                            border: 1px solid rgba(59, 130, 246, 0.3);
+                        }
                     }
                 }
 

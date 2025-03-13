@@ -146,7 +146,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import googleIcon from '/public/google.png';  // tu icono de Google
+import googleIcon from '@/assets/google.png';  // tu icono de Google
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useGoogleAuthStore } from '@/stores/useGoogleAuthStore';
 

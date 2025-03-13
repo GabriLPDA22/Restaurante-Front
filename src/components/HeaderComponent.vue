@@ -78,6 +78,7 @@
                 </router-link>
               </div>
               <v-btn @click="handleLogout" elevation="2" class="header__logout-btn">
+                <font-awesome-icon :icon="['fas', 'sign-out-alt']" class="header__logout-icon" />
                 Cerrar Sesión
               </v-btn>
             </div>
@@ -188,6 +189,7 @@
                     </router-link>
                   </div>
                   <v-btn @click="handleLogout" elevation="2" class="header__logout-btn">
+                    <font-awesome-icon :icon="['fas', 'sign-out-alt']" class="header__logout-icon" />
                     Cerrar Sesión
                   </v-btn>
                 </div>
