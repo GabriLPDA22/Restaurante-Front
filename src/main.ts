@@ -17,9 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faInstagram, faFacebook } from '@fortawesome/free-brands-svg-icons';
 import {
   faSearch, faHeart, faShoppingCart, faUser,
-  faBell, faStar, faTicket,
-  faChevronDown,
-  faReceipt
+  faBell, faStar, faTicket
 } from '@fortawesome/free-solid-svg-icons';
 
 // Google Login
@@ -30,7 +28,7 @@ config.familyDefault = "classic";
 config.styleDefault = "duotone";
 library.add(
   faInstagram, faFacebook, faSearch, faHeart,
-  faShoppingCart, faUser, faBell, faStar, faTicket, faChevronDown, faReceipt
+  faShoppingCart, faUser, faBell, faStar, faTicket
 );
 
 // Crear y configurar Pinia ANTES de cualquier uso

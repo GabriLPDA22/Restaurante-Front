@@ -11,7 +11,7 @@
     <!-- About Us Section -->
     <div class="about__container">
       <div class="about__image">
-        <img src="/public/chef-special.png" class="chef" alt="Chef presenting" />
+        <img src="../assets/chef-special.png" class="chef" alt="Chef presenting" />
         <div class="about__image-accent"></div>
       </div>
       <div class="about__text">
@@ -77,7 +77,7 @@
           </div>
         </div>
         <div class="mission__image">
-          <img src="/public/OurMission.jpeg" alt="Gourmet dish" />
+          <img src="../assets/OurMission.jpeg" alt="Gourmet dish" />
           <div class="mission__image-accent"></div>
         </div>
       </div>
@@ -117,7 +117,7 @@
     <div class="chef-spotlight">
       <div class="chef-spotlight__container">
         <div class="chef-spotlight__image">
-          <img src="/public/chef-special.png" alt="Head Chef" />
+          <img src="../assets/chef-special.png" alt="Head Chef" />
         </div>
         <div class="chef-spotlight__text">
           <div class="section-heading">
@@ -224,7 +224,7 @@ $body-font: 'Montserrat', sans-serif;
 // Hero Section
 .about__hero {
   height: 60vh;
-  background-image: url('/public/OurMission.jpeg');
+  background-image: url('../assets/OurMission.jpeg');
   background-size: cover;
   background-position: center;
   position: relative;
@@ -591,7 +591,7 @@ $body-font: 'Montserrat', sans-serif;
 
 // Call to Action Section
 .cta-section {
-  background-image: url('/public/OurMission.jpeg');
+  background-image: url('../assets/OurMission.jpeg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

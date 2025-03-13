@@ -72,7 +72,7 @@
 
 <script lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, defineComponent } from 'vue';
-import tableIcon from '/public/svg/table.svg';
+import tableIcon from '../assets/svg/table.svg';
 import { useReservationStore } from '@/stores/reservationStore'; // Ruta corregida
 
 export default defineComponent({
@@ -531,7 +531,7 @@ export default defineComponent({
     border: 2px solid #e0e0e0;
     border-radius: 12px;
     overflow: hidden;
-    background: url('/public/restaurant.jpg') no-repeat center/cover;
+    background: url('@/assets/restaurant.jpg') no-repeat center/cover;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
