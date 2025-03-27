@@ -12,12 +12,13 @@ import CheckoutView from '@/views/CheckoutView.vue';
 import ThanksOrderView from '@/views/ThanksOrderView.vue';
 import ApiTestView from '@/views/ApiTestView.vue';
 import ProfileView from '@/views/ProfileView.vue';
-import ApiUserView from '@/views/ApiUserTest.vue';
-import ProductosComentarios from '@/components/ProductosComentarios.vue';
+import ApiUserView from '@/views/ApiUserTest.vue'
 import LoginAdminView from '@/views/LoginAdminView.vue';
 import AdminDashboardView from '@/views/AdminDashboardView.vue';
 import Unauthorized401View from '@/views/Unauthorized401View.vue';
+import FavoritesView from '@/views/FavoritesView.vue';
 import { adminAuthStore } from '@/stores/adminAuthStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
@@ -36,7 +37,11 @@ const routes = [
   { path: '/api-test', name: 'api-test', component: ApiTestView },
   { path: '/api-user', name: 'api-user', component: ApiUserView },
   { path: '/admin', name: 'login-admin', component: LoginAdminView },
-  { path: '/productos-comentarios', name: 'productos-comentarios', component: ProductosComentarios },
+  {
+    path: '/favorites',
+    name: 'favorites',
+    component: FavoritesView,
+  },
   {
     path: '/admin/dashboard',
     name: 'admin-dashboard',

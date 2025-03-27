@@ -28,7 +28,17 @@
           </div>
 
           <div class="product-card__details">
-            <h3 class="product-card__name" style="color: #2b7a78;">{{ product.nombre }}</h3>
+            <div class="product-card__header">
+              <h3 class="product-card__name" style="color: #2b7a78;">{{ product.nombre }}</h3>
+              <button class="favorite-button" @click="toggleFavorite(product)"
+                :class="{ 'is-favorite': isFavorite(product.id) }">
+                <!-- Icono SVG de corazón en lugar de Font Awesome -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="20" height="20">
+                  <path
+                    d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z" />
+                </svg>
+              </button>
+            </div>
             <div class="product-card__rating">★★★★★</div>
             <p class="product-card__description">{{ product.descripcion }}</p>
 
@@ -46,7 +56,8 @@
     <!-- Redesigned Cart Float Button -->
     <div class="cart-float-button" @click="toggleCart">
       <div class="cart-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon__svg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon__svg">
           <circle cx="9" cy="21" r="1"></circle>
           <circle cx="20" cy="21" r="1"></circle>
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -97,6 +108,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface Product {
   id: number;
@@ -113,11 +125,13 @@ interface CartItem extends Product {
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 const products = ref<Product[]>([])
 const cart = ref<CartItem[]>([])
 const searchQuery = ref('')
 const selectedCategory = ref('Todos')
 const cartVisible = ref(false);
+const favorites = ref<number[]>([]);
 
 // Mapeo de categorías del home a las categorías exactas de la BBDD
 const categoryMapping = {
@@ -253,7 +267,7 @@ watch(() => products.value.length, (newLength) => {
 });
 
 const fetchProducts = async () => {
-
+  try {
     const response = await fetch('http://localhost:5021/api/Productos', {
       method: 'GET',
       headers: {
@@ -267,7 +281,14 @@ const fetchProducts = async () => {
 
     products.value = await response.json();
     console.log("Products loaded:", products.value.length);
-  } 
+
+    // Cargar favoritos después de cargar productos
+    loadFavorites();
+  } catch (error) {
+    console.error('Error al cargar productos:', error);
+  }
+}
+
 // Función para verificar y aplicar la categoría desde la URL después de cargar productos
 const checkCategoryFromQuery = () => {
   const categoryParam = route.query.category;
@@ -315,6 +336,194 @@ const checkCategoryFromQuery = () => {
   }
 }
 
+// Comprobar si un producto está en favoritos
+const isFavorite = (productId) => {
+  return favorites.value.includes(productId);
+};
+
+// Depurar información del usuario
+const logUserInfo = () => {
+  console.log("===== INFORMACIÓN DEL USUARIO =====");
+  console.log("authStore existe:", !!authStore);
+  console.log("authStore.user:", authStore.user);
+  console.log("authStore.isAuthenticated:", authStore.isAuthenticated);
+  
+  if (authStore.user) {
+    console.log("UserID:", authStore.user.UserID);
+    console.log("Email:", authStore.user.Email);
+    console.log("Nombre:", authStore.user.Nombre);
+    console.log("Valores disponibles:", Object.keys(authStore.user));
+  }
+  console.log("===================================");
+};
+
+// Función para obtener el ID del usuario actual
+const getCurrentUserId = () => {
+  logUserInfo();
+  
+  // Intentamos diferentes propiedades posibles para el ID de usuario
+  if (authStore.user) {
+    // Probar diferentes nombres de propiedades para el ID
+    const possibleIds = ['UserID', 'userId', 'userID', 'id', 'Id', 'ID'];
+    
+    for (const prop of possibleIds) {
+      if (authStore.user[prop] !== undefined) {
+        console.log(`Encontrado ID de usuario en propiedad: ${prop} = ${authStore.user[prop]}`);
+        return authStore.user[prop];
+      }
+    }
+    
+    // Si no se encontró por nombre específico, buscar cualquier propiedad que contenga 'id'
+    for (const key in authStore.user) {
+      if (key.toLowerCase().includes('id') && typeof authStore.user[key] === 'number') {
+        console.log(`Encontrado posible ID de usuario en propiedad: ${key} = ${authStore.user[key]}`);
+        return authStore.user[key];
+      }
+    }
+    
+    // Si todo falla, imprimir todo el objeto
+    console.log("No se encontró ID de usuario. Objeto completo:", JSON.stringify(authStore.user));
+  }
+  
+  console.error("No se pudo determinar el ID del usuario");
+  return null;
+};
+
+// Función para cargar favoritos desde la API
+const loadFavorites = async () => {
+  try {
+    const userId = getCurrentUserId();
+    
+    if (!userId) {
+      console.error("No se pudo obtener el ID del usuario para cargar favoritos");
+      return;
+    }
+    
+    console.log(`Cargando favoritos para usuario ID: ${userId}`);
+    
+    const response = await fetch(`http://localhost:5021/api/Favoritos/usuario/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    // Loguear la respuesta completa para depuración
+    console.log(`Respuesta de la API (status ${response.status}):`, response);
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Datos recibidos de la API:", data);
+      
+      if (Array.isArray(data)) {
+        favorites.value = data.map(fav => fav.productoId);
+        console.log("Favoritos cargados:", favorites.value);
+      } else {
+        console.error("Respuesta inesperada de la API:", data);
+      }
+    } else {
+      const errorText = await response.text();
+      console.error(`Error ${response.status} al cargar favoritos:`, errorText);
+      
+      // Si la API falla, podríamos cargar desde localStorage como respaldo
+      loadLocalFavorites();
+    }
+  } catch (error) {
+    console.error('Error al cargar favoritos:', error);
+    
+    // Si hay un error de conexión, podríamos cargar desde localStorage como respaldo
+    loadLocalFavorites();
+  }
+};
+
+// Función para añadir/quitar un producto de favoritos
+const toggleFavorite = async (product) => {
+  const userId = getCurrentUserId();
+  
+  if (!userId) {
+    console.error("No se pudo obtener el ID del usuario para toggle de favorito");
+    alert('Para añadir productos a favoritos, inicia sesión primero');
+    return;
+  }
+  
+  console.log(`Toggle favorito para usuario ID: ${userId}, producto ID: ${product.id}`);
+  
+  try {
+    const url = `http://localhost:5021/api/Favoritos/usuario/${userId}/producto/${product.id}/toggle`;
+    console.log("URL de la solicitud:", url);
+    
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log(`Respuesta de la API (status ${response.status})`, response);
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Respuesta del servidor:", data);
+      
+      if (data.isFavorito) {
+        if (!favorites.value.includes(product.id)) {
+          favorites.value.push(product.id);
+        }
+        console.log(`Producto ${product.nombre} añadido a favoritos`);
+      } else {
+        favorites.value = favorites.value.filter(id => id !== product.id);
+        console.log(`Producto ${product.nombre} eliminado de favoritos`);
+      }
+      
+      // También actualizamos localStorage como respaldo
+      saveLocalFavorites();
+    } else {
+      const errorText = await response.text();
+      console.error(`Error ${response.status} al modificar favorito:`, errorText);
+      
+      // Si la API falla, realizamos el cambio localmente
+      toggleLocalFavorite(product);
+    }
+  } catch (error) {
+    console.error('Error al modificar favorito:', error);
+    
+    // Si hay un error de conexión, realizamos el cambio localmente
+    toggleLocalFavorite(product);
+  }
+};
+
+// Funciones de respaldo usando localStorage
+const loadLocalFavorites = () => {
+  try {
+    const savedFavorites = localStorage.getItem('local_favorites');
+    if (savedFavorites) {
+      favorites.value = JSON.parse(savedFavorites);
+      console.log("Favoritos cargados desde localStorage:", favorites.value);
+    }
+  } catch (e) {
+    console.error('Error al cargar favoritos desde localStorage:', e);
+    favorites.value = [];
+  }
+};
+
+const saveLocalFavorites = () => {
+  localStorage.setItem('local_favorites', JSON.stringify(favorites.value));
+};
+
+const toggleLocalFavorite = (product) => {
+  const index = favorites.value.indexOf(product.id);
+  
+  if (index === -1) {
+    favorites.value.push(product.id);
+    console.log(`Producto ${product.nombre} añadido a favoritos localmente`);
+  } else {
+    favorites.value.splice(index, 1);
+    console.log(`Producto ${product.nombre} eliminado de favoritos localmente`);
+  }
+  
+  saveLocalFavorites();
+};
+
 // Cargar carrito guardado del localStorage
 const loadCart = () => {
   const savedCart = localStorage.getItem('cart');
@@ -336,6 +545,12 @@ onMounted(() => {
   console.log("Component mounted, fetching products");
   fetchProducts();
   loadCart();
+  
+  // Depurar información del usuario
+  logUserInfo();
+  
+  // Intentar cargar favoritos
+  loadFavorites();
 })
 
 const filteredProducts = computed(() => {
@@ -356,7 +571,7 @@ const totalCartItems = computed(() =>
   cart.value.reduce((total, item) => total + item.quantity, 0)
 )
 
-const addToCart = (product: Product) => {
+const addToCart = (product) => {
   const existingItem = cart.value.find(item => item.id === product.id);
 
   if (existingItem) {
@@ -377,7 +592,7 @@ const addToCart = (product: Product) => {
   }
 }
 
-const removeFromCart = (productId: number) => {
+const removeFromCart = (productId) => {
   const index = cart.value.findIndex(item => item.id === productId);
   if (index !== -1) {
     cart.value.splice(index, 1);
@@ -385,7 +600,7 @@ const removeFromCart = (productId: number) => {
   }
 }
 
-const updateQuantity = (productId: number, newQuantity: number) => {
+const updateQuantity = (productId, newQuantity) => {
   const item = cart.value.find(item => item.id === productId);
 
   if (item) {
@@ -406,7 +621,6 @@ const toggleCart = () => {
   cartVisible.value = !cartVisible.value;
 }
 
-
 const irAlCheckout = () => {
   saveCart();
   router.push('/checkout');
@@ -420,6 +634,7 @@ const irAlCheckout = () => {
   --accent-color: #FFC107;
   --text-dark: #17252A;
   --white: #FFFFFF;
+  --heart-color: #ff6b6b;
 }
 
 * {
@@ -476,9 +691,10 @@ const irAlCheckout = () => {
     border: none;
     color: white;
     border-radius: 50px;
-    background: rgb(255 , 255 , 255, 0.4);
+    background: rgb(255, 255, 255, 0.4);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
+
   &__input::placeholder {
     color: white;
   }
@@ -535,9 +751,16 @@ const irAlCheckout = () => {
     padding: 1rem;
   }
 
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+
   &__name {
     font-size: 1rem;
-    margin-bottom: 0.5rem;
+    margin: 0;
   }
 
   &__rating {
@@ -575,6 +798,32 @@ const irAlCheckout = () => {
   }
 }
 
+/* Estilos para el botón de favoritos */
+.favorite-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 5px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+
+  &.is-favorite svg path {
+    fill: #ff6b6b;
+  }
+
+  &:not(.is-favorite) svg path {
+    fill: #ccc;
+  }
+
+  svg {
+    vertical-align: middle;
+  }
+}
+
 /* Redesigned Cart Float Button */
 .cart-float-button {
   position: fixed;
@@ -591,13 +840,13 @@ const irAlCheckout = () => {
   transition: all 0.3s ease;
   color: white;
   min-width: 60px;
-  
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
     background-color: #2B7A78;
   }
-  
+
   &--pulse {
     animation: pulse 1s 1;
   }
@@ -608,7 +857,7 @@ const irAlCheckout = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &__svg {
     color: white;
     stroke-width: 2px;
@@ -642,9 +891,11 @@ const irAlCheckout = () => {
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
   }
@@ -652,17 +903,17 @@ const irAlCheckout = () => {
 
 .small-cart-preview {
   position: fixed;
-  bottom: 90px; 
+  bottom: 90px;
   right: 20px;
   max-width: 500px;
-  z-index: 999; 
+  z-index: 999;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   animation: slideUp 0.3s ease-out;
   display: flex;
   flex-direction: column;
-  max-height: calc(80vh - 90px); 
+  max-height: calc(80vh - 90px);
 
   &__header {
     display: flex;
@@ -710,7 +961,7 @@ const irAlCheckout = () => {
       margin-bottom: 0.75rem;
       padding-bottom: 0.75rem;
       border-bottom: 1px solid #eee;
-      gap:10px;
+      gap: 10px;
 
       &:last-child {
         margin-bottom: 0;
@@ -790,7 +1041,7 @@ const irAlCheckout = () => {
     background: var(--primary-color);
     padding: 0.85rem;
     border-radius: 8px;
-    margin:10px;
+    margin: 10px;
     cursor: pointer;
     transition: all 0.2s;
     font-weight: bold;
@@ -847,17 +1098,17 @@ const irAlCheckout = () => {
   .small-cart-preview {
     width: calc(100% - 2rem);
     margin: 0 1rem;
-    bottom: 80px; 
+    bottom: 80px;
 
     &__content {
-      max-height: 35vh; 
+      max-height: 35vh;
     }
   }
-  
+
   .cart-float-button {
     width: calc(100% - 40px);
     justify-content: space-between;
-    
+
     .cart-float-total {
       font-size: 1.1rem;
     }
